@@ -60,8 +60,11 @@ typings/
 # next.js build output
 .next
 
-# build files
+# parcel build files
 dist
 
 # parcel cache
 .cache
+
+# VuePress build files
+.vuepress/dist
