@@ -1,0 +1,33 @@
+{
+  "name": "vue-a11y-utils",
+  "version": "0.0.1",
+  "description": "Utilities for accessibility (a11y) in Vue.js",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jinjiang/vue-a11y-utils.git"
+  },
+  "keywords": [
+    "a11y",
+    "aria",
+    "vue",
+    "vue.js"
+  ],
+  "author": "Jinjiang <zhaojinjiang@me.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Jinjiang/vue-a11y-utils/issues"
+  },
+  "homepage": "https://github.com/Jinjiang/vue-a11y-utils#readme",
+  "devDependencies": {
+    "@vue/test-utils": "^1.0.0-beta.25",
+    "babel-jest": "^23.6.0",
+    "babel-preset-env": "^1.7.0",
+    "jest": "^23.6.0",
+    "vue": "^2.5.17",
+    "vue-template-compiler": "^2.5.17"
+  }
+}
