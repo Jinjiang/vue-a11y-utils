@@ -1,5 +1,5 @@
-import Vue from 'vue';
-import { mount } from '@vue/test-utils';
+import Vue, { Component } from 'vue';
+import { mount, Wrapper } from '@vue/test-utils';
 
 import VueA11y from './';
 
@@ -11,7 +11,7 @@ describe('foo', () => {
 
 describe('Counter', () => {
   // Now mount the component and you have the wrapper
-  const Counter = Vue.extend({
+  const Counter: Component = Vue.extend({
     template: `
       <div>
         <span class="count">0</span>
@@ -24,12 +24,12 @@ describe('Counter', () => {
       };
     },
     methods: {
-      increment() {
+      increment(): void {
         this.count++;
       }
     }
   });
-  const wrapper = mount(Counter);
+  const wrapper: Wrapper<Vue> = mount(Counter);
 
   it('renders the correct markup', () => {
     expect(wrapper.html()).toContain('<span class="count">0</span>');
