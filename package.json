@@ -8,7 +8,7 @@
     "build": "parcel build index.js -d dist -o vue-a11y.js",
     "docs": "vuepress dev",
     "docs:build": "vuepress build",
-    "lint": "prettier --write ./*.{js,json,css,md.ts.vue}",
+    "lint": "prettier --write *.{js,json,css,md,ts,vue}",
     "test": "jest"
   },
   "repository": {
