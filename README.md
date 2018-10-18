@@ -36,10 +36,6 @@ First you can put all `aria-*` attributes in an object. Second these a11y attrib
 
 * default slot: the element you would put these a11y attributes on.
 
-::: tip
-It will automatically remove all `aria-*` attributes (even already exist on the default slot) if the `role` is set to `"none"` or `"appearance"`.
-:::
-
 ### Examples
 
 ``` vue
@@ -113,52 +109,6 @@ or:
     <VueAria :aria="aria">
       <button>WAI-ARIA Quick Links</button>
     </VueAria>
-  </VueAria>
-</template>
-```
-
-When you set `"none"` or `"appearance"` to `role` prop. It will finally remove all `aria-*` attributes on the default slot element. For example:
-
-``` vue
-<template>
-  <VueAria role="none" :aria="otherAriaFromSomewhereElse">
-    <VueAria :aria="ariaProps">
-      <VueAria :aria="ariaData">
-        <button role="menubutton">WAI-ARIA Quick Links</button>
-      </VueAria>
-    </VueAria>
-  </VueAria>
-</template>
-```
-
-will be the same to:
-
-``` vue
-<template>
-  <button>WAI-ARIA Quick Links</button>
-</template>
-```
-
-And:
-
-``` vue
-<template>
-  <VueAria role="listitem" :aria="otherAriaFromSomewhereElse">
-    <VueAria role="none" :aria="ariaProps">
-      <VueAria :aria="ariaData">
-        <button role="menubutton">WAI-ARIA Quick Links</button>
-      </VueAria>
-    </VueAria>
-  </VueAria>
-</template>
-```
-
-will be the same to:
-
-``` vue
-<template>
-  <VueAria role="listitem" :aria="otherAriaFromSomewhereElse">
-    <button>WAI-ARIA Quick Links</button>
   </VueAria>
 </template>
 ```

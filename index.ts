@@ -19,26 +19,11 @@ export const VueAria = Vue.extend({
       if (role) {
         attrs.role = role;
       }
-      const isAppearance: boolean = attrs.role === "none" || attrs.role === "appearance";
-      if (isAppearance) {
-        clearAriaAttrs(attrs);
-      } else {
-        mergeAriaAttrs(attrs, aria);
-      }
+      mergeAriaAttrs(attrs, aria);
     }
     return rootVNode;
   }
 });
-
-function clearAriaAttrs(attrs: VNodeData["attrs"]): void {
-  if (attrs) {
-    for (const name in attrs) {
-      if (name.match(/^aria-.+/)) {
-        delete attrs[name];
-      }
-    }
-  }
-}
 
 function mergeAriaAttrs(attrs: VNodeData["attrs"], aria: any): void {
   if (attrs) {
