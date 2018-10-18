@@ -31,12 +31,20 @@ First you can put all `aria-*` attributes in an object. Second these a11y attrib
 
 * `role`: `string`
 * `aria`: `Array` or `Object`
+* `tabindex`: `number`
+
+::: tip
+When you pass `"none"` or `"appearance"` value into `role` prop but without a `tabindex` prop. The `tabindex` attribute on the root element will finally be `""`.
+:::
 
 #### slots
 
 * default slot: the element you would put these a11y attributes on.
 
 ### Examples
+
+
+#### For Props `role` And `aria`
 
 ``` vue
 <template>
@@ -109,6 +117,41 @@ or:
     <VueAria :aria="aria">
       <button>WAI-ARIA Quick Links</button>
     </VueAria>
+  </VueAria>
+</template>
+```
+
+#### For Prop `tabindex`
+
+If you want to make a ARIA widget focusable which is just a `<div>`. You should give it a `tabindex` attribute. For example:
+
+``` vue
+<template>
+  <VueAria
+    role="menubutton"
+    :tabindex="0"
+  >
+    <div>WAI-ARIA Quick Links</div>
+  </VueAria>
+</template>
+```
+
+When you pass `"none"` or `"appearance"` value into `role` prop but without a `tabindex` prop. The `tabindex` attribute on the root element will finally be `""`. For examples:
+
+``` vue
+<template>
+  <!-- won't be focused by click or TAB key -->
+  <VueAria role="none">
+    <div tabindex="0" role="menubutton">WAI-ARIA Quick Links</div>
+  </VueAria>
+</template>
+```
+
+``` vue
+<template>
+  <!-- won't be focused TAB key but could be focused by click -->
+  <VueAria role="none" :tabindex="-1">
+    <div role="button" tabindex="0">WAI-ARIA Quick Links</div>
   </VueAria>
 </template>
 ```

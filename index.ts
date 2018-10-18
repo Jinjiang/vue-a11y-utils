@@ -1,12 +1,13 @@
-import Vue, { Component, VueConstructor, VNode, VNodeData } from "vue";
+import Vue, { Component, VueConstructor, VNode, VNodeData } from 'vue';
 
 export const VueAria = Vue.extend({
   props: {
     role: String,
-    aria: [Object, Array]
+    aria: [Object, Array],
+    tabindex: Number
   },
   render(): VNode {
-    const { role, aria } = this;
+    const { role, aria, tabindex } = this;
     const rootVNode = this.$slots.default[0];
     if (rootVNode) {
       if (!rootVNode.data) {
@@ -16,26 +17,48 @@ export const VueAria = Vue.extend({
         rootVNode.data.attrs = {};
       }
       const attrs = rootVNode.data.attrs;
+
+      // set `role`
       if (role) {
         attrs.role = role;
       }
+
+      // set `tabindex`
+      mergeTabindex(attrs, tabindex);
+
+      // set `aria-*`
       mergeAriaAttrs(attrs, aria);
     }
     return rootVNode;
   }
 });
 
-function mergeAriaAttrs(attrs: VNodeData["attrs"], aria: any): void {
+function mergeTabindex(attrs: VNodeData['attrs'], tabindex: number): void {
+  if (attrs) {
+    const isAppearance: boolean = attrs.role === 'none' || attrs.role === 'appearance';
+    if (typeof tabindex !== 'number' || isNaN(tabindex)) {
+      // no value passed in
+      if (isAppearance) {
+        attrs.tabindex = '';
+      }
+    } else {
+      // a number passed in
+      attrs.tabindex = tabindex.toString();
+    }
+  }
+}
+
+function mergeAriaAttrs(attrs: VNodeData['attrs'], aria: any): void {
   if (attrs) {
     if (Array.isArray(aria)) {
       aria.forEach(ariaItem => mergeAriaAttrs(attrs, ariaItem));
-    } else if (typeof aria === "object") {
+    } else if (typeof aria === 'object') {
       for (const name in aria) {
         const value = aria[name];
-        if (value) {
+        if (value && value.toString) {
           attrs[`aria-${name}`] = value.toString();
         } else {
-          delete attrs[`aria-${name}`];
+          attrs[`aria-${name}`] = null;
         }
       }
     }

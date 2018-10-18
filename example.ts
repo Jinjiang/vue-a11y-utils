@@ -1,9 +1,7 @@
-import Vue, { VNode } from "vue";
-import VueA11y from "./index";
+import Vue from "vue";
+import App from "./example-app.vue";
 
 new Vue({
   el: "#app",
-  render(h): VNode {
-    return h("h1", VueA11y.name);
-  }
+  render: h => h(App)
 });
