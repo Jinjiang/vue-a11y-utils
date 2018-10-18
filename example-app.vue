@@ -29,9 +29,9 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { VueAria } from "./index";
+import Component from 'vue-class-component'
+import { VueAria } from "./index"
 
-export default Vue.extend({
-  components: { VueAria }
-})
+@Component({ components: { VueAria } })
+export default class App extends Vue {}
 </script>

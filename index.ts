@@ -1,12 +1,17 @@
-import Vue, { Component, VueConstructor, VNode, VNodeData } from 'vue';
+import Vue, { CreateElement, VNode, VNodeData } from 'vue';
+import Component from 'vue-class-component';
 
-export const VueAria = Vue.extend({
+const VueAriaProps = Vue.extend({
   props: {
     role: String,
     aria: [Object, Array],
     tabindex: Number
-  },
-  render(): VNode {
+  }
+})
+
+@Component
+export class VueAria extends VueAriaProps {
+  render(h: CreateElement): VNode {
     const { role, aria, tabindex } = this;
     const rootVNode = this.$slots.default[0];
     if (rootVNode) {
@@ -31,7 +36,7 @@ export const VueAria = Vue.extend({
     }
     return rootVNode;
   }
-});
+};
 
 function mergeTabindex(attrs: VNodeData['attrs'], tabindex: number): void {
   if (attrs) {
