@@ -10,3 +10,54 @@ When you write a Vue app with full accessible control. You may meet some issues 
 - Sometimes you need set a _ID reference_ or _ID reference list_ type aria attribute with _ID_ of another DOM element. But we don't use _ID_ for such a long time right?
 
 Vue A11y Utils try to supply a group of utilities to help Vue developers finish these jobs easier.
+
+## `<VueAria>` Component
+
+This component help you to write `role` and `aria-*` attributes better.
+
+First you can put all `aria-*` attributes in an object. Second these a11y attributes can be inherited. Third, it's more portable.
+
+### API
+
+#### props
+
+* `role`: `string`
+* `aria`: `Array` or `Object`
+
+#### slots
+
+* default slot: the element you would put these a11y attributes in.
+
+### Examples
+
+``` vue
+<template>
+  <VueAria role="menubutton" :aria="aria">
+    <button>WAI-ARIA Quick Links</button>
+  </VueAria>
+</template>
+
+<script>
+export default {
+  components: { VueAria },
+  data() {
+    return {
+      haspopup: true,
+      controls: 'menu2'
+    }
+  }
+}
+</script>
+```
+
+which is same to:
+
+``` vue
+<template>
+  <button id="menubutton" aria-haspopup="true" aria-controls="menu2">
+    WAI-ARIA Quick Links
+  </button>
+</template>
+```
+
+So the content and structure is more clear than which with a lot of `aria-*` attribute in.

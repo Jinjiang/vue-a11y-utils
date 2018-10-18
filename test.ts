@@ -1,42 +1,66 @@
-import Vue, { Component } from "vue";
-import { mount, Wrapper } from "@vue/test-utils";
+import Vue, { Component } from 'vue';
+import { mount, Wrapper, config } from '@vue/test-utils';
 
-import VueA11y from "./";
+import { VueAria } from './';
 
-describe("foo", () => {
-  it("bar", () => {
-    expect(VueA11y.name).toBe("vue-a11y-utils");
-  });
-});
+config.logModifiedComponents = false;
 
-describe("Counter", () => {
-  // Now mount the component and you have the wrapper
-  const Counter: Component = Vue.extend({
-    template: `
-      <div>
-        <span class="count">0</span>
-        <button @click="increment">Increment</button>
-      </div>
-    `,
-    data() {
-      return {
-        count: 0
-      };
-    },
-    methods: {
-      increment(): void {
-        this.count++;
+describe('<VueAria> Component', () => {
+  it('set role and aria props correctly', () => {
+    const Foo = Vue.extend({
+      template: `
+        <VueAria
+          role="button"
+          :aria="{ label: 'save your changes' }"
+        >
+          <i class="icon-save" />
+        </VueAria>
+      `,
+      components: {
+        VueAria
       }
-    }
+    });
+    const wrapper: Wrapper<Vue> = mount(Foo);
+    expect(wrapper.element.tagName).toBe('I');
+    expect(wrapper.text()).toBe('');
+    expect(wrapper.attributes()).toEqual({
+      class: 'icon-save',
+      role: 'button',
+      'aria-label': 'save your changes'
+    });
   });
-  const wrapper: Wrapper<Vue> = mount(Counter);
 
-  it("renders the correct markup", () => {
-    expect(wrapper.html()).toContain('<span class="count">0</span>');
-  });
-
-  // it's also easy to check for the existence of elements
-  it("has a button", () => {
-    expect(wrapper.contains("button")).toBe(true);
+  it('set array-type aria props correctly', () => {
+    const Foo = Vue.extend({
+      template: `
+        <VueAria
+          role="button"
+          :aria="[{ label: 'save your changes' }, otherAriaProps]"
+        >
+          <i class="icon-save" />
+        </VueAria>
+      `,
+      components: {
+        VueAria
+      },
+      props: {
+        otherAriaProps: Object
+      }
+    });
+    const wrapper: Wrapper<Vue> = mount(Foo, {
+      propsData: {
+        otherAriaProps: {
+          pressed: true
+        }
+      }
+    });
+    expect(wrapper.element.tagName).toBe('I');
+    expect(wrapper.text()).toBe('');
+    expect(wrapper.attributes()).toEqual({
+      class: 'icon-save',
+      role: 'button',
+      'aria-label': 'save your changes',
+      'aria-pressed': 'true'
+    });
   });
 });
