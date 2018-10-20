@@ -102,4 +102,94 @@ describe('<VueAria> Component', () => {
       'aria-pressed': 'true'
     });
   });
+
+  it('set tabindex correctly', () => {
+    const Foo = Vue.extend({
+      template: `
+      <VueAria
+        role="button"
+        :tabindex="0"
+      >
+        <i class="icon-save" />
+      </VueAria>
+    `,
+      components: {
+        VueAria
+      }
+    });
+    const wrapper: Wrapper<Vue> = mount(Foo);
+    expect(wrapper.element.tagName).toBe('I');
+    expect(wrapper.text()).toBe('');
+    expect(wrapper.attributes()).toEqual({
+      class: 'icon-save',
+      role: 'button',
+      tabindex: '0'
+    });
+  });
+
+  it('not set tabindex when when it is not a number', () => {
+    const Foo = Vue.extend({
+      template: `
+      <VueAria role="button" :tabindex="NaN">
+        <i class="icon-save" />
+      </VueAria>
+    `,
+      components: {
+        VueAria
+      }
+    });
+    const wrapper: Wrapper<Vue> = mount(Foo);
+    expect(wrapper.element.tagName).toBe('I');
+    expect(wrapper.text()).toBe('');
+    expect(wrapper.attributes()).toEqual({
+      class: 'icon-save',
+      role: 'button'
+    });
+  });
+
+  it('reset tabindex in child when the role is none', () => {
+    const Foo = Vue.extend({
+      template: `
+      <VueAria role="none">
+        <VueAria role="button" :tabindex="0">
+          <i class="icon-save" />
+        </VueAria>
+      </VueAria>
+    `,
+      components: {
+        VueAria
+      }
+    });
+    const wrapper: Wrapper<Vue> = mount(Foo);
+    expect(wrapper.element.tagName).toBe('I');
+    expect(wrapper.text()).toBe('');
+    expect(wrapper.attributes()).toEqual({
+      class: 'icon-save',
+      role: 'none',
+      tabindex: ''
+    });
+  });
+
+  it('set tabindex correctly even when the role is none', () => {
+    const Foo = Vue.extend({
+      template: `
+      <VueAria role="none" :tabindex="-1">
+        <VueAria role="button" :tabindex="0">
+          <i class="icon-save" />
+        </VueAria>
+      </VueAria>
+    `,
+      components: {
+        VueAria
+      }
+    });
+    const wrapper: Wrapper<Vue> = mount(Foo);
+    expect(wrapper.element.tagName).toBe('I');
+    expect(wrapper.text()).toBe('');
+    expect(wrapper.attributes()).toEqual({
+      class: 'icon-save',
+      role: 'none',
+      tabindex: '-1'
+    });
+  });
 });
