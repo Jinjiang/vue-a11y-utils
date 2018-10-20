@@ -9,6 +9,7 @@ Utilities for accessibility (a11y) in Vue.js
 
 * [Why](#why)
 * [`<VueAria>` Component](#vuearia-component)
+* [`v-aria` Custome Directive](#v-aria-custom-directive)
 * to be continued ...
 
 ## Why
@@ -24,7 +25,7 @@ Vue A11y Utils try to supply a group of utilities to help Vue developers finish 
 
 ## `<VueAria>` Component
 
-This component help you to write `role` and `aria-*` attributes better.
+This component helps you to write `role` and `aria-*` attributes better.
 
 First you can put all `aria-*` attributes in an object. Second these a11y attributes can be inherited when more than 1 `<VueAria>` components nested. Third, it's more portable to use.
 
@@ -158,3 +159,54 @@ When you pass `"none"` or `"appearance"` value into `role` prop but without a `t
   </VueAria>
 </template>
 ```
+
+## `v-aria` Custom Directive
+
+If you prefer using directives rather than components, here is another choise: `v-aria` custom directive.
+
+It helps you to write `aria-*` attributes better throught a Vue custom directive.
+
+Almost the same to the `aria` prop in `<VueAria>` component, let you put all `aria-*` attributes in an object or array.
+
+::: tip
+Because the custom directive would modify the DOM element. It is different from component which renders virtual DOM. So `v-aria` will run after all `<VueAria>` executed if you put both of them on a same DOM element. And the performance of `v-aria` would be a little bit slow than `<VueAria>` if you use them quite a lot.
+:::
+
+### Examples
+
+``` vue
+<template>
+  <i class="icon-save" role="button" v-aria="aria" />
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      aria: {
+        label: 'save your changes',
+        controls: 'id-of-a-textbox'
+      }
+    };
+  },
+  directives: {
+    aria: vAria
+  }
+};
+</script>
+```
+
+This example above is same to:
+
+``` vue
+<template>
+  <i
+    class="icon-save"
+    role="button"
+    aria-label="save your changes"
+    aria-controls="id-of-a-textbox"
+  >
+</template>
+```
+
+Btw. there is not custom directives such as `v-role` and `v-tabindex` because you can set the two raw attributes directly on a component or an element with `v-aria`.
