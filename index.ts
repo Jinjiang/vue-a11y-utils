@@ -1,4 +1,4 @@
-import Vue, { CreateElement, VNode, VNodeData } from 'vue';
+import Vue, { CreateElement, VNode, VNodeData, DirectiveOptions } from 'vue';
 import Component from 'vue-class-component';
 
 const VueAriaProps = Vue.extend({
@@ -29,16 +29,16 @@ export class VueAria extends VueAriaProps {
       }
 
       // set `tabindex`
-      mergeTabindex(attrs, tabindex);
+      mergeTabindexToVNode(attrs, tabindex);
 
       // set `aria-*`
-      mergeAriaAttrs(attrs, aria);
+      mergeAriaAttrsToVNode(attrs, aria);
     }
     return rootVNode;
   }
 };
 
-function mergeTabindex(attrs: VNodeData['attrs'], tabindex: number): void {
+function mergeTabindexToVNode(attrs: VNodeData['attrs'], tabindex: number): void {
   if (attrs) {
     const isAppearance: boolean = attrs.role === 'none' || attrs.role === 'appearance';
     if (typeof tabindex !== 'number' || isNaN(tabindex)) {
@@ -53,14 +53,14 @@ function mergeTabindex(attrs: VNodeData['attrs'], tabindex: number): void {
   }
 }
 
-function mergeAriaAttrs(attrs: VNodeData['attrs'], aria: any): void {
+function mergeAriaAttrsToVNode(attrs: VNodeData['attrs'], aria: any): void {
   if (attrs) {
     if (Array.isArray(aria)) {
-      aria.forEach(ariaItem => mergeAriaAttrs(attrs, ariaItem));
+      aria.forEach(ariaItem => mergeAriaAttrsToVNode(attrs, ariaItem));
     } else if (typeof aria === 'object') {
       for (const name in aria) {
         const value = aria[name];
-        if (value && value.toString) {
+        if (isValidAttributeValue(value)) {
           attrs[`aria-${name}`] = value.toString();
         } else {
           attrs[`aria-${name}`] = null;
@@ -68,4 +68,60 @@ function mergeAriaAttrs(attrs: VNodeData['attrs'], aria: any): void {
       }
     }
   }
+}
+
+export const vAria: DirectiveOptions = {
+  inserted(el: HTMLElement, { value, oldValue }) {
+    mergeAriaAttrsToElement(el, value, oldValue);
+  },
+  update(el: HTMLElement, { value, oldValue }) {
+    mergeAriaAttrsToElement(el, value, oldValue);
+  }
+};
+
+function mergeAriaAttrsToElement(el: HTMLElement, aria: any, oldAria: any) {
+  const flatAria = flattenAria(aria);
+  const flatOldAria = flattenAria(oldAria);
+
+  // 1. find attributes in value but not in oldValue and remove them
+  for (const name in flatOldAria) {
+    if (
+      !isValidAttributeValue(flatAria[name]) &&
+      isValidAttributeValue(flatOldAria[name])
+    ) {
+      el.removeAttribute(`aria-${name}`);
+    }
+  }
+
+  // 2. set all attributes in value
+  for (const name in flatAria) {
+    const value = flatAria[name];
+    if (isValidAttributeValue(value)) {
+      el.setAttribute(`aria-${name}`, value.toString());
+    }
+  }
+}
+
+function flattenAria(aria: any): { [key: string]: any } {
+  const result = {};
+  if (aria) {
+    if (Array.isArray(aria)) {
+      aria.forEach(ariaItem => {
+        Object.assign(result, ariaItem);
+      });
+    } else {
+      Object.assign(result, aria);
+    }
+  }
+  return result;
+}
+
+function isValidAttributeValue(value: any): boolean {
+  if (typeof value === 'undefined') {
+    return false;
+  }
+  if (value === null) {
+    return false;
+  }
+  return true;
 }
