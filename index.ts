@@ -55,16 +55,13 @@ function mergeTabindexToVNode(attrs: VNodeData['attrs'], tabindex: number): void
 
 function mergeAriaAttrsToVNode(attrs: VNodeData['attrs'], aria: any): void {
   if (attrs) {
-    if (Array.isArray(aria)) {
-      aria.forEach(ariaItem => mergeAriaAttrsToVNode(attrs, ariaItem));
-    } else if (typeof aria === 'object') {
-      for (const name in aria) {
-        const value = aria[name];
-        if (isValidAttributeValue(value)) {
-          attrs[`aria-${name}`] = value.toString();
-        } else {
-          attrs[`aria-${name}`] = null;
-        }
+    const flatAria = flattenAria(aria);
+    for (const name in flatAria) {
+      const value = flatAria[name];
+      if (isValidAttributeValue(value)) {
+        attrs[`aria-${name}`] = value.toString();
+      } else {
+        delete attrs[`aria-${name}`];
       }
     }
   }
