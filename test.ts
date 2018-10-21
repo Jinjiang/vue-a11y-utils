@@ -1,7 +1,7 @@
 import Vue, { Component } from 'vue';
 import { mount, Wrapper, config } from '@vue/test-utils';
 
-import { VueAria, vAria } from './';
+import { VueAria, directiveAria, MixinKeyTravel } from './';
 
 config.logModifiedComponents = false;
 
@@ -211,7 +211,7 @@ describe('v-aria directive', () => {
         />
       `,
       directives: {
-        aria: vAria
+        aria: directiveAria
       }
     });
     const wrapper: Wrapper<Vue> = mount(Foo);
@@ -234,7 +234,7 @@ describe('v-aria directive', () => {
         />
       `,
       directives: {
-        aria: vAria
+        aria: directiveAria
       },
       props: {
         ariaConfig: Object
@@ -311,7 +311,7 @@ describe('v-aria directive', () => {
         NothingHappen
       },
       directives: {
-        aria: vAria
+        aria: directiveAria
       }
     });
     const wrapper: Wrapper<Vue> = mount(Foo);
@@ -339,7 +339,7 @@ describe('v-aria directive', () => {
         NothingHappen
       },
       directives: {
-        aria: vAria
+        aria: directiveAria
       },
       props: {
         outer: Object,
@@ -440,7 +440,7 @@ describe('v-aria directive', () => {
         </VueAria>
       `,
       components: { VueAria },
-      directives: { aria: vAria }
+      directives: { aria: directiveAria }
     });
     const wrapper: Wrapper<Vue> = mount(Foo);
     expect(wrapper.element.tagName).toBe('I');
@@ -469,7 +469,7 @@ describe('v-aria directive', () => {
         </VueAria>
       `,
       components: { VueAria },
-      directives: { aria: vAria }
+      directives: { aria: directiveAria }
     });
     const wrapperBar: Wrapper<Vue> = mount(Bar);
     expect(wrapperBar.element.tagName).toBe('I');
@@ -501,7 +501,7 @@ describe('v-aria directive', () => {
         </NothingHappen>
       `,
       components: { VueAria, NothingHappen },
-      directives: { aria: vAria }
+      directives: { aria: directiveAria }
     });
     const wrapperBaz: Wrapper<Vue> = mount(Baz);
     expect(wrapperBaz.element.tagName).toBe('I');
@@ -512,5 +512,195 @@ describe('v-aria directive', () => {
       'aria-label': 'save your changes',
       'aria-pressed': 'false'
     });
+  });
+});
+
+describe('KeyTravel mixin', () => {
+  it('autofocus', () => {
+    const Foo = Vue.extend({
+      mixins: [MixinKeyTravel],
+      template: `<div><button ref="btn">Hello</button></div>`,
+      props: {
+        autofocus: Boolean
+      },
+      methods: {
+        getAutofocusItem() {
+          return this.$refs.btn;
+        }
+      }
+    });
+
+    const wrapper: Wrapper<Vue> = mount(Foo, {
+      attachToDocument: true
+    });
+    const document: Document | null = wrapper.element.ownerDocument;
+    expect(document).toBeTruthy();
+    if (document) {
+      expect(document.activeElement).toBe(document.body);
+    }
+
+    const wrapperFocus: Wrapper<Vue> = mount(Foo, {
+      propsData: { autofocus: true },
+      attachToDocument: true
+    });
+    const documentFocus: Document | null = wrapperFocus.element.ownerDocument;
+    const btnFocus: any = wrapperFocus.vm.$refs.btn;
+    expect(documentFocus).toBeTruthy();
+    expect(btnFocus).toBeTruthy();
+    if (documentFocus) {
+      expect(documentFocus.activeElement).toBe(btnFocus);
+    }
+  });
+
+  it('travel through all focusable items', () => {
+    const Foo = Vue.extend({
+      mixins: [MixinKeyTravel],
+      template: `
+        <ul @keydown="keyTravel">
+          <li
+            tabindex="-1"
+            v-for="option in options"
+            :key="option.value"
+            ref="items"
+          >
+            {{ option.text }}
+          </li>
+        </ul>
+      `,
+      data() {
+        return {
+          autofocus: true
+        };
+      },
+      props: {
+        options: Array
+      },
+      methods: {
+        getKeyItems() {
+          return this.$refs.items;
+        }
+      }
+    });
+
+    const wrapper: Wrapper<Vue> = mount(Foo, {
+      attachToDocument: true,
+      propsData: {
+        options: [
+          { text: 'First', value: 'foo' },
+          { text: 'Second', value: 'bar' },
+          { text: 'Third', value: 'baz' }
+        ]
+      }
+    });
+    const document: Document | null = wrapper.element.ownerDocument;
+    const items: any = wrapper.vm.$refs.items;
+    expect(document).toBeTruthy();
+    expect(Array.isArray(items)).toBeTruthy();
+    if (!document || !Array.isArray(items)) {
+      return;
+    }
+    expect(document.activeElement).toBe(items[0]);
+
+    wrapper.trigger('keydown', { key: 'ArrowDown' });
+    expect(document.activeElement).toBe(items[1]);
+
+    wrapper.trigger('keydown', { key: 'ArrowDown' });
+    expect(document.activeElement).toBe(items[2]);
+
+    wrapper.trigger('keydown', { key: 'ArrowDown' });
+    expect(document.activeElement).toBe(items[0]);
+
+    wrapper.trigger('keydown', { key: 'End' });
+    expect(document.activeElement).toBe(items[2]);
+  });
+
+  it('fire action when enter key down', () => {
+    let lastAction: string = '';
+
+    const ListItem = Vue.extend({
+      template: `<div role="listitem" tabindex="-1">{{ text }}</div>`,
+      props: {
+        text: String,
+        value: String
+      },
+      methods: {
+        fireAction() {
+          lastAction = this.value;
+        }
+      }
+    });
+
+    const Foo = Vue.extend({
+      mixins: [MixinKeyTravel],
+      template: `
+        <div role="list" @keydown="keyTravel">
+          <ListItem
+            ref="items"
+            v-for="option in options"
+            :key="option.value"
+            :text="option.text"
+            :value="option.value"
+          />
+        </div>
+      `,
+      components: { ListItem },
+      data() {
+        return {
+          autofocus: true
+        };
+      },
+      props: {
+        options: Array
+      },
+      methods: {
+        getKeyItems() {
+          return this.$refs.items;
+        }
+      }
+    });
+
+    const wrapper: Wrapper<Vue> = mount(Foo, {
+      attachToDocument: true,
+      propsData: {
+        options: [
+          { text: 'First', value: 'foo' },
+          { text: 'Second', value: 'bar' },
+          { text: 'Third', value: 'baz' }
+        ]
+      }
+    });
+    const document: Document | null = wrapper.element.ownerDocument;
+    const items: any = wrapper.vm.$refs.items;
+    expect(document).toBeTruthy();
+    expect(Array.isArray(items)).toBeTruthy();
+    if (!document || !Array.isArray(items)) {
+      return;
+    }
+    expect(document.activeElement).toBe(items[0].$el);
+    expect(lastAction).toBe('');
+
+    wrapper.trigger('keydown', { key: 'ArrowDown' });
+    expect(document.activeElement).toBe(items[1].$el);
+    expect(lastAction).toBe('');
+
+    wrapper.trigger('keydown', { key: 'Enter' });
+    expect(document.activeElement).toBe(items[1].$el);
+    expect(lastAction).toBe('bar');
+
+    wrapper.trigger('keydown', { key: 'ArrowDown' });
+    expect(document.activeElement).toBe(items[2].$el);
+    expect(lastAction).toBe('bar');
+
+    wrapper.trigger('keydown', { key: 'Enter' });
+    expect(document.activeElement).toBe(items[2].$el);
+    expect(lastAction).toBe('baz');
+
+    wrapper.trigger('keydown', { key: 'ArrowDown' });
+    expect(document.activeElement).toBe(items[0].$el);
+    expect(lastAction).toBe('baz');
+
+    wrapper.trigger('keydown', { key: 'End' });
+    expect(document.activeElement).toBe(items[2].$el);
+    expect(lastAction).toBe('baz');
   });
 });

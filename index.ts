@@ -9,6 +9,11 @@ const VueAriaProps = Vue.extend({
   }
 })
 
+/**
+ * <VueAria role aria tabindex>
+ * - props: role, aria, tabindex
+ * - slots: default slot
+ */
 @Component
 export class VueAria extends VueAriaProps {
   render(h: CreateElement): VNode {
@@ -67,6 +72,9 @@ function mergeAriaAttrsToVNode(attrs: VNodeData['attrs'], aria: any): void {
   }
 }
 
+/**
+ * <Foo v-aria>
+ */
 export const directiveAria: DirectiveOptions = {
   inserted(el: HTMLElement, { value, oldValue }) {
     mergeAriaAttrsToElement(el, value, oldValue);
@@ -146,6 +154,24 @@ declare module 'vue/types/vue' {
   }
 }
 
+/**
+ * Mixin: KeyTravel
+ * - methods: keyTravel(event[, config])
+ * work with:
+ * - value: autofocus, orientation
+ * - methods: getKeyItems()
+ * could be overrided:
+ * - methods: // call focus() or $el.focus() by default
+ *            goPrev(), goNext(), goFirst(), goLast(),
+ *            // focus first item in key items by default
+ *            getAutofocusItem(),
+ *            // nothing happen by default
+ *            goNextPage(), goPrevPage(),
+ *            // call fireAction(item) by default
+ *            goAction()
+ *            // call fireAction() in the item by default
+ *            fireAction(item)
+ */
 export const MixinKeyTravel = Vue.extend({
   // fixed
   mounted(): void {
@@ -183,13 +209,17 @@ export const MixinKeyTravel = Vue.extend({
         }
       }
     },
-    // could be overrided
-    getAutofocusItem(): Vue {
-      return this.getKeyItems()[0];
-    },
     // need be overrided
     getKeyItems(): Array<Vue> {
       return [];
+    },
+    // could be overrided
+    fireAction(item: Vue): void {
+      fireItemAction(item);
+    },
+    // could be overrided
+    getAutofocusItem(): Vue {
+      return this.getKeyItems()[0];
     },
     // could be overrided
     goPrev() {
