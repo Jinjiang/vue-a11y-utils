@@ -67,7 +67,7 @@ function mergeAriaAttrsToVNode(attrs: VNodeData['attrs'], aria: any): void {
   }
 }
 
-export const vAria: DirectiveOptions = {
+export const directiveAria: DirectiveOptions = {
   inserted(el: HTMLElement, { value, oldValue }) {
     mergeAriaAttrsToElement(el, value, oldValue);
   },
@@ -121,4 +121,182 @@ function isValidAttributeValue(value: any): boolean {
     return false;
   }
   return true;
+}
+
+interface KeyConfig {
+  [key: string]: string;
+};
+
+const defaultKeyToMethod: KeyConfig = {
+  ArrowUp: 'prev',
+  ArrowDown: 'next',
+  ArrowLeft: 'prev',
+  ArrowRight: 'next',
+  Home: 'first',
+  End: 'last',
+  Enter: 'action',
+  Space: 'action'
+};
+
+declare module 'vue/types/vue' {
+  interface Vue {
+    autofocus?: boolean
+    orientation?: string
+    [keyMethod: string]: any
+  }
+}
+
+export const MixinKeyTravel = Vue.extend({
+  // fixed
+  mounted(): void {
+    if (this.autofocus) {
+      focusItem(this.getAutofocusItem());
+    }
+  },
+  methods: {
+    // fixed
+    keyTravel(event: KeyboardEvent, config?: KeyConfig): void {
+      // get the current key
+      const keyToMethod: KeyConfig = Object.assign(
+        {},
+        defaultKeyToMethod,
+        this.orientation === 'vertical' ? {
+          ArrowLeft: '',
+          ArrowRight: ''
+        } : {},
+        this.orientation === 'horizontal' ? {
+          ArrowUp: '',
+          ArrowDown: ''
+        } : {},
+        config
+      );
+      const methodName: string = keyToMethod[event.key] || '';
+
+      // make sure what to do next
+      if (methodName) {
+        const method = this[`go${capitalizeFirstLetter(methodName)}`];
+        if (typeof method === 'function') {
+          const willPreventDefault = method.call(this, event);
+          if (willPreventDefault) {
+            event.preventDefault();
+          }
+        }
+      }
+    },
+    // could be overrided
+    getAutofocusItem(): Vue {
+      return this.getKeyItems()[0];
+    },
+    // need be overrided
+    getKeyItems(): Array<Vue> {
+      return [];
+    },
+    // could be overrided
+    goPrev() {
+      const items = this.getKeyItems();
+      const length = items.length;
+      if (length === 0) {
+        return;
+      }
+      const activeIndex = getActiveIndex(items);
+      const prevItem = activeIndex <= 0 ? items[length - 1] : items[activeIndex - 1];
+      return focusItem(prevItem);
+    },
+    // could be overrided
+    goNext() {
+      const items = this.getKeyItems();
+      const length = items.length;
+      if (length === 0) {
+        return;
+      }
+      const activeIndex = getActiveIndex(items);
+      const nextItem = activeIndex === length - 1 ? items[0] : items[activeIndex + 1];
+      return focusItem(nextItem);
+    },
+    // could be overrided
+    goFirst() {
+      const items = this.getKeyItems();
+      const length = items.length;
+      if (length === 0) {
+        return;
+      }
+      const firstItem = items[0];
+      if (!isActiveItem(firstItem)) {
+        return focusItem(firstItem);
+      }
+    },
+    // could be overrided
+    goLast() {
+      const items = this.getKeyItems();
+      const length = items.length;
+      if (length === 0) {
+        return;
+      }
+      const lastItem = items[length - 1];
+      if (!isActiveItem(lastItem)) {
+        return focusItem(lastItem);
+      }
+    },
+    // could be overrided
+    goNextPage() { },
+    // could be overrided
+    goPrevPage() { },
+    // could be overrided
+    goAction() {
+      const items = this.getKeyItems();
+      const length = items.length;
+      if (length === 0) {
+        return;
+      }
+      const activeIndex = getActiveIndex(items);
+      const activeItem = items[activeIndex];
+      return fireItemAction(activeItem);
+    }
+  }
+});
+
+function getActiveIndex(items: Array<Vue>): number {
+  let activeIndex = -1;
+  const activeElement = document.activeElement;
+  items.some((item: Vue, index: number) => {
+    const el = item.$el ? item.$el : item;
+    if (el === activeElement) {
+      activeIndex = index;
+      return true;
+    }
+    return false;
+  });
+  return activeIndex;
+}
+
+function isActiveItem(item: Vue): boolean {
+  if (!item) {
+    return false;
+  }
+  const el = item.$el ? item.$el : item;
+  return el === document.activeElement;
+}
+
+function focusItem(item: Vue): any {
+  if (item) {
+    if (typeof item.focus === 'function') {
+      item.focus();
+      return true;
+    }
+    if (item.$el && typeof item.$el.focus === 'function') {
+      item.$el.focus();
+      return true;
+    }
+  }
+}
+
+function fireItemAction(item: Vue): any {
+  if (item && typeof item.fireAction === 'function') {
+    item.fireAction();
+    return true;
+  }
+}
+
+function capitalizeFirstLetter(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1);
 }
