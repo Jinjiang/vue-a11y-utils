@@ -10,6 +10,7 @@ Utilities for accessibility (a11y) in Vue.js
 * [Why](#why)
 * [`<VueAria>` Component](#vuearia-component)
 * [`v-aria` Custome Directive](#v-aria-custom-directive)
+* [`KeyTravel` Mixin](#keytravel-mixin)
 * to be continued ...
 
 ## Why
@@ -27,7 +28,7 @@ Vue A11y Utils try to supply a group of utilities to help Vue developers finish 
 
 This component helps you to write `role` and `aria-*` attributes better.
 
-First you can put all `aria-*` attributes in an object. Second these a11y attributes can be inherited when more than 1 `<VueAria>` components nested. Third, it's more portable to use.
+First you could put all `aria-*` attributes in an object. Second these a11y attributes could be inherited when more than 1 `<VueAria>` components nested. Third, it's more portable to use.
 
 ### API
 
@@ -190,7 +191,7 @@ export default {
     };
   },
   directives: {
-    aria: vAria
+    aria: directiveAria
   }
 };
 </script>
@@ -209,4 +210,170 @@ This example above is same to:
 </template>
 ```
 
-Btw. there is not custom directives such as `v-role` and `v-tabindex` because you can set the two raw attributes directly on a component or an element with `v-aria`.
+Btw. there is not custom directives such as `v-role` and `v-tabindex` because you could set the two raw attributes directly on a component or an element with `v-aria`.
+
+## `KeyTravel` Mixin
+
+This mixin help you travel through focusable items by _arrow_ keys in a Vue component. At the same time you could easily fire an action by _enter_ key or _space_ key.
+
+### Examples
+
+#### Auto-focus
+
+The first example is about auto-focus. Make sure where is a value (through a prop/data/computed etc.) named `autofocus` in the component. When it's truthy, the item returned by `getAutofocusItem()` would be focused when component mounted to the DOM.
+
+``` vue
+<template>
+  <div>
+    <button ref="btn">Click!</button>
+  </div>
+</template>
+
+<script>
+export default {
+  mixins: [MixinKeyTravel],
+  data() {
+    return {
+      // You can also define this value through `prop` or `computed` etc.
+      autofocus: true
+    }
+  },
+  methods: {
+    // The mixin will call this method to find the focus when mounted to the DOM.
+    getAutofocusItem() {
+      return this.$refs.btn;
+    }
+  }
+};
+</script>
+```
+
+#### Focus Travel Using Arrow Keys
+
+The second example is about focus travel using arrow keys in a Vue component. There are 2 files:
+
+- `App.vue`:
+
+  ``` vue
+  <template>
+    <div role="list" @keydown="keyTravel">
+      <ListItem
+        ref="items"
+        v-for="option in options"
+        :key="option.value"
+        :text="option.text"
+        :value="option.value"
+      />
+    </div>
+  </template>
+
+  <script>
+  export default {
+    mixins: [MixinKeyTravel],
+    components: { ListItem },
+    data() {
+      return {
+        autofocus: true,
+        // Only ArrowUp and ArrowDown keys would work.
+        orientation: 'vertical'
+      };
+    },
+    props: {
+      options: Array
+    },
+    methods: {
+      // You need to define all focusable items here. And if you don't define
+      // getAutofocusItem(), the first one you defined will be auto-focused.
+      getKeyItems() {
+        return this.$refs.items;
+      }
+    }
+  };
+  </script>
+  ```
+
+- `ListItem.vue`:
+
+  ``` vue
+  <template>
+    <div role="listitem" tabindex="-1" @click="fireAction">{{ text }}</div>
+  </template>
+
+  <script>
+  export default {
+    props: {
+      text: String,
+      value: String
+    },
+    methods: {
+      fireAction() {
+        alert(this.value);
+      }
+    }
+  };
+  </script>
+  ```
+
+Here are some points you would notice:
+
+1. Bind `@keydown="keyTravel"` to the root DOM element of your component.
+2. Put a prop/data/computed named `orientation` to define which arrow keys would work.
+3. Define a `getKeyItems()` method to return all focusable items.
+4. Define a `fireAction()` method in `<ListItem>` for the action when user press enter or space.
+
+Now you can use ArrowUp and ArrowDown keys to travel each items. When you press enter or space key, an alert with the value of the current focused item would be poped up.
+
+### API
+
+#### Method you can call
+
+* `keyTravel(event: KeyboardEvent, config?: KeyConfig): void`
+
+  The second parameter is optional. The key is the `key` in the keyboard event, and the value if the "travel signal" to trigger when user press the corresponding key.
+
+  All available travel signals: `prev`, `next`, `prevPage`, `nextPage`, `first`, `last`, `action`.
+
+  Default config:
+
+  * `ArrowUp`: `prev` when `this.orientation` is `vertical` or empty
+  * `ArrowDown`: `next` when `this.orientation` is `vertical` or empty
+  * `ArrowLeft`: `prev` when `this.orientation` is `horizontal` or empty
+  * `ArrowRight`: `next` when `this.orientation` is `horizontal` or empty
+  * `Home`: `first`
+  * `End`: `last`
+  * `Enter`: `action`
+  * `Space`: `action`
+
+
+#### Values you can define
+
+* `autofocus: boolean`
+* `orientation: 'horizontal' | 'vertical' | other`
+
+#### Methods you can override
+
+_Main method for travel:_
+
+* `getKeyItems(): Array<Vue | HTMLElement>`: return an empty array by default
+
+_Main method for auto-focus:_
+
+* `getAutofocusItem(): void`: return first key item by default
+
+_Methods you can customize to fire action:_
+
+* `fireAction(item: Vue | HTMLElement): void`: call `item.fireAction()` by default
+
+_Methods you can customize to travel:_
+
+* `goPrev(): void`: focus previous item
+* `goNext(): void`: focus next item
+* `goFirst(): void`: focus the first item
+* `goLast(): void`: focus the last item
+* `goNextPage(): void`: do nothing by default
+* `goPrevPage(): void`: do nothing by default
+* `goAction(): void`: fire action at the current focused item
+
+#### Method you can define in item component
+
+* `fireAction(): void`
