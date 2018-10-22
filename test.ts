@@ -1,7 +1,13 @@
-import Vue, { Component } from 'vue';
+import Vue from 'vue';
 import { mount, Wrapper, config } from '@vue/test-utils';
 
-import { VueAria, directiveAria, MixinKeyTravel, MixinId } from './';
+import {
+  VueAria,
+  directiveAria,
+  MixinKeyTravel,
+  MixinId,
+  VueFocusTrap
+} from './';
 
 config.logModifiedComponents = false;
 
@@ -11,7 +17,7 @@ const NothingHappen = Vue.extend({
   }
 });
 
-describe('<VueAria> Component', () => {
+describe('<VueAria> component', () => {
   it('set role and aria props correctly', () => {
     const Foo = Vue.extend({
       template: `
@@ -773,5 +779,102 @@ describe('Id mixin', () => {
       expect(label.getAttribute('id')).not.toBe('v-helloworld-label');
       expect(label.getAttribute('id')).toBe(input.getAttribute('aria-labelledby'));
     }
+  });
+});
+
+describe('<VueFocusTrap> component', () => {
+  it('will trap focus to a modal dialog', done => {
+    const Foo = Vue.extend({
+      template: `
+        <div id="focus-trap-example">
+          <button class="trigger" ref="trigger" @click="shown = true">
+            Open a Modal Dialog
+          </button>
+          <div v-show="shown" class="dialog">
+            <VueFocusTrap
+              @gofirst="goFirst"
+              @golast="goLast"
+            >
+              <label>
+                Email:
+                <input ref="email" type="email" />
+              </label>
+              <label>
+                Password
+                <input ref="password" type="password" />
+              </label>
+              <button ref="login" @click="shown = false">Login</button>
+              <button ref="cancel">Cancel</button>
+            </VueFocusTrap>
+          </div>
+        </div>
+      `,
+      components: {
+        VueFocusTrap
+      },
+      data() {
+        return {
+          shown: false
+        };
+      },
+      watch: {
+        shown(value) {
+          if (value) {
+            this.$nextTick(() => {
+              this.goFirst();
+            });
+          } else {
+            this.$nextTick(() => {
+              this.goTrigger();
+            });
+          }
+        }
+      },
+      methods: {
+        goFirst() {
+          (<HTMLElement>this.$refs.email).focus();
+        },
+        goLast() {
+          (<HTMLElement>this.$refs.cancel).focus();
+        },
+        goTrigger() {
+          (<HTMLElement>this.$refs.trigger).focus();
+        }
+      }
+    });
+
+    // init
+    const wrapper: Wrapper<Vue> = mount(Foo, { attachToDocument: true });
+    const document = <HTMLDocument>wrapper.element.ownerDocument;
+    expect(document).toBeTruthy();
+
+    const trigger = <HTMLElement>wrapper.element.querySelector('.trigger');
+    const dialog = <HTMLElement>wrapper.element.querySelector('.dialog');
+    const first = <HTMLElement>wrapper.element.querySelector('.dialog input[type="email"]');
+    const password = <HTMLElement>wrapper.element.querySelector('.dialog input[type="password"]');
+    const login = <HTMLElement>wrapper.element.querySelectorAll('.dialog button')[0];
+    const last = <HTMLElement>wrapper.element.querySelectorAll('.dialog button')[1];
+    expect(trigger).toBeTruthy();
+    expect(dialog).toBeTruthy();
+    expect(first).toBeTruthy();
+    expect(last).toBeTruthy();
+
+    // init state
+    expect(wrapper.vm.shown).toBeFalsy();
+    expect(dialog.style.display).toBe('none');
+
+    // click trigger
+    trigger.click();
+    wrapper.vm.$nextTick().then(() => {
+      expect(wrapper.vm.shown).toBeTruthy();
+      expect(dialog.style.display).toBe('');
+      expect(document.activeElement).toBe(first);
+      login.click();
+      return wrapper.vm.$nextTick();
+    }).then(() => {
+      expect(wrapper.vm.shown).toBeFalsy();
+      expect(dialog.style.display).toBe('none');
+      done();
+    });
   });
 });

@@ -24,6 +24,7 @@
         <span role="button" tabindex="0">X</span>
       </VueAria>
     </p>
+    <ExampleFocusTrap />
   </div>
 </template>
 
@@ -31,7 +32,8 @@
 import Vue from 'vue'
 import Component from 'vue-class-component'
 import { VueAria } from "./index"
+import ExampleFocusTrap from './focus-trap-example.vue'
 
-@Component({ components: { VueAria } })
+@Component({ components: { VueAria, ExampleFocusTrap } })
 export default class App extends Vue {}
 </script>
