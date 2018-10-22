@@ -1,5 +1,7 @@
 # vue-a11y-utils
 
+<img src="https://vuejs.org/images/logo.png" width="200" />
+
 [![LICENSE](https://img.shields.io/github/license/Jinjiang/vue-a11y-utils.svg?style=for-the-badge)](https://github.com/Jinjiang/vue-a11y-utils/blob/master/LICENSE)
 [![CircleCI](https://img.shields.io/circleci/project/github/Jinjiang/vue-a11y-utils/master.svg?style=for-the-badge)](https://circleci.com/gh/Jinjiang/vue-a11y-utils/tree/master)
 
