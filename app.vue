@@ -1,39 +1,24 @@
 <template>
   <div id="app">
-    <p>
-      <button tabindex="-1">X</button>
-      <button tabindex="0">X</button>
-      <button tabindex>X</button>
-      <button>X</button>
-      <span tabindex="-1">X</span>
-      <span tabindex="0">X</span>
-      <span tabindex>X</span>
-      <span>X</span>
-    </p>
-    <p>
-      <VueAria role="none" :tabindex="-1">
-        <button>X</button>
-      </VueAria>
-      <VueAria role="none">
-        <button :tabindex="-1">X</button>
-      </VueAria>
-      <VueAria role="none">
-        <span role="button" tabindex="0">X</span>
-      </VueAria>
-      <VueAria role="none" :tabindex="-1">
-        <span role="button" tabindex="0">X</span>
-      </VueAria>
-    </p>
-    <ExampleFocusTrap />
+    <h1>Vue A11y Utils Examples</h1>
+    <h2>VueAria Component</h2>
+    <ExampleAria></ExampleAria>
+    <h2>VueFocusTrap Component</h2>
+    <ExampleFocusTrap></ExampleFocusTrap>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
 import Component from 'vue-class-component'
-import { VueAria } from "./index"
+import ExampleAria from './aria-example.vue'
 import ExampleFocusTrap from './focus-trap-example.vue'
 
-@Component({ components: { VueAria, ExampleFocusTrap } })
+@Component({
+  components: {
+    ExampleAria,
+    ExampleFocusTrap
+  }
+})
 export default class App extends Vue {}
 </script>

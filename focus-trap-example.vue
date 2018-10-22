@@ -8,6 +8,7 @@
         @gofirst="goFirst"
         @golast="goLast"
       >
+        <h1>Modal Dialog</h1>
         <label>
           Email:
           <input ref="email" type="email" />
@@ -17,7 +18,7 @@
           <input ref="password" type="password" />
         </label>
         <button ref="login" @click="shown = false">Login</button>
-        <button ref="cancel">Cancel</button>
+        <button ref="cancel" @click="shown = false">Cancel</button>
       </VueFocusTrap>
     </div>
   </div>
@@ -62,3 +63,15 @@ export default Vue.extend({
   }
 });
 </script>
+
+<style>
+.dialog {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  width: 100vw;
+  height: 100vh;
+  background: white;
+}
+</style>
