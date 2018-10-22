@@ -517,6 +517,10 @@ Additionally, as a best practise of managing focus, you'd better auto-focus the 
 
 ### API
 
+#### Slots
+
+* default slot: the content you would trap focus in.
+
 #### Events
 
 * `gofirst`: when you should manually set focus to the first focusable element
