@@ -17,6 +17,7 @@ Utilities for accessibility (a11y) in Vue.js
 * [`v-aria` Custome Directive](#v-aria-custom-directive)
 * [`KeyTravel` Mixin](#keytravel-mixin)
 * [`Id` Mixin](#id-mixin)
+* [`<VueFocusTrap>` Component](#vuefocustrap-component)
 * to be continued ...
 
 ## Why
@@ -463,3 +464,124 @@ Now the final generated DOM tree is:
 #### Values you can get
 
 * `localId: string`
+
+## `<VueFocusTrap>` Component
+
+Usually, when there is a modal dialog in your Vue app, you should keep the focus still in this dialog whatever you navigate with touch, mouse or keyboard.
+
+`<VueFocusTrap>` gives you a easy way to trap focus by just two events `gofirst` and `golast` which should bind handlers to reset the focus to the first or last focusable target in the dialog.
+
+### Examples
+
+In this example below, after you open the modal dialog by click the trigger button, the focus will always in the 4 control elements in `<form>`, whatever you press <kbd>tab</kbd>, <kbd>tab</kbd> + <kbd>shift</kbd> or click somewhere out of the dialog:
+
+``` vue
+<template>
+  <div>
+    <button ref="trigger" @click="shown = true">
+      Open a Modal Dialog
+    </button>
+    <form class="dialog" v-show="shown">
+      <VueFocusTrap @gofirst="goFirst" @golast="goLast">
+        <label>Email: <input ref="email" type="email" /></label>
+        <label>Password: <input ref="password" type="password" /></label>
+        <button ref="login" @click="shown = false">Login</button>
+        <button ref="cancel">Cancel</button>
+      </VueFocusTrap>
+    </form>
+  </div>
+</template>
+
+<script>
+export default {
+  components: { VueFocusTrap },
+  data() { return { shown: false }; },
+  watch: {
+    shown(value) {
+      if (value) { this.$nextTick(() => this.goFirst()); }
+      else { this.$nextTick(() => this.goTrigger()); }
+    }
+  },
+  methods: {
+    goFirst() { this.$refs.email.focus(); },
+    goLast() { this.$refs.cancel.focus(); },
+    goTrigger() { this.$refs.trigger.focus(); }
+  }
+};
+</script>
+```
+
+::: tip
+Additionally, as a best practise of managing focus, you'd better auto-focus the first control element in when the dialog shows up, and auto-focus the trigger button back when the dialog closed. Just like the code logic in the example above.
+:::
+
+### API
+
+#### Events
+
+* `gofirst`: when you should manually set focus to the first focusable element
+* `golast`: when you should manually set focus to the last focusable element
+
+### Using `<VueFocusTrap>` Component and `KeyTravel` Mixin Together
+
+The better thing is: you can combine `<VueFocusTrap>` component and `KeyTravel` mixin together in a widget like actionsheet.
+
+``` vue
+<template>
+  <div>
+    <button ref="trigger" @click="shown = true">
+      Open a Modal Dialog
+    </button>
+    <ul class="actionsheet" v-show="shown" @keydown="keyTravel">
+      <VueFocusTrap @gofirst="goFirst" @golast="goLast">
+        <li
+          v-for="option in options"
+          :key="option.value"
+          ref="items"
+          tabindex="0"
+        >{{ option.text }}</li>
+      </VueFocusTrap>
+    </ul>
+  </div>
+</template>
+
+<script>
+export default {
+  mixins: [MixinKeyTravel],
+  components: { VueFocusTrap },
+  props: { options: Array, value: String },
+  data() { return { shown: false, orientation: 'vertical' }; },
+  watch: {
+    shown(value) {
+      if (value) {
+        this.$nextTick(() => this.getAutofocusItem().focus());
+      } else {
+        this.$nextTick(() => this.goTrigger());
+      }
+    }
+  },
+  methods: {
+    getKeyItems() { return this.$refs.items; },
+    getAutofocusItem() {
+      const items = this.getKeyItems();
+      const index = this.options.map(option => option.value).indexOf(value);
+      return items[index] || items[0];
+    },
+    goTrigger() { this.$refs.trigger.focus(); },
+    fireAction(item) {
+      const items = this.getKeyItems();
+      const index = this.options.map(option => option.value).indexOf(value);
+      const currentIndex = items.indexOf(item);
+      if (index !== currentIndex) {
+        const option = this.options[index];
+        if (option) {
+          this.$emit('input', .value);
+        }
+      }
+      this.shown = false;
+    }
+  }
+};
+</script>
+```
+
