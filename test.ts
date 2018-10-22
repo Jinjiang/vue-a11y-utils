@@ -757,4 +757,21 @@ describe('Id mixin', () => {
       expect(labelledby).toBe('v-helloworld-label');
     }
   });
+
+  it('will update localId after id prop changed', () => {
+    const wrapper: Wrapper<Vue> = mount(Foo);
+    const label = wrapper.vm.$refs.label;
+    const input = wrapper.vm.$refs.input;
+    expect(label).toBeTruthy();
+    expect(Array.isArray(label)).toBeFalsy();
+    expect(input).toBeTruthy();
+    expect(Array.isArray(input)).toBeFalsy();
+    if (label && input && !Array.isArray(label) && !Array.isArray(input)) {
+      wrapper.setProps({ id: 'v-helloworld' });
+      expect(label.getAttribute('id')).toBe('v-helloworld-label');
+      wrapper.setProps({ id: null });
+      expect(label.getAttribute('id')).not.toBe('v-helloworld-label');
+      expect(label.getAttribute('id')).toBe(input.getAttribute('aria-labelledby'));
+    }
+  });
 });

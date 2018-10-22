@@ -344,10 +344,8 @@ const MixinIdProps = Vue.extend({
  */
 @Component
 export class MixinId extends MixinIdProps {
-  data() {
-    return {
-      localId: this.id || generateNewId()
-    };
+  get localId() {
+    return this.id || generateNewId();
   }
 }
 
