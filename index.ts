@@ -330,3 +330,33 @@ function fireItemAction(item: Vue): any {
 function capitalizeFirstLetter(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
+
+const MixinIdProps = Vue.extend({
+  props: {
+    id: String
+  }
+});
+
+/**
+ * Mixin: Id
+ * - prop: id
+ * - data: localId
+ */
+@Component
+export class MixinId extends MixinIdProps {
+  data() {
+    return {
+      localId: this.id || generateNewId()
+    };
+  }
+}
+
+export let lastId = Date.now();
+
+function generateNewId() {
+  const now = Date.now();
+  if (now === lastId) {
+    lastId++;
+  }
+  return `v-${lastId}`;
+}
