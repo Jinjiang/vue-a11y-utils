@@ -351,7 +351,7 @@ export class MixinId extends MixinIdProps {
   }
 }
 
-export let lastId = Date.now();
+let lastId = Date.now();
 
 function generateNewId() {
   const now = Date.now();

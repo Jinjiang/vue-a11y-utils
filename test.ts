@@ -1,7 +1,7 @@
 import Vue, { Component } from 'vue';
 import { mount, Wrapper, config } from '@vue/test-utils';
 
-import { VueAria, directiveAria, MixinKeyTravel } from './';
+import { VueAria, directiveAria, MixinKeyTravel, MixinId } from './';
 
 config.logModifiedComponents = false;
 
@@ -702,5 +702,59 @@ describe('KeyTravel mixin', () => {
     wrapper.trigger('keydown', { key: 'End' });
     expect(document.activeElement).toBe(items[2].$el);
     expect(lastAction).toBe('baz');
+  });
+});
+
+describe('Id mixin', () => {
+  const Foo = Vue.extend({
+    mixins: [MixinId],
+    template: `
+      <div>
+        <label ref="label" :id="\`\${localId}-label\`">Username</label>
+        <input
+          ref="input"
+          :id="\`\${localId}-input\`"
+          :aria-labelledby="\`\${localId}-label\`"
+        />
+      </div>
+    `
+  });
+
+  it('will generate unique new ids for each component instance', () => {
+    const wrapper: Wrapper<Vue> = mount(Foo);
+    const label = wrapper.vm.$refs.label;
+    const input = wrapper.vm.$refs.input;
+    expect(label).toBeTruthy();
+    expect(Array.isArray(label)).toBeFalsy();
+    expect(input).toBeTruthy();
+    expect(Array.isArray(input)).toBeFalsy();
+    if (label && input && !Array.isArray(label) && !Array.isArray(input)) {
+      const labelId = label.getAttribute('id');
+      const inputId = input.getAttribute('id');
+      const labelledby = input.getAttribute('aria-labelledby');
+      expect(labelledby).toBe(labelId);
+      expect(labelId.substr(0, labelId.length - 5)).
+        toBe(inputId.substr(0, inputId.length - 5));
+    }
+  });
+
+  it('will use an id prop to assign sub ids', () => {
+    const wrapper: Wrapper<Vue> = mount(Foo, {
+      propsData: { id: 'v-helloworld' }
+    });
+    const label = wrapper.vm.$refs.label;
+    const input = wrapper.vm.$refs.input;
+    expect(label).toBeTruthy();
+    expect(Array.isArray(label)).toBeFalsy();
+    expect(input).toBeTruthy();
+    expect(Array.isArray(input)).toBeFalsy();
+    if (label && input && !Array.isArray(label) && !Array.isArray(input)) {
+      const labelId = label.getAttribute('id');
+      const inputId = input.getAttribute('id');
+      const labelledby = input.getAttribute('aria-labelledby');
+      expect(labelId).toBe('v-helloworld-label');
+      expect(inputId).toBe('v-helloworld-input');
+      expect(labelledby).toBe('v-helloworld-label');
+    }
   });
 });
