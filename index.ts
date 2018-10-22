@@ -1,5 +1,6 @@
 import Vue, { CreateElement, VNode, VNodeData, DirectiveOptions } from 'vue';
 import Component from 'vue-class-component';
+export { default as VueFocusTrap } from './focus-trap.vue';
 
 const VueAriaProps = Vue.extend({
   props: {
