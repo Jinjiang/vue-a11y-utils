@@ -6,7 +6,8 @@ import {
   directiveAria,
   MixinKeyTravel,
   MixinId,
-  VueFocusTrap
+  VueFocusTrap,
+  MixinKeyShortcuts
 } from './';
 
 config.logModifiedComponents = false;
@@ -876,5 +877,42 @@ describe('<VueFocusTrap> component', () => {
       expect(dialog.style.display).toBe('none');
       done();
     });
+  });
+});
+
+describe('KeyShortcuts mixin', () => {
+  it('will trigger a single-key shortcut', () => {
+    const messages: Array<string> = [];
+    const Foo = Vue.extend({
+      template: `
+        <div>
+          Please press:
+          <kbd>CMD</kbd> + <kbd>G</kbd> or
+          <kbd>Window</kbd> + <kbd>G</kbd>
+        </div>
+      `,
+      mixins: [MixinKeyShortcuts],
+      shortcuts: [
+        {
+          key: 'g',
+          modifiers: { meta: true },
+          handle(event: KeyboardEvent) {
+            messages.push('trigger: CMD + G');
+          }
+        }
+      ]
+    });
+    const wrapper: Wrapper<Vue> = mount(Foo, {
+      attachToDocument: true
+    });
+    // { key, code, ctrlKey, shiftKey, altKey, metaKey }
+    expect(messages.length).toBe(0);
+    wrapper.trigger('keydown', {
+      key: 'g', code: 'KeyG',
+      metaKey: true,
+      ctrlKey: false, shiftKey: false, altKey: false
+    });
+    expect(messages.length).toBe(1);
+    expect(messages[0]).toBe('trigger: CMD + G');
   });
 });

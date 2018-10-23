@@ -377,7 +377,7 @@ function generateNewId() {
 }
 
 @Component({
-  mounted() {
+  created() {
     window.addEventListener('keydown', this.detectShortcuts);
   },
   beforeDestroy() {
@@ -393,7 +393,7 @@ export class MixinKeyShortcuts extends Vue {
       // check whether end rule matched
       const touchedEndBefore = keyEventIsEnded();
       if (!touchedEndBefore) {
-        this.shortcuts.some((shortcut: ShortcutConfig) => {
+        (this.$options.shortcuts || []).some((shortcut: ShortcutConfig) => {
           // match new rules in current shortcut config
           if (matchShortcut(shortcut)) {
             // do the job and make sure whether to end the matching process
@@ -445,7 +445,7 @@ class KeyDown {
   static parseEvent(event: KeyboardEvent): KeyDown | void {
     const { key, code, ctrlKey, shiftKey, altKey, metaKey } = event;
     // skip modifier key
-    if (['Control', 'Shift', 'Alt', 'Meta'].indexOf(key) < 0) {
+    if (['Control', 'Shift', 'Alt', 'Meta'].indexOf(key) >= 0) {
       return;
     }
     const keyModifiers: KeyModifiers = {
@@ -475,7 +475,10 @@ class KeyDown {
     // other: code
     return new KeyDown(code, keyModifiers);
   }
-  equals(keyDown: KeyDown) {
+  equals(keyDown: any) {
+    if (!keyDown || typeof keyDown.toString !== 'function') {
+      return false;
+    }
     return this.toString() === keyDown.toString();
   }
   toString(): string {
@@ -517,6 +520,9 @@ function updateKeySeq(event: KeyboardEvent): boolean {
   const keyDown: KeyDown | void = KeyDown.parseEvent(event);
   if (keyDown) {
     keySeq.push(keyDown);
+    if (keySeq.length > maxKeySeqLength) {
+      keySeq.shift();
+    }
     return true;
   }
   return false;
@@ -542,7 +548,10 @@ function matchShortcut(shortcut: ShortcutConfig): boolean {
     return false;
   }
   for (let index = 0; index < keyDownListLength; index++) {
-    if (!(<KeyDown>keySeq[keySeqLength - index]).equals(keyDownList[keyDownListLength - index])) {
+    if (
+      !(<KeyDown>keySeq[keySeqLength - 1 - index])
+        .equals(keyDownList[keyDownListLength - 1 - index])
+    ) {
       return false;
     }
   }
