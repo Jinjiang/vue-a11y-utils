@@ -16,8 +16,14 @@ declare module 'vue/types/options' {
   }
 }
 
-interface ShortcutConfig {
+interface ShortcutConfig extends KeyDescriptor {
+  keys?: Array<KeyDescriptor>
   handle: Function
+}
+
+interface KeyDescriptor {
+  key?: string
+  modifiers?: KeyModifiers
 }
 
 const VueAriaProps = Vue.extend({
@@ -381,36 +387,171 @@ function generateNewId() {
 export class MixinKeyShortcuts extends Vue {
   detectShortcuts(event: KeyboardEvent): void {
     // update global unique key seq
-    updateKeySeq(event);
-    // match shortcuts if no end rule matched before
-    if (keyEventIsEnded(event)) {
-      const shortcuts = this.shortcuts;
-      shortcuts.some((shortcut: ShortcutConfig) => {
-        if (matchShortcut(shortcut)) {
-          // do the job and make sure whether to end the matching process
-          const result = shortcut.handle(event);
-          setEventMatchingEnded(event);
-          return result;
-        }
-        return false;
-      })
+    const updated = updateKeySeq(event);
+    // match shortcuts
+    if (updated) {
+      // check whether end rule matched
+      const touchedEndBefore = keyEventIsEnded();
+      if (!touchedEndBefore) {
+        this.shortcuts.some((shortcut: ShortcutConfig) => {
+          // match new rules in current shortcut config
+          if (matchShortcut(shortcut)) {
+            // do the job and make sure whether to end the matching process
+            const ended = shortcut.handle(event);
+            if (ended) {
+              endLastKeyDown();
+            }
+            return keyEventIsEnded();
+          }
+          return false;
+        })
+      }
     }
   }
 }
 
-function updateKeySeq(event: KeyboardEvent): void {
-  // todo
+interface KeyModifiers {
+  ctrl?: boolean
+  shift?: boolean
+  alt?: boolean
+  meta?: boolean
+  window?: boolean
+  cmd?: boolean
+  option?: boolean
 }
 
-function keyEventIsEnded(event: KeyboardEvent): boolean {
-  // todo
+interface KeyDown {
+  [modifier: string]: boolean | string | number | Function
+  name: string
+  ctrl: boolean
+  shift: boolean
+  alt: boolean
+  meta: boolean
+  timestamp: number
+  ended: boolean
+  toString(): string
+}
+
+class KeyDown {
+  constructor(name: string, modifiers: KeyModifiers = {}) {
+    this.name = parseKeyName(name);
+    const { ctrl, shift, alt, meta, window, cmd, option } = modifiers;
+    this.ctrl = !!ctrl;
+    this.shift = !!shift;
+    this.alt = !!alt || !!option;
+    this.meta = !!meta || !!window || !!cmd;
+    this.timestamp = Date.now();
+  }
+  static parseEvent(event: KeyboardEvent): KeyDown | void {
+    const { key, code, ctrlKey, shiftKey, altKey, metaKey } = event;
+    // skip modifier key
+    if (['Control', 'Shift', 'Alt', 'Meta'].indexOf(key) < 0) {
+      return;
+    }
+    const keyModifiers: KeyModifiers = {
+      ctrl: ctrlKey,
+      shift: shiftKey,
+      alt: altKey,
+      meta: metaKey
+    }
+    // number: key
+    if (key.match(/^Digit\d$/)) {
+      return new KeyDown(key, keyModifiers);
+    }
+    // alphabet: code
+    if (code.match(/^Key\w$/)) {
+      return new KeyDown(code, keyModifiers);
+    }
+    // navigation: key
+    if (
+      [
+        'Up', 'Down', 'Left', 'Right',
+        'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
+        'Home', 'End', 'PageUp', 'PageDown'
+      ].indexOf(key) >= 0
+    ) {
+      return new KeyDown(key, keyModifiers);
+    }
+    // other: code
+    return new KeyDown(code, keyModifiers);
+  }
+  equals(keyDown: KeyDown) {
+    return this.toString() === keyDown.toString();
+  }
+  toString(): string {
+    const { name } = this;
+    const modifiers: string = ['ctrl', 'shift', 'alt', 'meta']
+      .filter((modifier: string) => this[modifier]).join(',');
+    return modifiers ? `${name}(${modifiers})` : name;
+  }
+}
+
+function parseKeyName(name: string): string {
+  if (name.match(/^[a-z]$/)) {
+    return `Key${name.toUpperCase()}`;
+  }
+  if (name.match(/^[0-9]$/)) {
+    return `Digit${name.toUpperCase()}`;
+  }
+  const specialNameMap: Record<string, string> = {
+    up: 'ArrowUp',
+    down: 'ArrowDown',
+    left: 'ArrowLeft',
+    right: 'ArrowRight',
+    home: 'Home',
+    end: 'End',
+    pagedown: 'PageDown',
+    pageup: 'PageUp'
+  }
+  const specialName = specialNameMap[name.toLowerCase()];
+  if (specialName) {
+    return specialName;
+  }
+  return capitalizeFirstLetter(name);
+}
+
+const keySeq: Array<KeyDown> = [];
+const maxKeySeqLength = 32;
+
+function updateKeySeq(event: KeyboardEvent): boolean {
+  const keyDown: KeyDown | void = KeyDown.parseEvent(event);
+  if (keyDown) {
+    keySeq.push(keyDown);
+    return true;
+  }
   return false;
+}
+
+function keyEventIsEnded(): boolean {
+  const lastKeyDown = keySeq[keySeq.length - 1];
+  return lastKeyDown ? !!lastKeyDown.ended : false;
 }
 
 function matchShortcut(shortcut: ShortcutConfig): boolean {
-  // todo
-  return false;
+  const { key, keys, modifiers } = shortcut;
+  const keyDownList: Array<KeyDown> = [];
+  if (Array.isArray(keys)) {
+    keyDownList.push(...keys.filter(descriptor => descriptor.key).map(
+      descriptor => new KeyDown(<string>descriptor.key, descriptor.modifiers)));
+  } else if (key) {
+    keyDownList.push(new KeyDown(key, modifiers));
+  }
+  const keyDownListLength = keyDownList.length;
+  const keySeqLength = keySeq.length;
+  if (!keyDownListLength) {
+    return false;
+  }
+  for (let index = 0; index < keyDownListLength; index++) {
+    if (!(<KeyDown>keySeq[keySeqLength - index]).equals(keyDownList[keyDownListLength - index])) {
+      return false;
+    }
+  }
+  return true;
 }
-function setEventMatchingEnded(event: KeyboardEvent): void {
-  // todo
+
+function endLastKeyDown(): void {
+  const lastKeyDown = keySeq[keySeq.length - 1];
+  if (lastKeyDown) {
+    lastKeyDown.ended = true;
+  }
 }
