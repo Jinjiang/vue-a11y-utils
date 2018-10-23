@@ -649,11 +649,52 @@ export default {
 </script>
 ```
 
+At last, if you would like to bind key shortcuts on a certain element, for example an input text box, we also supports named shortcuts like below:
+
+``` vue
+<template>
+  <div>
+    <input
+      type="text" value="CMD + G"
+      @keydown="bindShortcut($event, 'foo')"
+    />
+    <input
+      type="text" value="CMD + K"
+      @keydown="bindShortcut($event, 'bar')"
+    />
+  </div>
+</template>
+
+<script>
+export default {
+  mixins: [MixinKeyShortcuts],
+  shortcuts: {
+    foo: [
+      {
+        key: 'g',
+        modifiers: { meta: true },
+        handle(event) { alert('trigger: CMD + G'); }
+      }
+    ],
+    bar: [
+      {
+        key: 'k',
+        modifiers: { meta: true },
+        handle(event) { alert('trigger: CMD + K'); }
+      }
+    ]
+  }
+};
+</script>
+```
+
 ### API
 
 #### New option you can define
 
 * `shortcuts: Array<ShortcutConfig>`
+* `shortcuts: Record<string, ShortcutConfig>`
+* `shortcuts: Record<string, Array<ShortcutConfig>>`
 
   The interface `ShortcutConfig` is like:
 
@@ -684,3 +725,7 @@ export default {
     handle(event: KeyboardEvent)
   }
   ```
+
+### Methods you can use
+
+* `bindShortcut(event: KeyboardEvent, name: string)`
