@@ -2,6 +2,24 @@ import Vue, { CreateElement, VNode, VNodeData, DirectiveOptions } from 'vue';
 import Component from 'vue-class-component';
 export { default as VueFocusTrap } from './focus-trap.vue';
 
+declare module 'vue/types/vue' {
+  interface Vue {
+    autofocus?: boolean // MixinKeyTravel
+    orientation?: string // MixinKeyTravel
+    [keyMethod: string]: any // MixinKeyTravel
+  }
+}
+
+declare module 'vue/types/options' {
+  interface ComponentOptions<V extends Vue> {
+    shortcuts?: Array<ShortcutConfig> // MixinKeyShortcuts
+  }
+}
+
+interface ShortcutConfig {
+  handle: Function
+}
+
 const VueAriaProps = Vue.extend({
   props: {
     role: String,
@@ -146,14 +164,6 @@ const defaultKeyToMethod: KeyConfig = {
   Enter: 'action',
   Space: 'action'
 };
-
-declare module 'vue/types/vue' {
-  interface Vue {
-    autofocus?: boolean
-    orientation?: string
-    [keyMethod: string]: any
-  }
-}
 
 /**
  * Mixin: KeyTravel
@@ -358,4 +368,49 @@ function generateNewId() {
     lastId++;
   }
   return `v-${lastId}`;
+}
+
+@Component({
+  mounted() {
+    window.addEventListener('keydown', this.detectShortcuts);
+  },
+  beforeDestroy() {
+    window.removeEventListener('keydown', this.detectShortcuts);
+  }
+})
+export class MixinKeyShortcuts extends Vue {
+  detectShortcuts(event: KeyboardEvent): void {
+    // update global unique key seq
+    updateKeySeq(event);
+    // match shortcuts if no end rule matched before
+    if (keyEventIsEnded(event)) {
+      const shortcuts = this.shortcuts;
+      shortcuts.some((shortcut: ShortcutConfig) => {
+        if (matchShortcut(shortcut)) {
+          // do the job and make sure whether to end the matching process
+          const result = shortcut.handle(event);
+          setEventMatchingEnded(event);
+          return result;
+        }
+        return false;
+      })
+    }
+  }
+}
+
+function updateKeySeq(event: KeyboardEvent): void {
+  // todo
+}
+
+function keyEventIsEnded(event: KeyboardEvent): boolean {
+  // todo
+  return false;
+}
+
+function matchShortcut(shortcut: ShortcutConfig): boolean {
+  // todo
+  return false;
+}
+function setEventMatchingEnded(event: KeyboardEvent): void {
+  // todo
 }
