@@ -663,8 +663,8 @@ export default {
     modifiers: {
       ctrl?: boolean,
       shift?: boolean,
-      alt?: boolean,
-      meta?: boolean
+      alt?: boolean, // you can also use `option`
+      meta?: boolean // you can also use `cmd` or `window`
     },
     handle(event: KeyboardEvent)
   } |
@@ -675,8 +675,8 @@ export default {
         modifiers: {
           ctrl?: boolean,
           shift?: boolean,
-          alt?: boolean,
-          meta?: boolean
+          alt?: boolean, // you can also use `option`
+          meta?: boolean // you can also use `cmd` or `window`
         }
       } |
       key: string
