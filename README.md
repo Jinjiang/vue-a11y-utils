@@ -18,7 +18,7 @@ Utilities for accessibility (a11y) in Vue.js
 * [`KeyTravel` Mixin](#keytravel-mixin)
 * [`Id` Mixin](#id-mixin)
 * [`<VueFocusTrap>` Component](#vuefocustrap-component)
-* [`KeyShortcuts` Mixin](@keyshortcuts-mixin)
+* [`KeyShortcuts` Mixin](#keyshortcuts-mixin)
 * to be continued ...
 
 ## Why
