@@ -18,6 +18,7 @@ Utilities for accessibility (a11y) in Vue.js
 * [`KeyTravel` Mixin](#keytravel-mixin)
 * [`Id` Mixin](#id-mixin)
 * [`<VueFocusTrap>` Component](#vuefocustrap-component)
+* [`KeyShortcuts` Mixin](@keyshortcuts-mixin)
 * to be continued ...
 
 ## Why
@@ -589,3 +590,97 @@ export default {
 </script>
 ```
 
+## `KeyShortcuts` Mixin
+
+### Examples
+
+Listen <kbd>CMD</kbd> + <kbd>G</kbd>:
+
+``` vue
+<template>...</template>
+
+<script>
+export default {
+  mixins: [MixinKeyShortcuts],
+  shortcuts: [
+    {
+      key: 'G', modifiers: { meta: true },
+      handle(event) { alert('trigger: CMD + G'); }
+    }
+  ]
+};
+</script>
+```
+
+Another way to config <kbd>CMD</kbd> + <kbd>G</kbd> as a `keys` sequence:
+
+
+``` vue
+<template>...</template>
+
+<script>
+export default {
+  mixins: [MixinKeyShortcuts],
+  shortcuts: [
+    {
+      keys: [key: 'G', modifiers: { meta: true }],
+      handle(event) { alert('trigger: CMD + G'); }
+    }
+  ]
+};
+</script>
+```
+
+You can also quickly config each key in `keys` as a string if there is no modifiers to declare:
+
+``` vue
+<template>...</template>
+
+<script>
+export default {
+  mixins: [MixinKeyShortcuts],
+  shortcuts: [
+    {
+      keys: ['a', 's', 'd', 'f'],
+      handle(event) { alert('trigger: A-S-D-F'); }
+    }
+  ]
+};
+</script>
+```
+
+### API
+
+#### New option you can define
+
+* `shortcuts: Array<ShortcutConfig>`
+
+  The interface `ShortcutConfig` is like:
+
+  ``` ts
+  {
+    key: string,
+    modifiers: {
+      ctrl?: boolean,
+      shift?: boolean,
+      alt?: boolean,
+      meta?: boolean
+    },
+    handle(event: KeyboardEvent)
+  } |
+  {
+    keys[
+      {
+        key: string,
+        modifiers: {
+          ctrl?: boolean,
+          shift?: boolean,
+          alt?: boolean,
+          meta?: boolean
+        }
+      } |
+      key: string
+    ],
+    handle(event: KeyboardEvent)
+  }
+  ```
