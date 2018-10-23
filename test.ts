@@ -908,11 +908,79 @@ describe('KeyShortcuts mixin', () => {
     // { key, code, ctrlKey, shiftKey, altKey, metaKey }
     expect(messages.length).toBe(0);
     wrapper.trigger('keydown', {
+      key: 'g', code: 'KeyG'
+    });
+    expect(messages.length).toBe(0);
+    wrapper.trigger('keydown', {
+      key: 'F', code: 'KeyF',
+      metaKey: true,
+      ctrlKey: false, shiftKey: false, altKey: false
+    });
+    expect(messages.length).toBe(0);
+    wrapper.trigger('keydown', {
+      key: 'G', code: 'KeyG',
+      metaKey: true, ctrlKey: true,
+      shiftKey: false, altKey: false
+    });
+    expect(messages.length).toBe(0);
+    wrapper.trigger('keydown', {
       key: 'g', code: 'KeyG',
       metaKey: true,
       ctrlKey: false, shiftKey: false, altKey: false
     });
     expect(messages.length).toBe(1);
     expect(messages[0]).toBe('trigger: CMD + G');
+    wrapper.trigger('keydown', {
+      key: 'G', code: 'KeyG',
+      metaKey: true,
+      ctrlKey: false, shiftKey: false, altKey: false
+    });
+    expect(messages.length).toBe(2);
+    expect(messages[1]).toBe('trigger: CMD + G');
+    wrapper.destroy();
   });
+  it('will trigger a key seq shortcut', () => {
+    const messages: Array<string> = [];
+    const Foo = Vue.extend({
+      template: `
+        <div>
+          Please press:
+          <kbd>CMD</kbd> + <kbd>G</kbd> or
+          <kbd>Window</kbd> + <kbd>G</kbd>
+        </div>
+      `,
+      mixins: [MixinKeyShortcuts],
+      shortcuts: [
+        {
+          keys: [{ key: 'a' }, { key: 's' }, { key: 'd' }, { key: 'f' }],
+          handle(event: KeyboardEvent) {
+            messages.push('trigger: seems you are so boring');
+          }
+        }
+      ]
+    });
+    const wrapper: Wrapper<Vue> = mount(Foo, {
+      attachToDocument: true
+    });
+    // { key, code, ctrlKey, shiftKey, altKey, metaKey }
+    expect(messages.length).toBe(0);
+    wrapper.trigger('keydown', {
+      key: 'a', code: 'KeyA'
+    });
+    expect(messages.length).toBe(0);
+    wrapper.trigger('keydown', {
+      key: 's', code: 'KeyS'
+    });
+    expect(messages.length).toBe(0);
+    wrapper.trigger('keydown', {
+      key: 'd', code: 'KeyD'
+    });
+    expect(messages.length).toBe(0);
+    wrapper.trigger('keydown', {
+      key: 'f', code: 'KeyF'
+    });
+    expect(messages.length).toBe(1);
+    expect(messages[0]).toBe('trigger: seems you are so boring');
+    wrapper.destroy();
+  })
 });

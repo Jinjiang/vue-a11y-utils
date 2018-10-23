@@ -377,7 +377,7 @@ function generateNewId() {
 }
 
 @Component({
-  created() {
+  beforeMount() {
     window.addEventListener('keydown', this.detectShortcuts);
   },
   beforeDestroy() {
