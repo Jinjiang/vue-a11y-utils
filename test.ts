@@ -1029,4 +1029,40 @@ describe('KeyShortcuts mixin', () => {
     expect(messages[0]).toBe('trigger: seems you are so boring');
     wrapper.destroy();
   })
+
+  it('will trigger a key shortcut on a certain element', () => {
+    const messages: Array<string> = [];
+    const Foo = Vue.extend({
+      template: `
+        <div>
+          <input type="text" value="CMD + G" @keydown="bindShortcut($event, 'first')" />
+          <input type="text" value="CMD + K" @keydown="bindShortcut($event, 'second')" />
+        </div>
+      `,
+      mixins: [MixinKeyShortcuts],
+      shortcuts: {
+        first: [{
+          key: 'g', modifiers: { meta: true },
+          handle() { messages.push('trigger: CMD + G'); }
+        }],
+        second: [{
+          key: 'k', modifiers: { meta: true },
+          handle() { messages.push('trigger: CMD + K'); }
+        }]
+      }
+    });
+    const wrapper: Wrapper<Vue> = mount(Foo, {
+      attachToDocument: true
+    });
+    // { key, code, ctrlKey, shiftKey, altKey, metaKey }
+    expect(messages.length).toBe(0);
+    const inputs = wrapper.findAll('input');
+    inputs.at(0).trigger('keydown', { key: 'g', code: 'KeyG', metaKey: true });
+    expect(messages.length).toBe(1);
+    expect(messages[0]).toBe('trigger: CMD + G');
+    inputs.at(1).trigger('keydown', { key: 'k', code: 'KeyK', metaKey: true });
+    expect(messages.length).toBe(2);
+    expect(messages[1]).toBe('trigger: CMD + K');
+    wrapper.destroy();
+  });
 });

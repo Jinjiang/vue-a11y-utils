@@ -3,13 +3,16 @@ import Component from 'vue-class-component';
 
 import { capitalizeFirstLetter } from './util';
 
-// shortcuts config
+// shortcuts interface
 
 declare module 'vue/types/options' {
   interface ComponentOptions<V extends Vue> {
-    shortcuts?: Array<ShortcutConfig>
+    shortcuts?: ShortcutsOption
   }
 }
+
+type ShortcutsOption = Array<ShortcutConfig> |
+  Record<string, Array<ShortcutConfig> | ShortcutConfig>
 
 interface ShortcutConfig extends KeyDescriptor {
   keys?: Array<KeyDescriptor | string>
@@ -24,37 +27,43 @@ interface KeyDescriptor {
 /**
  * Mixin: KeyShortcuts
  * - option: shortcuts: Array<ShortcutConfig>
+ * - methods: bindShortcut(KeyboardEvent, name)
  */
 @Component({
   beforeMount() {
     if (this.$options.shortcuts) {
-      window.addEventListener('keydown', this.detectShortcuts);
+      window.addEventListener('keydown', this.bindShortcut);
     }
   },
   beforeDestroy() {
     if (this.$options.shortcuts) {
-      window.removeEventListener('keydown', this.detectShortcuts);
+      window.removeEventListener('keydown', this.bindShortcut);
     }
   }
 })
 export default class MixinKeyShortcuts extends Vue {
-  detectShortcuts(event: KeyboardEvent): void {
+  bindShortcut(event: KeyboardEvent, name: string = 'default'): void {
+    const target: EventTarget | null = event.currentTarget;
+    if (!target) {
+      return;
+    }
     // update global unique key seq
-    const updated = updateKeySeq(event);
+    const updated = updateKeySeq(event, target);
     // match shortcuts
     if (updated) {
       // check whether end rule matched
-      const touchedEndBefore = keyEventIsEnded();
+      const touchedEndBefore = keyEventIsEnded(target);
       if (!touchedEndBefore) {
-        (this.$options.shortcuts || []).some((shortcut: ShortcutConfig) => {
+        const shortcuts = getShortcutsByName(this.$options.shortcuts, name);
+        shortcuts.some((shortcut: ShortcutConfig) => {
           // match new rules in current shortcut config
-          if (matchShortcut(shortcut)) {
+          if (matchShortcut(shortcut, target)) {
             // do the job and make sure whether to end the matching process
             const ended = shortcut.handle(event);
             if (ended) {
-              endLastKeyDown();
+              endLastKeyDown(target);
             }
-            return keyEventIsEnded();
+            return keyEventIsEnded(target);
           }
           return false;
         })
@@ -170,12 +179,41 @@ function parseKeyName(name: string): string {
   return capitalizeFirstLetter(name);
 }
 
+// key shortcuts config functions
+
+function getShortcutsByName(
+  shortcutsOption: ShortcutsOption | void,
+  name: string = 'default'
+): Array<ShortcutConfig> {
+  if (Array.isArray(shortcutsOption)) {
+    if (name === 'default') {
+      return shortcutsOption;
+    }
+    return [];
+  }
+  if (shortcutsOption) {
+    const shortcuts = shortcutsOption[name];
+    if (Array.isArray(shortcuts)) {
+      return shortcuts
+    } else if (shortcuts) {
+      return [shortcuts];
+    }
+    return [];
+  }
+  return [];
+}
+
 // key sequence functions
 
-const keySeq: Array<KeyDown> = [];
 const maxKeySeqLength = 32;
 
-function updateKeySeq(event: KeyboardEvent): boolean {
+const keySeqMap: Map<EventTarget, Array<KeyDown>> = new Map();
+
+function updateKeySeq(event: KeyboardEvent, target: EventTarget): boolean {
+  const keySeq = keySeqMap.get(target) || [];
+  if (!keySeqMap.has(target)) {
+    keySeqMap.set(target, keySeq);
+  }
   const keyDown: KeyDown | void = KeyDown.parseEvent(event);
   if (keyDown) {
     keySeq.push(keyDown);
@@ -187,12 +225,20 @@ function updateKeySeq(event: KeyboardEvent): boolean {
   return false;
 }
 
-function keyEventIsEnded(): boolean {
+function keyEventIsEnded(target: EventTarget): boolean {
+  const keySeq = keySeqMap.get(target) || [];
+  if (!keySeqMap.has(target)) {
+    keySeqMap.set(target, keySeq);
+  }
   const lastKeyDown = keySeq[keySeq.length - 1];
   return lastKeyDown ? !!lastKeyDown.ended : false;
 }
 
-function matchShortcut(shortcut: ShortcutConfig): boolean {
+function matchShortcut(shortcut: ShortcutConfig, target: EventTarget): boolean {
+  const keySeq = keySeqMap.get(target) || [];
+  if (!keySeqMap.has(target)) {
+    keySeqMap.set(target, keySeq);
+  }
   const { key, keys, modifiers } = shortcut;
   const keyDownList: Array<KeyDown> = [];
   if (Array.isArray(keys)) {
@@ -225,7 +271,11 @@ function matchShortcut(shortcut: ShortcutConfig): boolean {
   return true;
 }
 
-function endLastKeyDown(): void {
+function endLastKeyDown(target: EventTarget): void {
+  const keySeq = keySeqMap.get(target) || [];
+  if (!keySeqMap.has(target)) {
+    keySeqMap.set(target, keySeq);
+  }
   const lastKeyDown = keySeq[keySeq.length - 1];
   if (lastKeyDown) {
     lastKeyDown.ended = true;

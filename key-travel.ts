@@ -3,7 +3,7 @@ import Component from 'vue-class-component';
 
 import { capitalizeFirstLetter } from './util';
 
-// key travel config
+// key travel interface
 
 declare module 'vue/types/vue' {
   interface Vue {
