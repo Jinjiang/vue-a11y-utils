@@ -17,7 +17,7 @@ declare module 'vue/types/options' {
 }
 
 interface ShortcutConfig extends KeyDescriptor {
-  keys?: Array<KeyDescriptor>
+  keys?: Array<KeyDescriptor | string>
   handle: Function
 }
 
@@ -537,8 +537,16 @@ function matchShortcut(shortcut: ShortcutConfig): boolean {
   const { key, keys, modifiers } = shortcut;
   const keyDownList: Array<KeyDown> = [];
   if (Array.isArray(keys)) {
-    keyDownList.push(...keys.filter(descriptor => descriptor.key).map(
-      descriptor => new KeyDown(<string>descriptor.key, descriptor.modifiers)));
+    keyDownList.push(...keys.filter(descriptor =>
+      descriptor && (typeof descriptor === 'string' || descriptor.key)
+    ).map(
+      descriptor => {
+        if (typeof descriptor === 'string') {
+          return new KeyDown(descriptor);
+        }
+        return new KeyDown(<string>descriptor.key, descriptor.modifiers)
+      }
+    ));
   } else if (key) {
     keyDownList.push(new KeyDown(key, modifiers));
   }
