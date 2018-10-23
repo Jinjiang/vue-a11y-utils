@@ -207,7 +207,7 @@ function getShortcutsByName(
 
 const maxKeySeqLength = 32;
 
-const keySeqMap: Map<EventTarget, Array<KeyDown>> = new Map();
+const keySeqMap: WeakMap<EventTarget, Array<KeyDown>> = new WeakMap();
 
 function updateKeySeq(event: KeyboardEvent, target: EventTarget): boolean {
   const keySeq = keySeqMap.get(target) || [];
