@@ -9,10 +9,10 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
-import Component from 'vue-class-component'
-import ExampleAria from './aria-example.vue'
-import ExampleFocusTrap from './focus-trap-example.vue'
+import Vue from "vue";
+import Component from "vue-class-component";
+import ExampleAria from "./aria-example.vue";
+import ExampleFocusTrap from "./focus-trap-example.vue";
 
 @Component({
   components: {

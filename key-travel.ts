@@ -1,31 +1,31 @@
-import Vue from 'vue';
-import Component from 'vue-class-component';
+import Vue from "vue";
+import Component from "vue-class-component";
 
-import { capitalizeFirstLetter } from './util';
+import { capitalizeFirstLetter } from "./util";
 
 // key travel interface
 
-declare module 'vue/types/vue' {
+declare module "vue/types/vue" {
   interface Vue {
-    autofocus?: boolean
-    orientation?: string
-    [keyMethod: string]: any
+    autofocus?: boolean;
+    orientation?: string;
+    [keyMethod: string]: any;
   }
 }
 
 interface KeyConfig {
   [key: string]: string;
-};
+}
 
 const defaultKeyToMethod: KeyConfig = {
-  ArrowUp: 'prev',
-  ArrowDown: 'next',
-  ArrowLeft: 'prev',
-  ArrowRight: 'next',
-  Home: 'first',
-  End: 'last',
-  Enter: 'action',
-  Space: 'action'
+  ArrowUp: "prev",
+  ArrowDown: "next",
+  ArrowLeft: "prev",
+  ArrowRight: "next",
+  Home: "first",
+  End: "last",
+  Enter: "action",
+  Space: "action"
 };
 
 /**
@@ -61,22 +61,26 @@ export default class MixinKeyTravel extends Vue {
     const keyToMethod: KeyConfig = Object.assign(
       {},
       defaultKeyToMethod,
-      this.orientation === 'vertical' ? {
-        ArrowLeft: '',
-        ArrowRight: ''
-      } : {},
-      this.orientation === 'horizontal' ? {
-        ArrowUp: '',
-        ArrowDown: ''
-      } : {},
+      this.orientation === "vertical"
+        ? {
+            ArrowLeft: "",
+            ArrowRight: ""
+          }
+        : {},
+      this.orientation === "horizontal"
+        ? {
+            ArrowUp: "",
+            ArrowDown: ""
+          }
+        : {},
       config
     );
-    const methodName: string = keyToMethod[event.key] || '';
+    const methodName: string = keyToMethod[event.key] || "";
 
     // make sure what to do next
     if (methodName) {
       const method = this[`go${capitalizeFirstLetter(methodName)}`];
-      if (typeof method === 'function') {
+      if (typeof method === "function") {
         const willPreventDefault = method.call(this, event);
         if (willPreventDefault) {
           event.preventDefault();
@@ -104,7 +108,8 @@ export default class MixinKeyTravel extends Vue {
       return;
     }
     const activeIndex = getActiveIndex(items);
-    const prevItem = activeIndex <= 0 ? items[length - 1] : items[activeIndex - 1];
+    const prevItem =
+      activeIndex <= 0 ? items[length - 1] : items[activeIndex - 1];
     return focusItem(prevItem);
   }
   // could be overrided
@@ -115,7 +120,8 @@ export default class MixinKeyTravel extends Vue {
       return;
     }
     const activeIndex = getActiveIndex(items);
-    const nextItem = activeIndex === length - 1 ? items[0] : items[activeIndex + 1];
+    const nextItem =
+      activeIndex === length - 1 ? items[0] : items[activeIndex + 1];
     return focusItem(nextItem);
   }
   // could be overrided
@@ -143,9 +149,9 @@ export default class MixinKeyTravel extends Vue {
     }
   }
   // could be overrided
-  goNextPage() { }
+  goNextPage() {}
   // could be overrided
-  goPrevPage() { }
+  goPrevPage() {}
   // could be overrided
   goAction() {
     const items = this.getKeyItems();
@@ -157,7 +163,7 @@ export default class MixinKeyTravel extends Vue {
     const activeItem = items[activeIndex];
     return fireItemAction(activeItem);
   }
-};
+}
 
 // focus functions
 
@@ -185,11 +191,11 @@ function isActiveItem(item: Vue): boolean {
 
 function focusItem(item: Vue): any {
   if (item) {
-    if (typeof item.focus === 'function') {
+    if (typeof item.focus === "function") {
       item.focus();
       return true;
     }
-    if (item.$el && typeof item.$el.focus === 'function') {
+    if (item.$el && typeof item.$el.focus === "function") {
       item.$el.focus();
       return true;
     }
@@ -197,7 +203,7 @@ function focusItem(item: Vue): any {
 }
 
 function fireItemAction(item: Vue): any {
-  if (item && typeof item.fireAction === 'function') {
+  if (item && typeof item.fireAction === "function") {
     item.fireAction();
     return true;
   }

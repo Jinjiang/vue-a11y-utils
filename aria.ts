@@ -1,5 +1,5 @@
-import Vue, { CreateElement, VNode, VNodeData, DirectiveOptions } from 'vue';
-import Component from 'vue-class-component';
+import Vue, { CreateElement, VNode, VNodeData, DirectiveOptions } from "vue";
+import Component from "vue-class-component";
 
 const VueAriaInterface = Vue.extend({
   props: {
@@ -7,7 +7,7 @@ const VueAriaInterface = Vue.extend({
     aria: [Object, Array],
     tabindex: Number
   }
-})
+});
 
 /**
  * <VueAria role aria tabindex>
@@ -41,7 +41,7 @@ export class VueAria extends VueAriaInterface {
     }
     return rootVNode;
   }
-};
+}
 
 /**
  * <Foo v-aria>
@@ -57,13 +57,17 @@ export const directiveAria: DirectiveOptions = {
 
 // merging functions
 
-function mergeTabindexToVNode(attrs: VNodeData['attrs'], tabindex: number): void {
+function mergeTabindexToVNode(
+  attrs: VNodeData["attrs"],
+  tabindex: number
+): void {
   if (attrs) {
-    const isAppearance: boolean = attrs.role === 'none' || attrs.role === 'appearance';
-    if (typeof tabindex !== 'number' || isNaN(tabindex)) {
+    const isAppearance: boolean =
+      attrs.role === "none" || attrs.role === "appearance";
+    if (typeof tabindex !== "number" || isNaN(tabindex)) {
       // no value passed in
       if (isAppearance) {
-        attrs.tabindex = '';
+        attrs.tabindex = "";
       }
     } else {
       // a number passed in
@@ -72,7 +76,7 @@ function mergeTabindexToVNode(attrs: VNodeData['attrs'], tabindex: number): void
   }
 }
 
-function mergeAriaAttrsToVNode(attrs: VNodeData['attrs'], aria: any): void {
+function mergeAriaAttrsToVNode(attrs: VNodeData["attrs"], aria: any): void {
   if (attrs) {
     const flatAria = flattenAria(aria);
     for (const name in flatAria) {
@@ -126,7 +130,7 @@ function flattenAria(aria: any): { [key: string]: any } {
 }
 
 function isValidAttributeValue(value: any): boolean {
-  if (typeof value === 'undefined') {
+  if (typeof value === "undefined") {
     return false;
   }
   if (value === null) {
@@ -134,4 +138,3 @@ function isValidAttributeValue(value: any): boolean {
   }
   return true;
 }
-

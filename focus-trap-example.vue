@@ -25,8 +25,8 @@
 </template>
 
 <script>
-import Vue from 'vue';
-import { VueFocusTrap } from './index';
+import Vue from "vue";
+import { VueFocusTrap } from "./index";
 
 export default Vue.extend({
   components: {

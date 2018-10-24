@@ -1,5 +1,5 @@
-import Vue from 'vue';
-import { mount, Wrapper, config } from '@vue/test-utils';
+import Vue from "vue";
+import { mount, Wrapper, config } from "@vue/test-utils";
 
 import {
   VueAria,
@@ -8,7 +8,7 @@ import {
   MixinId,
   VueFocusTrap,
   MixinKeyShortcuts
-} from './';
+} from "./";
 
 config.logModifiedComponents = false;
 
@@ -18,8 +18,8 @@ const NothingHappen = Vue.extend({
   }
 });
 
-describe('<VueAria> component', () => {
-  it('set role and aria props correctly', () => {
+describe("<VueAria> component", () => {
+  it("set role and aria props correctly", () => {
     const Foo = Vue.extend({
       template: `
         <VueAria
@@ -34,16 +34,16 @@ describe('<VueAria> component', () => {
       }
     });
     const wrapper: Wrapper<Vue> = mount(Foo);
-    expect(wrapper.element.tagName).toBe('I');
-    expect(wrapper.text()).toBe('');
+    expect(wrapper.element.tagName).toBe("I");
+    expect(wrapper.text()).toBe("");
     expect(wrapper.attributes()).toEqual({
-      class: 'icon-save',
-      role: 'button',
-      'aria-label': 'save your changes'
+      class: "icon-save",
+      role: "button",
+      "aria-label": "save your changes"
     });
   });
 
-  it('set array-type aria props correctly', () => {
+  it("set array-type aria props correctly", () => {
     const Foo = Vue.extend({
       template: `
         <VueAria
@@ -67,17 +67,17 @@ describe('<VueAria> component', () => {
         }
       }
     });
-    expect(wrapper.element.tagName).toBe('I');
-    expect(wrapper.text()).toBe('');
+    expect(wrapper.element.tagName).toBe("I");
+    expect(wrapper.text()).toBe("");
     expect(wrapper.attributes()).toEqual({
-      class: 'icon-save',
-      role: 'button',
-      'aria-label': 'save your changes',
-      'aria-pressed': 'true'
+      class: "icon-save",
+      role: "button",
+      "aria-label": "save your changes",
+      "aria-pressed": "true"
     });
   });
 
-  it('nested using', () => {
+  it("nested using", () => {
     const Foo = Vue.extend({
       template: `
         <VueAria
@@ -102,21 +102,21 @@ describe('<VueAria> component', () => {
       propsData: {
         otherAriaProps: {
           pressed: true,
-          label: 'changed label'
+          label: "changed label"
         }
       }
     });
-    expect(wrapper.element.tagName).toBe('I');
-    expect(wrapper.text()).toBe('');
+    expect(wrapper.element.tagName).toBe("I");
+    expect(wrapper.text()).toBe("");
     expect(wrapper.attributes()).toEqual({
-      class: 'icon-save',
-      role: 'button',
-      'aria-label': 'changed label',
-      'aria-pressed': 'true'
+      class: "icon-save",
+      role: "button",
+      "aria-label": "changed label",
+      "aria-pressed": "true"
     });
   });
 
-  it('set tabindex correctly', () => {
+  it("set tabindex correctly", () => {
     const Foo = Vue.extend({
       template: `
       <VueAria
@@ -131,16 +131,16 @@ describe('<VueAria> component', () => {
       }
     });
     const wrapper: Wrapper<Vue> = mount(Foo);
-    expect(wrapper.element.tagName).toBe('I');
-    expect(wrapper.text()).toBe('');
+    expect(wrapper.element.tagName).toBe("I");
+    expect(wrapper.text()).toBe("");
     expect(wrapper.attributes()).toEqual({
-      class: 'icon-save',
-      role: 'button',
-      tabindex: '0'
+      class: "icon-save",
+      role: "button",
+      tabindex: "0"
     });
   });
 
-  it('not set tabindex when when it is not a number', () => {
+  it("not set tabindex when when it is not a number", () => {
     const Foo = Vue.extend({
       template: `
       <VueAria role="button" :tabindex="NaN">
@@ -152,15 +152,15 @@ describe('<VueAria> component', () => {
       }
     });
     const wrapper: Wrapper<Vue> = mount(Foo);
-    expect(wrapper.element.tagName).toBe('I');
-    expect(wrapper.text()).toBe('');
+    expect(wrapper.element.tagName).toBe("I");
+    expect(wrapper.text()).toBe("");
     expect(wrapper.attributes()).toEqual({
-      class: 'icon-save',
-      role: 'button'
+      class: "icon-save",
+      role: "button"
     });
   });
 
-  it('reset tabindex in child when the role is none', () => {
+  it("reset tabindex in child when the role is none", () => {
     const Foo = Vue.extend({
       template: `
       <VueAria role="none">
@@ -174,16 +174,16 @@ describe('<VueAria> component', () => {
       }
     });
     const wrapper: Wrapper<Vue> = mount(Foo);
-    expect(wrapper.element.tagName).toBe('I');
-    expect(wrapper.text()).toBe('');
+    expect(wrapper.element.tagName).toBe("I");
+    expect(wrapper.text()).toBe("");
     expect(wrapper.attributes()).toEqual({
-      class: 'icon-save',
-      role: 'none',
-      tabindex: ''
+      class: "icon-save",
+      role: "none",
+      tabindex: ""
     });
   });
 
-  it('set tabindex correctly even when the role is none', () => {
+  it("set tabindex correctly even when the role is none", () => {
     const Foo = Vue.extend({
       template: `
       <VueAria role="none" :tabindex="-1">
@@ -197,18 +197,18 @@ describe('<VueAria> component', () => {
       }
     });
     const wrapper: Wrapper<Vue> = mount(Foo);
-    expect(wrapper.element.tagName).toBe('I');
-    expect(wrapper.text()).toBe('');
+    expect(wrapper.element.tagName).toBe("I");
+    expect(wrapper.text()).toBe("");
     expect(wrapper.attributes()).toEqual({
-      class: 'icon-save',
-      role: 'none',
-      tabindex: '-1'
+      class: "icon-save",
+      role: "none",
+      tabindex: "-1"
     });
   });
 });
 
-describe('v-aria directive', () => {
-  it('set aria-* attributes correctly when init', () => {
+describe("v-aria directive", () => {
+  it("set aria-* attributes correctly when init", () => {
     const Foo = Vue.extend({
       template: `
         <i
@@ -222,16 +222,16 @@ describe('v-aria directive', () => {
       }
     });
     const wrapper: Wrapper<Vue> = mount(Foo);
-    expect(wrapper.element.tagName).toBe('I');
-    expect(wrapper.text()).toBe('');
+    expect(wrapper.element.tagName).toBe("I");
+    expect(wrapper.text()).toBe("");
     expect(wrapper.attributes()).toEqual({
-      class: 'icon-save',
-      role: 'button',
-      'aria-label': 'save your changes'
+      class: "icon-save",
+      role: "button",
+      "aria-label": "save your changes"
     });
   });
 
-  it('update aria-* attributes correctly when update prop data', () => {
+  it("update aria-* attributes correctly when update prop data", () => {
     const Foo = Vue.extend({
       template: `
         <i
@@ -248,37 +248,37 @@ describe('v-aria directive', () => {
       }
     });
     const wrapper: Wrapper<Vue> = mount(Foo);
-    expect(wrapper.element.tagName).toBe('I');
-    expect(wrapper.text()).toBe('');
+    expect(wrapper.element.tagName).toBe("I");
+    expect(wrapper.text()).toBe("");
     expect(wrapper.attributes()).toEqual({
-      class: 'icon-save',
-      role: 'button'
+      class: "icon-save",
+      role: "button"
     });
 
     wrapper.setProps({
-      ariaConfig: { label: 'save your changes' }
+      ariaConfig: { label: "save your changes" }
     });
-    expect(wrapper.element.tagName).toBe('I');
-    expect(wrapper.text()).toBe('');
+    expect(wrapper.element.tagName).toBe("I");
+    expect(wrapper.text()).toBe("");
     expect(wrapper.attributes()).toEqual({
-      class: 'icon-save',
-      role: 'button',
-      'aria-label': 'save your changes'
+      class: "icon-save",
+      role: "button",
+      "aria-label": "save your changes"
     });
 
     wrapper.setProps({
       ariaConfig: {
-        label: 'Save Your Changes',
+        label: "Save Your Changes",
         pressed: true
       }
     });
-    expect(wrapper.element.tagName).toBe('I');
-    expect(wrapper.text()).toBe('');
+    expect(wrapper.element.tagName).toBe("I");
+    expect(wrapper.text()).toBe("");
     expect(wrapper.attributes()).toEqual({
-      class: 'icon-save',
-      role: 'button',
-      'aria-label': 'Save Your Changes',
-      'aria-pressed': 'true'
+      class: "icon-save",
+      role: "button",
+      "aria-label": "Save Your Changes",
+      "aria-pressed": "true"
     });
 
     wrapper.setProps({
@@ -286,16 +286,16 @@ describe('v-aria directive', () => {
         pressed: false
       }
     });
-    expect(wrapper.element.tagName).toBe('I');
-    expect(wrapper.text()).toBe('');
+    expect(wrapper.element.tagName).toBe("I");
+    expect(wrapper.text()).toBe("");
     expect(wrapper.attributes()).toEqual({
-      class: 'icon-save',
-      role: 'button',
-      'aria-pressed': 'false'
+      class: "icon-save",
+      role: "button",
+      "aria-pressed": "false"
     });
   });
 
-  it('runs on component', () => {
+  it("runs on component", () => {
     const Foo = Vue.extend({
       template: `
         <NothingHappen
@@ -322,18 +322,18 @@ describe('v-aria directive', () => {
       }
     });
     const wrapper: Wrapper<Vue> = mount(Foo);
-    expect(wrapper.element.tagName).toBe('I');
-    expect(wrapper.text()).toBe('');
+    expect(wrapper.element.tagName).toBe("I");
+    expect(wrapper.text()).toBe("");
     expect(wrapper.attributes()).toEqual({
-      class: 'icon-save',
-      role: 'button',
-      'aria-label': 'save your changes',
-      'aria-pressed': 'true',
-      'aria-controls': 'id-of-a-textbox'
+      class: "icon-save",
+      role: "button",
+      "aria-label": "save your changes",
+      "aria-pressed": "true",
+      "aria-controls": "id-of-a-textbox"
     });
   });
 
-  it('runs on component when update', () => {
+  it("runs on component when update", () => {
     const Foo = Vue.extend({
       template: `
         <NothingHappen v-aria="outer">
@@ -357,41 +357,41 @@ describe('v-aria directive', () => {
     const wrapper: Wrapper<Vue> = mount(Foo, {
       propsData: {
         outer: {
-          label: 'save your changes',
+          label: "save your changes",
           pressed: true
         },
         inner: {
-          label: 'Save Your Changes',
-          controls: 'id-of-a-textbox'
+          label: "Save Your Changes",
+          controls: "id-of-a-textbox"
         }
       }
     });
-    expect(wrapper.element.tagName).toBe('I');
-    expect(wrapper.text()).toBe('');
+    expect(wrapper.element.tagName).toBe("I");
+    expect(wrapper.text()).toBe("");
     expect(wrapper.attributes()).toEqual({
-      class: 'icon-save',
-      role: 'button',
-      'aria-label': 'save your changes',
-      'aria-pressed': 'true',
-      'aria-controls': 'id-of-a-textbox'
+      class: "icon-save",
+      role: "button",
+      "aria-label": "save your changes",
+      "aria-pressed": "true",
+      "aria-controls": "id-of-a-textbox"
     });
 
     wrapper.setProps({
       outer: {
-        label: 'save your changes',
+        label: "save your changes",
         pressed: false
       },
       inner: {
-        label: 'Save Your Changes',
-        controls: 'id-of-a-textbox'
+        label: "Save Your Changes",
+        controls: "id-of-a-textbox"
       }
     });
     expect(wrapper.attributes()).toEqual({
-      class: 'icon-save',
-      role: 'button',
-      'aria-label': 'save your changes',
-      'aria-pressed': 'false',
-      'aria-controls': 'id-of-a-textbox'
+      class: "icon-save",
+      role: "button",
+      "aria-label": "save your changes",
+      "aria-pressed": "false",
+      "aria-controls": "id-of-a-textbox"
     });
 
     wrapper.setProps({
@@ -399,37 +399,37 @@ describe('v-aria directive', () => {
         pressed: false
       },
       inner: {
-        label: 'Save Your Changes',
-        controls: 'id-of-a-textbox'
+        label: "Save Your Changes",
+        controls: "id-of-a-textbox"
       }
     });
     expect(wrapper.attributes()).toEqual({
-      class: 'icon-save',
-      role: 'button',
-      'aria-label': 'Save Your Changes',
-      'aria-pressed': 'false',
-      'aria-controls': 'id-of-a-textbox'
+      class: "icon-save",
+      role: "button",
+      "aria-label": "Save Your Changes",
+      "aria-pressed": "false",
+      "aria-controls": "id-of-a-textbox"
     });
 
     wrapper.setProps({
       outer: {
-        label: 'save your changes',
+        label: "save your changes",
         pressed: false
       },
       inner: {
-        controls: 'id-of-a-textbox'
+        controls: "id-of-a-textbox"
       }
     });
     expect(wrapper.attributes()).toEqual({
-      class: 'icon-save',
-      role: 'button',
-      'aria-label': 'save your changes',
-      'aria-pressed': 'false',
-      'aria-controls': 'id-of-a-textbox'
+      class: "icon-save",
+      role: "button",
+      "aria-label": "save your changes",
+      "aria-pressed": "false",
+      "aria-controls": "id-of-a-textbox"
     });
   });
 
-  it('runs after all parent <VueAria> components', () => {
+  it("runs after all parent <VueAria> components", () => {
     const Foo = Vue.extend({
       template: `
         <VueAria
@@ -450,13 +450,13 @@ describe('v-aria directive', () => {
       directives: { aria: directiveAria }
     });
     const wrapper: Wrapper<Vue> = mount(Foo);
-    expect(wrapper.element.tagName).toBe('I');
-    expect(wrapper.text()).toBe('');
+    expect(wrapper.element.tagName).toBe("I");
+    expect(wrapper.text()).toBe("");
     expect(wrapper.attributes()).toEqual({
-      class: 'icon-save',
-      role: 'menubutton',
-      'aria-label': 'save your changes',
-      'aria-pressed': 'false'
+      class: "icon-save",
+      role: "menubutton",
+      "aria-label": "save your changes",
+      "aria-pressed": "false"
     });
 
     const Bar = Vue.extend({
@@ -479,13 +479,13 @@ describe('v-aria directive', () => {
       directives: { aria: directiveAria }
     });
     const wrapperBar: Wrapper<Vue> = mount(Bar);
-    expect(wrapperBar.element.tagName).toBe('I');
-    expect(wrapperBar.text()).toBe('');
+    expect(wrapperBar.element.tagName).toBe("I");
+    expect(wrapperBar.text()).toBe("");
     expect(wrapperBar.attributes()).toEqual({
-      class: 'icon-save',
-      role: 'menubutton',
-      'aria-label': 'save your changes',
-      'aria-pressed': 'false'
+      class: "icon-save",
+      role: "menubutton",
+      "aria-label": "save your changes",
+      "aria-pressed": "false"
     });
 
     const Baz = Vue.extend({
@@ -511,19 +511,19 @@ describe('v-aria directive', () => {
       directives: { aria: directiveAria }
     });
     const wrapperBaz: Wrapper<Vue> = mount(Baz);
-    expect(wrapperBaz.element.tagName).toBe('I');
-    expect(wrapperBaz.text()).toBe('');
+    expect(wrapperBaz.element.tagName).toBe("I");
+    expect(wrapperBaz.text()).toBe("");
     expect(wrapperBaz.attributes()).toEqual({
-      class: 'icon-save',
-      role: 'menubutton',
-      'aria-label': 'save your changes',
-      'aria-pressed': 'false'
+      class: "icon-save",
+      role: "menubutton",
+      "aria-label": "save your changes",
+      "aria-pressed": "false"
     });
   });
 });
 
-describe('KeyTravel mixin', () => {
-  it('autofocus', () => {
+describe("KeyTravel mixin", () => {
+  it("autofocus", () => {
     const Foo = Vue.extend({
       mixins: [MixinKeyTravel],
       template: `<div><button ref="btn">Hello</button></div>`,
@@ -559,7 +559,7 @@ describe('KeyTravel mixin', () => {
     }
   });
 
-  it('travel through all focusable items', () => {
+  it("travel through all focusable items", () => {
     const Foo = Vue.extend({
       mixins: [MixinKeyTravel],
       template: `
@@ -593,9 +593,9 @@ describe('KeyTravel mixin', () => {
       attachToDocument: true,
       propsData: {
         options: [
-          { text: 'First', value: 'foo' },
-          { text: 'Second', value: 'bar' },
-          { text: 'Third', value: 'baz' }
+          { text: "First", value: "foo" },
+          { text: "Second", value: "bar" },
+          { text: "Third", value: "baz" }
         ]
       }
     });
@@ -608,21 +608,21 @@ describe('KeyTravel mixin', () => {
     }
     expect(document.activeElement).toBe(items[0]);
 
-    wrapper.trigger('keydown', { key: 'ArrowDown' });
+    wrapper.trigger("keydown", { key: "ArrowDown" });
     expect(document.activeElement).toBe(items[1]);
 
-    wrapper.trigger('keydown', { key: 'ArrowDown' });
+    wrapper.trigger("keydown", { key: "ArrowDown" });
     expect(document.activeElement).toBe(items[2]);
 
-    wrapper.trigger('keydown', { key: 'ArrowDown' });
+    wrapper.trigger("keydown", { key: "ArrowDown" });
     expect(document.activeElement).toBe(items[0]);
 
-    wrapper.trigger('keydown', { key: 'End' });
+    wrapper.trigger("keydown", { key: "End" });
     expect(document.activeElement).toBe(items[2]);
   });
 
-  it('fire action when enter key down', () => {
-    let lastAction: string = '';
+  it("fire action when enter key down", () => {
+    let lastAction: string = "";
 
     const ListItem = Vue.extend({
       template: `<div role="listitem" tabindex="-1">{{ text }}</div>`,
@@ -670,9 +670,9 @@ describe('KeyTravel mixin', () => {
       attachToDocument: true,
       propsData: {
         options: [
-          { text: 'First', value: 'foo' },
-          { text: 'Second', value: 'bar' },
-          { text: 'Third', value: 'baz' }
+          { text: "First", value: "foo" },
+          { text: "Second", value: "bar" },
+          { text: "Third", value: "baz" }
         ]
       }
     });
@@ -684,35 +684,35 @@ describe('KeyTravel mixin', () => {
       return;
     }
     expect(document.activeElement).toBe(items[0].$el);
-    expect(lastAction).toBe('');
+    expect(lastAction).toBe("");
 
-    wrapper.trigger('keydown', { key: 'ArrowDown' });
+    wrapper.trigger("keydown", { key: "ArrowDown" });
     expect(document.activeElement).toBe(items[1].$el);
-    expect(lastAction).toBe('');
+    expect(lastAction).toBe("");
 
-    wrapper.trigger('keydown', { key: 'Enter' });
+    wrapper.trigger("keydown", { key: "Enter" });
     expect(document.activeElement).toBe(items[1].$el);
-    expect(lastAction).toBe('bar');
+    expect(lastAction).toBe("bar");
 
-    wrapper.trigger('keydown', { key: 'ArrowDown' });
+    wrapper.trigger("keydown", { key: "ArrowDown" });
     expect(document.activeElement).toBe(items[2].$el);
-    expect(lastAction).toBe('bar');
+    expect(lastAction).toBe("bar");
 
-    wrapper.trigger('keydown', { key: 'Enter' });
+    wrapper.trigger("keydown", { key: "Enter" });
     expect(document.activeElement).toBe(items[2].$el);
-    expect(lastAction).toBe('baz');
+    expect(lastAction).toBe("baz");
 
-    wrapper.trigger('keydown', { key: 'ArrowDown' });
+    wrapper.trigger("keydown", { key: "ArrowDown" });
     expect(document.activeElement).toBe(items[0].$el);
-    expect(lastAction).toBe('baz');
+    expect(lastAction).toBe("baz");
 
-    wrapper.trigger('keydown', { key: 'End' });
+    wrapper.trigger("keydown", { key: "End" });
     expect(document.activeElement).toBe(items[2].$el);
-    expect(lastAction).toBe('baz');
+    expect(lastAction).toBe("baz");
   });
 });
 
-describe('Id mixin', () => {
+describe("Id mixin", () => {
   const Foo = Vue.extend({
     mixins: [MixinId],
     template: `
@@ -727,7 +727,7 @@ describe('Id mixin', () => {
     `
   });
 
-  it('will generate unique new ids for each component instance', () => {
+  it("will generate unique new ids for each component instance", () => {
     const wrapper: Wrapper<Vue> = mount(Foo);
     const label = wrapper.vm.$refs.label;
     const input = wrapper.vm.$refs.input;
@@ -736,18 +736,19 @@ describe('Id mixin', () => {
     expect(input).toBeTruthy();
     expect(Array.isArray(input)).toBeFalsy();
     if (label && input && !Array.isArray(label) && !Array.isArray(input)) {
-      const labelId = label.getAttribute('id');
-      const inputId = input.getAttribute('id');
-      const labelledby = input.getAttribute('aria-labelledby');
+      const labelId = label.getAttribute("id");
+      const inputId = input.getAttribute("id");
+      const labelledby = input.getAttribute("aria-labelledby");
       expect(labelledby).toBe(labelId);
-      expect(labelId.substr(0, labelId.length - 5)).
-        toBe(inputId.substr(0, inputId.length - 5));
+      expect(labelId.substr(0, labelId.length - 5)).toBe(
+        inputId.substr(0, inputId.length - 5)
+      );
     }
   });
 
-  it('will use an id prop to assign sub ids', () => {
+  it("will use an id prop to assign sub ids", () => {
     const wrapper: Wrapper<Vue> = mount(Foo, {
-      propsData: { id: 'v-helloworld' }
+      propsData: { id: "v-helloworld" }
     });
     const label = wrapper.vm.$refs.label;
     const input = wrapper.vm.$refs.input;
@@ -756,16 +757,16 @@ describe('Id mixin', () => {
     expect(input).toBeTruthy();
     expect(Array.isArray(input)).toBeFalsy();
     if (label && input && !Array.isArray(label) && !Array.isArray(input)) {
-      const labelId = label.getAttribute('id');
-      const inputId = input.getAttribute('id');
-      const labelledby = input.getAttribute('aria-labelledby');
-      expect(labelId).toBe('v-helloworld-label');
-      expect(inputId).toBe('v-helloworld-input');
-      expect(labelledby).toBe('v-helloworld-label');
+      const labelId = label.getAttribute("id");
+      const inputId = input.getAttribute("id");
+      const labelledby = input.getAttribute("aria-labelledby");
+      expect(labelId).toBe("v-helloworld-label");
+      expect(inputId).toBe("v-helloworld-input");
+      expect(labelledby).toBe("v-helloworld-label");
     }
   });
 
-  it('will update localId after id prop changed', () => {
+  it("will update localId after id prop changed", () => {
     const wrapper: Wrapper<Vue> = mount(Foo);
     const label = wrapper.vm.$refs.label;
     const input = wrapper.vm.$refs.input;
@@ -774,17 +775,19 @@ describe('Id mixin', () => {
     expect(input).toBeTruthy();
     expect(Array.isArray(input)).toBeFalsy();
     if (label && input && !Array.isArray(label) && !Array.isArray(input)) {
-      wrapper.setProps({ id: 'v-helloworld' });
-      expect(label.getAttribute('id')).toBe('v-helloworld-label');
+      wrapper.setProps({ id: "v-helloworld" });
+      expect(label.getAttribute("id")).toBe("v-helloworld-label");
       wrapper.setProps({ id: null });
-      expect(label.getAttribute('id')).not.toBe('v-helloworld-label');
-      expect(label.getAttribute('id')).toBe(input.getAttribute('aria-labelledby'));
+      expect(label.getAttribute("id")).not.toBe("v-helloworld-label");
+      expect(label.getAttribute("id")).toBe(
+        input.getAttribute("aria-labelledby")
+      );
     }
   });
 });
 
-describe('<VueFocusTrap> component', () => {
-  it('will trap focus to a modal dialog', done => {
+describe("<VueFocusTrap> component", () => {
+  it("will trap focus to a modal dialog", done => {
     const Foo = Vue.extend({
       template: `
         <div id="focus-trap-example">
@@ -849,12 +852,20 @@ describe('<VueFocusTrap> component', () => {
     const document = <HTMLDocument>wrapper.element.ownerDocument;
     expect(document).toBeTruthy();
 
-    const trigger = <HTMLElement>wrapper.element.querySelector('.trigger');
-    const dialog = <HTMLElement>wrapper.element.querySelector('.dialog');
-    const first = <HTMLElement>wrapper.element.querySelector('.dialog input[type="email"]');
-    const password = <HTMLElement>wrapper.element.querySelector('.dialog input[type="password"]');
-    const login = <HTMLElement>wrapper.element.querySelectorAll('.dialog button')[0];
-    const last = <HTMLElement>wrapper.element.querySelectorAll('.dialog button')[1];
+    const trigger = <HTMLElement>wrapper.element.querySelector(".trigger");
+    const dialog = <HTMLElement>wrapper.element.querySelector(".dialog");
+    const first = <HTMLElement>(
+      wrapper.element.querySelector('.dialog input[type="email"]')
+    );
+    const password = <HTMLElement>(
+      wrapper.element.querySelector('.dialog input[type="password"]')
+    );
+    const login = <HTMLElement>(
+      wrapper.element.querySelectorAll(".dialog button")[0]
+    );
+    const last = <HTMLElement>(
+      wrapper.element.querySelectorAll(".dialog button")[1]
+    );
     expect(trigger).toBeTruthy();
     expect(dialog).toBeTruthy();
     expect(first).toBeTruthy();
@@ -862,26 +873,29 @@ describe('<VueFocusTrap> component', () => {
 
     // init state
     expect(wrapper.vm.shown).toBeFalsy();
-    expect(dialog.style.display).toBe('none');
+    expect(dialog.style.display).toBe("none");
 
     // click trigger
     trigger.click();
-    wrapper.vm.$nextTick().then(() => {
-      expect(wrapper.vm.shown).toBeTruthy();
-      expect(dialog.style.display).toBe('');
-      expect(document.activeElement).toBe(first);
-      login.click();
-      return wrapper.vm.$nextTick();
-    }).then(() => {
-      expect(wrapper.vm.shown).toBeFalsy();
-      expect(dialog.style.display).toBe('none');
-      done();
-    });
+    wrapper.vm
+      .$nextTick()
+      .then(() => {
+        expect(wrapper.vm.shown).toBeTruthy();
+        expect(dialog.style.display).toBe("");
+        expect(document.activeElement).toBe(first);
+        login.click();
+        return wrapper.vm.$nextTick();
+      })
+      .then(() => {
+        expect(wrapper.vm.shown).toBeFalsy();
+        expect(dialog.style.display).toBe("none");
+        done();
+      });
   });
 });
 
-describe('KeyShortcuts mixin', () => {
-  it('will trigger a single-key shortcut', () => {
+describe("KeyShortcuts mixin", () => {
+  it("will trigger a single-key shortcut", () => {
     const messages: Array<string> = [];
     const Foo = Vue.extend({
       template: `
@@ -894,10 +908,10 @@ describe('KeyShortcuts mixin', () => {
       mixins: [MixinKeyShortcuts],
       shortcuts: [
         {
-          key: 'g',
+          key: "g",
           modifiers: { meta: true },
           handle(event: KeyboardEvent) {
-            messages.push('trigger: CMD + G');
+            messages.push("trigger: CMD + G");
           }
         }
       ]
@@ -907,40 +921,53 @@ describe('KeyShortcuts mixin', () => {
     });
     // { key, code, ctrlKey, shiftKey, altKey, metaKey }
     expect(messages.length).toBe(0);
-    wrapper.trigger('keydown', {
-      key: 'g', code: 'KeyG'
+    wrapper.trigger("keydown", {
+      key: "g",
+      code: "KeyG"
     });
     expect(messages.length).toBe(0);
-    wrapper.trigger('keydown', {
-      key: 'F', code: 'KeyF',
+    wrapper.trigger("keydown", {
+      key: "F",
+      code: "KeyF",
       metaKey: true,
-      ctrlKey: false, shiftKey: false, altKey: false
+      ctrlKey: false,
+      shiftKey: false,
+      altKey: false
     });
     expect(messages.length).toBe(0);
-    wrapper.trigger('keydown', {
-      key: 'G', code: 'KeyG',
-      metaKey: true, ctrlKey: true,
-      shiftKey: false, altKey: false
-    });
-    expect(messages.length).toBe(0);
-    wrapper.trigger('keydown', {
-      key: 'g', code: 'KeyG',
+    wrapper.trigger("keydown", {
+      key: "G",
+      code: "KeyG",
       metaKey: true,
-      ctrlKey: false, shiftKey: false, altKey: false
+      ctrlKey: true,
+      shiftKey: false,
+      altKey: false
+    });
+    expect(messages.length).toBe(0);
+    wrapper.trigger("keydown", {
+      key: "g",
+      code: "KeyG",
+      metaKey: true,
+      ctrlKey: false,
+      shiftKey: false,
+      altKey: false
     });
     expect(messages.length).toBe(1);
-    expect(messages[0]).toBe('trigger: CMD + G');
-    wrapper.trigger('keydown', {
-      key: 'G', code: 'KeyG',
+    expect(messages[0]).toBe("trigger: CMD + G");
+    wrapper.trigger("keydown", {
+      key: "G",
+      code: "KeyG",
       metaKey: true,
-      ctrlKey: false, shiftKey: false, altKey: false
+      ctrlKey: false,
+      shiftKey: false,
+      altKey: false
     });
     expect(messages.length).toBe(2);
-    expect(messages[1]).toBe('trigger: CMD + G');
+    expect(messages[1]).toBe("trigger: CMD + G");
     wrapper.destroy();
   });
 
-  it('will trigger a key seq shortcut', () => {
+  it("will trigger a key seq shortcut", () => {
     const messages: Array<string> = [];
     const Foo = Vue.extend({
       template: `
@@ -953,9 +980,9 @@ describe('KeyShortcuts mixin', () => {
       mixins: [MixinKeyShortcuts],
       shortcuts: [
         {
-          keys: [{ key: 'a' }, { key: 's' }, { key: 'd' }, { key: 'f' }],
+          keys: [{ key: "a" }, { key: "s" }, { key: "d" }, { key: "f" }],
           handle(event: KeyboardEvent) {
-            messages.push('trigger: seems you are so boring');
+            messages.push("trigger: seems you are so boring");
           }
         }
       ]
@@ -965,27 +992,31 @@ describe('KeyShortcuts mixin', () => {
     });
     // { key, code, ctrlKey, shiftKey, altKey, metaKey }
     expect(messages.length).toBe(0);
-    wrapper.trigger('keydown', {
-      key: 'a', code: 'KeyA'
+    wrapper.trigger("keydown", {
+      key: "a",
+      code: "KeyA"
     });
     expect(messages.length).toBe(0);
-    wrapper.trigger('keydown', {
-      key: 's', code: 'KeyS'
+    wrapper.trigger("keydown", {
+      key: "s",
+      code: "KeyS"
     });
     expect(messages.length).toBe(0);
-    wrapper.trigger('keydown', {
-      key: 'd', code: 'KeyD'
+    wrapper.trigger("keydown", {
+      key: "d",
+      code: "KeyD"
     });
     expect(messages.length).toBe(0);
-    wrapper.trigger('keydown', {
-      key: 'f', code: 'KeyF'
+    wrapper.trigger("keydown", {
+      key: "f",
+      code: "KeyF"
     });
     expect(messages.length).toBe(1);
-    expect(messages[0]).toBe('trigger: seems you are so boring');
+    expect(messages[0]).toBe("trigger: seems you are so boring");
     wrapper.destroy();
-  })
+  });
 
-  it('will trigger a key seq shortcut which keys is declared by string array', () => {
+  it("will trigger a key seq shortcut which keys is declared by string array", () => {
     const messages: Array<string> = [];
     const Foo = Vue.extend({
       template: `
@@ -998,9 +1029,9 @@ describe('KeyShortcuts mixin', () => {
       mixins: [MixinKeyShortcuts],
       shortcuts: [
         {
-          keys: ['a', 's', 'd', 'f'],
+          keys: ["a", "s", "d", "f"],
           handle(event: KeyboardEvent) {
-            messages.push('trigger: seems you are so boring');
+            messages.push("trigger: seems you are so boring");
           }
         }
       ]
@@ -1010,27 +1041,31 @@ describe('KeyShortcuts mixin', () => {
     });
     // { key, code, ctrlKey, shiftKey, altKey, metaKey }
     expect(messages.length).toBe(0);
-    wrapper.trigger('keydown', {
-      key: 'a', code: 'KeyA'
+    wrapper.trigger("keydown", {
+      key: "a",
+      code: "KeyA"
     });
     expect(messages.length).toBe(0);
-    wrapper.trigger('keydown', {
-      key: 's', code: 'KeyS'
+    wrapper.trigger("keydown", {
+      key: "s",
+      code: "KeyS"
     });
     expect(messages.length).toBe(0);
-    wrapper.trigger('keydown', {
-      key: 'd', code: 'KeyD'
+    wrapper.trigger("keydown", {
+      key: "d",
+      code: "KeyD"
     });
     expect(messages.length).toBe(0);
-    wrapper.trigger('keydown', {
-      key: 'f', code: 'KeyF'
+    wrapper.trigger("keydown", {
+      key: "f",
+      code: "KeyF"
     });
     expect(messages.length).toBe(1);
-    expect(messages[0]).toBe('trigger: seems you are so boring');
+    expect(messages[0]).toBe("trigger: seems you are so boring");
     wrapper.destroy();
-  })
+  });
 
-  it('will trigger a key shortcut on a certain element', () => {
+  it("will trigger a key shortcut on a certain element", () => {
     const messages: Array<string> = [];
     const Foo = Vue.extend({
       template: `
@@ -1041,14 +1076,24 @@ describe('KeyShortcuts mixin', () => {
       `,
       mixins: [MixinKeyShortcuts],
       shortcuts: {
-        first: [{
-          key: 'g', modifiers: { meta: true },
-          handle() { messages.push('trigger: CMD + G'); }
-        }],
-        second: [{
-          key: 'k', modifiers: { meta: true },
-          handle() { messages.push('trigger: CMD + K'); }
-        }]
+        first: [
+          {
+            key: "g",
+            modifiers: { meta: true },
+            handle() {
+              messages.push("trigger: CMD + G");
+            }
+          }
+        ],
+        second: [
+          {
+            key: "k",
+            modifiers: { meta: true },
+            handle() {
+              messages.push("trigger: CMD + K");
+            }
+          }
+        ]
       }
     });
     const wrapper: Wrapper<Vue> = mount(Foo, {
@@ -1056,13 +1101,13 @@ describe('KeyShortcuts mixin', () => {
     });
     // { key, code, ctrlKey, shiftKey, altKey, metaKey }
     expect(messages.length).toBe(0);
-    const inputs = wrapper.findAll('input');
-    inputs.at(0).trigger('keydown', { key: 'g', code: 'KeyG', metaKey: true });
+    const inputs = wrapper.findAll("input");
+    inputs.at(0).trigger("keydown", { key: "g", code: "KeyG", metaKey: true });
     expect(messages.length).toBe(1);
-    expect(messages[0]).toBe('trigger: CMD + G');
-    inputs.at(1).trigger('keydown', { key: 'k', code: 'KeyK', metaKey: true });
+    expect(messages[0]).toBe("trigger: CMD + G");
+    inputs.at(1).trigger("keydown", { key: "k", code: "KeyK", metaKey: true });
     expect(messages.length).toBe(2);
-    expect(messages[1]).toBe('trigger: CMD + K');
+    expect(messages[1]).toBe("trigger: CMD + K");
     wrapper.destroy();
   });
 });

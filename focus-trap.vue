@@ -7,13 +7,13 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+import Vue from "vue";
 export default Vue.extend({
   mounted() {
-    document.addEventListener('focus', this.trapFocus, true);
+    document.addEventListener("focus", this.trapFocus, true);
   },
   beforeDestroy() {
-    document.removeEventListener('focus', this.trapFocus, true);
+    document.removeEventListener("focus", this.trapFocus, true);
   },
   methods: {
     trapFocus(event: FocusEvent) {
@@ -22,13 +22,13 @@ export default Vue.extend({
       const { target } = event;
       if (!root.contains(<HTMLElement>target)) {
         event.preventDefault();
-        this.$emit('gofirst');
+        this.$emit("gofirst");
       } else if (target === start) {
         event.preventDefault();
-        this.$emit('golast');
+        this.$emit("golast");
       } else if (target === end) {
         event.preventDefault();
-        this.$emit('gofirst');
+        this.$emit("gofirst");
       }
     }
   }

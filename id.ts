@@ -1,5 +1,5 @@
-import Vue from 'vue';
-import Component from 'vue-class-component';
+import Vue from "vue";
+import Component from "vue-class-component";
 
 const MixinIdInterface = Vue.extend({
   props: {
@@ -28,4 +28,3 @@ function generateNewId() {
   }
   return `v-${lastId}`;
 }
-

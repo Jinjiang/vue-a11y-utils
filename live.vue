@@ -14,10 +14,10 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
-import Component from 'vue-class-component';
+import Vue from "vue";
+import Component from "vue-class-component";
 
-import { VueAria } from './aria';
+import { VueAria } from "./aria";
 
 const VueLiveInterface = Vue.extend({
   props: {
@@ -33,8 +33,8 @@ const VueLiveInterface = Vue.extend({
     return {
       announce(message: string, important: boolean, force: boolean) {
         if (force) {
-          self.assertiveMessage = '';
-          self.politeMessage = '';
+          self.assertiveMessage = "";
+          self.politeMessage = "";
         }
         setTimeout(() => {
           if (important) {
@@ -48,18 +48,18 @@ const VueLiveInterface = Vue.extend({
         self.busy = busy;
       },
       clear() {
-        self.assertiveMessage = '';
-        self.politeMessage = '';
+        self.assertiveMessage = "";
+        self.politeMessage = "";
       }
-    }
+    };
   }
 })
 export default class VueLive extends VueLiveInterface {
-  assertiveMessage: string = ''
-  politeMessage: string = ''
-  busy: boolean = false
+  assertiveMessage: string = "";
+  politeMessage: string = "";
+  busy: boolean = false;
   get localRole(): string {
-    return this.role || 'log';
+    return this.role || "log";
   }
 }
 </script>
