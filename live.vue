@@ -1,11 +1,15 @@
 <template>
+  <!-- https://github.com/AlmeroSteyn/react-aria-live -->
   <div>
-    <VueAria :role="localRole" :aria="{ live: 'assertive', label, buzy }">
-      <div>{{ assertiveMessage }}</div>
-    </VueAria>
-    <VueAria :role="localRole" :aria="{ live: 'polite', label, buzy }">
-      <div>{{ politeMessage }}</div>
-    </VueAria>
+    <slot></slot>
+    <div class="vue-live">
+      <VueAria :role="localRole" :aria="{ live: 'assertive', label, busy }">
+        <div>{{ assertiveMessage }}</div>
+      </VueAria>
+      <VueAria :role="localRole" :aria="{ live: 'polite', label, busy }">
+        <div>{{ politeMessage }}</div>
+      </VueAria>
+    </div>
   </div>
 </template>
 
@@ -27,15 +31,25 @@ const VueLiveInterface = Vue.extend({
   provide() {
     const self = this;
     return {
-      announce(message: string, important: boolean) {
-        if (important) {
-          self.assertiveMessage = message;
-        } else {
-          self.politeMessage = message;
+      announce(message: string, important: boolean, force: boolean) {
+        if (force) {
+          self.assertiveMessage = '';
+          self.politeMessage = '';
         }
+        setTimeout(() => {
+          if (important) {
+            self.assertiveMessage = message;
+          } else {
+            self.politeMessage = message;
+          }
+        }, force ? 300 : 0);
       },
-      setBuzy(buzy: boolean) {
-        self.buzy = buzy;
+      setBusy(busy: boolean) {
+        self.busy = busy;
+      },
+      clear() {
+        self.assertiveMessage = '';
+        self.politeMessage = '';
       }
     }
   }
@@ -43,9 +57,20 @@ const VueLiveInterface = Vue.extend({
 export default class VueLive extends VueLiveInterface {
   assertiveMessage: string = ''
   politeMessage: string = ''
-  buzy: boolean = false
+  busy: boolean = false
   get localRole(): string {
     return this.role || 'log';
   }
 }
 </script>
+
+<style scoped>
+.vue-live {
+  position: absolute;
+  height: 1px;
+  width: 1px;
+  margin: -1px;
+  clip: rect(0 0 0 0);
+  overflow: hidden;
+}
+</style>
