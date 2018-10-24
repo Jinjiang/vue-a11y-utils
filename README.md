@@ -19,6 +19,7 @@ Utilities for accessibility (a11y) in Vue.js
 * [`Id` Mixin](#id-mixin)
 * [`<VueFocusTrap>` Component](#vuefocustrap-component)
 * [`KeyShortcuts` Mixin](#keyshortcuts-mixin)
+* [`<VueLive>` Component](#vuelive-component)
 * to be continued ...
 
 ## Why
@@ -52,7 +53,7 @@ When you pass `"none"` or `"appearance"` value into `role` prop but without a `t
 
 #### slots
 
-* default slot: the element you would put these a11y attributes on.
+* default slot: the element you would put these a11y attributes on (only one root element is accepted)
 
 ### Examples
 
@@ -731,3 +732,122 @@ export default {
 ### Methods you can use
 
 * `bindShortcut(event: KeyboardEvent, name: string)`
+
+## `<VueLive>` Component
+
+This component is actually a wrapper which generates a invisible [WAI-ARIA live region](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Live_Regions) and provides a default slot which injects some methods to announce live messages on its descendant components.
+
+### Examples
+
+`App.vue`:
+
+``` vue
+<template>
+  <VueLive>
+    <Foo />
+  </VueLive>
+</template>
+
+<script>
+export default {
+  components: { VueLive }
+};
+</script>
+```
+
+`Foo.vue`:
+
+``` vue
+<template>
+  <div>
+    Message: <input type="text" v-model="message" />
+    <button @click="announce(message)">Announce</button>
+  </div>
+</template>
+
+<script>
+export default {
+  inject: ['announce'],
+  data() {
+    return { message: '' };
+  }
+};
+</script>
+```
+
+Now, if you enable VoiceOver of other a11y screen readers, there will be a live message when you input something in the textbox and press the announce button.
+
+The injected method `announce(message)` could announce live message to the screen reader.
+
+But by default the live message will be announced "politely" after other voices have been spoken. If you want to announce the message immediately, you can add a second parameter with a truthy value:
+
+``` vue
+<template>
+  <div>
+    Message: <input type="text" v-model="message" />
+    <input type="checkbox" v-model="immediately" />: immediately
+    <button @click="announce(message, immediately)">Announce</button>
+  </div>
+</template>
+
+<script>
+export default {
+  inject: ['announce'],
+  data() {
+    return {
+      message: '',
+      immediately: false
+    }
+  }
+};
+</script>
+```
+
+Also there is a third boolean parameter which could announce the same message by force if the current message is same to the previous one.
+
+As the example below, you can choose the way by two parameters: `immediately` and `force`. And another injected method could manually clear the message history. That is another way to ensure the same message could be announced.
+
+``` vue
+<template>
+  <div>
+    Message: <input type="text" v-model="message" />
+    <input type="checkbox" v-model="immediately" />: immediately
+    <input type="checkbox" v-model="force" />: force
+    <button @click="announce(message, immediately, force)">Announce</button>
+    <button @click="clear()">Clear</button>
+  </div>
+</template>
+
+<script>
+export default {
+  inject: ['announce', 'clear'],
+  data() {
+    return {
+      message: '',
+      immediately: false,
+      force: false
+    }
+  }
+};
+</script>
+```
+
+### API
+
+#### Props
+
+* `role: string`: `"log"` by default, you can also choose other [live region roles](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Live_Regions#Preferring_Specialized_Live_Region_Roles)
+* `label: string`: the label of the live region
+
+#### Slots
+
+* default slot: the content you would wrap.
+
+#### Provide
+
+* `announce(message: string, immediately: boolean, force: boolean)`: announce message to screen reader
+  * `message`: the message text would be announced
+  * `immediately`: whether announce immediately or "politely"
+  * `force`: whether announce by force whatever the message is same to the previous one
+* `clear()`: clear the previous message history to ensure the next message 100% would be announced
+* `isBusy(busy: boolean)` if you set it true, only the last message you send during that time would be announced after you set it false later  _(experimental, not sure screen readers support that well)_
