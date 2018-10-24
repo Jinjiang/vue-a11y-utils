@@ -1,5 +1,5 @@
 import Vue from "vue";
-import { mount, Wrapper, config } from "@vue/test-utils";
+import { mount, Wrapper, config, WrapperArray } from "@vue/test-utils";
 
 import {
   VueAria,
@@ -7,7 +7,8 @@ import {
   MixinKeyTravel,
   MixinId,
   VueFocusTrap,
-  MixinKeyShortcuts
+  MixinKeyShortcuts,
+  VueLive
 } from "./";
 
 config.logModifiedComponents = false;
@@ -1109,5 +1110,106 @@ describe("KeyShortcuts mixin", () => {
     expect(messages.length).toBe(2);
     expect(messages[1]).toBe("trigger: CMD + K");
     wrapper.destroy();
+  });
+});
+
+describe("<VueLive> component", () => {
+  it("will generate two zero-size live regions", () => {
+    const Foo = Vue.extend({
+      template: `<VueLive>hello</VueLive>`,
+      components: { VueLive }
+    });
+    const wrapper: Wrapper<Vue> = mount(Foo);
+    const childNodes = wrapper.element.childNodes;
+    expect(childNodes.length).toBe(2);
+    expect(childNodes[0].nodeType).toBe(wrapper.element.TEXT_NODE);
+    expect(childNodes[1].nodeName).toBe("DIV");
+    expect(wrapper.element.innerHTML).toBe(
+      `
+      hello 
+      <div class="vue-live">
+        <div role="log" aria-live="assertive" aria-busy="false"></div> 
+        <div role="log" aria-live="polite" aria-busy="false"></div>
+      </div>
+    `.replace(/(  |\n)/g, "")
+    );
+  });
+
+  it("will provide announce method", done => {
+    let announce: Function = () => {};
+    let clear: Function = () => {};
+    const Foo = Vue.extend({
+      template: `<div>hello</div>`,
+      inject: ["announce", "clear"],
+      created() {
+        announce = (...args: []) => {
+          this.announce(...args);
+        };
+        clear = (...args: []) => {
+          this.clear(...args);
+        };
+      }
+    });
+    const Bar = Vue.extend({
+      template: `<VueLive><Foo /></VueLive>`,
+      components: { VueLive, Foo }
+    });
+    const wrapper: Wrapper<Vue> = mount(Bar);
+    const logs: WrapperArray<Vue> = wrapper.findAll('[role="log"]');
+    expect(logs.at(0).text()).toBe("");
+    expect(logs.at(1).text()).toBe("");
+    announce("A");
+    new Promise(resolve => {
+      setTimeout(() => {
+        expect(logs.at(0).text()).toBe("");
+        expect(logs.at(1).text()).toBe("A");
+        announce("B");
+        resolve();
+      });
+    })
+      .then(
+        () =>
+          new Promise(resolve => {
+            setTimeout(() => {
+              expect(logs.at(0).text()).toBe("");
+              expect(logs.at(1).text()).toBe("B");
+              announce("C", true);
+              resolve();
+            });
+          })
+      )
+      .then(
+        () =>
+          new Promise(resolve => {
+            setTimeout(() => {
+              expect(logs.at(0).text()).toBe("C");
+              expect(logs.at(1).text()).toBe("B");
+              announce("D", true);
+              resolve();
+            });
+          })
+      )
+      .then(
+        () =>
+          new Promise(resolve => {
+            setTimeout(() => {
+              expect(logs.at(0).text()).toBe("D");
+              expect(logs.at(1).text()).toBe("B");
+              clear();
+              resolve();
+            });
+          })
+      )
+      .then(
+        () =>
+          new Promise(resolve => {
+            setTimeout(() => {
+              expect(logs.at(0).text()).toBe("");
+              expect(logs.at(1).text()).toBe("");
+              resolve();
+              done();
+            });
+          })
+      );
   });
 });
