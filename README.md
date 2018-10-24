@@ -12,15 +12,15 @@ Utilities for accessibility (a11y) in Vue.js
 
 ## Summary
 
-* [Why](#why)
-* [`<VueAria>` Component](#vuearia-component)
-* [`v-aria` Custome Directive](#v-aria-custom-directive)
-* [`KeyTravel` Mixin](#keytravel-mixin)
-* [`Id` Mixin](#id-mixin)
-* [`<VueFocusTrap>` Component](#vuefocustrap-component)
-* [`KeyShortcuts` Mixin](#keyshortcuts-mixin)
-* [`<VueLive>` Component](#vuelive-component)
-* to be continued ...
+- [Why](#why)
+- [`<VueAria>` Component](#vuearia-component)
+- [`v-aria` Custome Directive](#v-aria-custom-directive)
+- [`KeyTravel` Mixin](#keytravel-mixin)
+- [`Id` Mixin](#id-mixin)
+- [`<VueFocusTrap>` Component](#vuefocustrap-component)
+- [`KeyShortcuts` Mixin](#keyshortcuts-mixin)
+- [`<VueLive>` Component](#vuelive-component)
+- to be continued ...
 
 ## Why
 
@@ -43,9 +43,9 @@ First you could put all `aria-*` attributes in an object. Second these a11y attr
 
 #### props
 
-* `role`: `string`
-* `aria`: `Array` or `Object`
-* `tabindex`: `number`
+- `role`: `string`
+- `aria`: `Array` or `Object`
+- `tabindex`: `number`
 
 ::: tip
 When you pass `"none"` or `"appearance"` value into `role` prop but without a `tabindex` prop. The `tabindex` attribute on the root element will finally be `""`.
@@ -53,14 +53,13 @@ When you pass `"none"` or `"appearance"` value into `role` prop but without a `t
 
 #### slots
 
-* default slot: the element you would put these a11y attributes on (only one root element is accepted)
+- default slot: the element you would put these a11y attributes on (only one root element is accepted)
 
 ### Examples
 
-
 #### For Props `role` And `aria`
 
-``` vue
+```vue
 <template>
   <VueAria role="menubutton" :aria="aria">
     <button>WAI-ARIA Quick Links</button>
@@ -74,17 +73,17 @@ export default {
     return {
       aria: {
         haspopup: true,
-        controls: 'menu2'
+        controls: "menu2"
       }
-    }
+    };
   }
-}
+};
 </script>
 ```
 
 which is same to:
 
-``` vue
+```vue
 <template>
   <button id="menubutton" aria-haspopup="true" aria-controls="menu2">
     WAI-ARIA Quick Links
@@ -96,7 +95,7 @@ So the content and structure is more clear than which with a lot of `aria-*` att
 
 The `aria` prop could be an Array which is convenient to merge multiple `aria-*` attribute from different places:
 
-``` vue
+```vue
 <template>
   <VueAria
     role="menubutton"
@@ -113,7 +112,7 @@ The `aria` prop could be an Array which is convenient to merge multiple `aria-*`
 
 And this component could be nested like:
 
-``` vue
+```vue
 <template>
   <VueAria :aria="otherAriaFromSomewhereElse">
     <VueAria :aria="ariaProps">
@@ -127,7 +126,7 @@ And this component could be nested like:
 
 or:
 
-``` vue
+```vue
 <template>
   <VueAria role="menubutton">
     <VueAria :aria="aria">
@@ -141,7 +140,7 @@ or:
 
 If you want to make a ARIA widget focusable which is just a `<div>`. You should give it a `tabindex` attribute. For example:
 
-``` vue
+```vue
 <template>
   <VueAria
     role="menubutton"
@@ -154,7 +153,7 @@ If you want to make a ARIA widget focusable which is just a `<div>`. You should 
 
 When you pass `"none"` or `"appearance"` value into `role` prop but without a `tabindex` prop. The `tabindex` attribute on the root element will finally be `""`. For examples:
 
-``` vue
+```vue
 <template>
   <!-- won't be focused by click or TAB key -->
   <VueAria role="none">
@@ -163,7 +162,7 @@ When you pass `"none"` or `"appearance"` value into `role` prop but without a `t
 </template>
 ```
 
-``` vue
+```vue
 <template>
   <!-- won't be focused TAB key but could be focused by click -->
   <VueAria role="none" :tabindex="-1">
@@ -186,7 +185,7 @@ Because the custom directive would modify the DOM element. It is different from 
 
 ### Examples
 
-``` vue
+```vue
 <template>
   <i class="icon-save" role="button" v-aria="aria" />
 </template>
@@ -196,8 +195,8 @@ export default {
   data() {
     return {
       aria: {
-        label: 'save your changes',
-        controls: 'id-of-a-textbox'
+        label: "save your changes",
+        controls: "id-of-a-textbox"
       }
     };
   },
@@ -210,7 +209,7 @@ export default {
 
 This example above is same to:
 
-``` vue
+```vue
 <template>
   <i
     class="icon-save"
@@ -233,7 +232,7 @@ This mixin help you travel through focusable items by _arrow_ keys in a Vue comp
 
 The first example is about auto-focus. Make sure where is a value (through a prop/data/computed etc.) named `autofocus` in the component. When it's truthy, the item returned by `getAutofocusItem()` would be focused when component mounted to the DOM.
 
-``` vue
+```vue
 <template>
   <div>
     <button ref="btn">Click!</button>
@@ -247,7 +246,7 @@ export default {
     return {
       // You can also define this value through `prop` or `computed` etc.
       autofocus: true
-    }
+    };
   },
   methods: {
     // The mixin will call this method to find the focus when mounted to the DOM.
@@ -265,7 +264,7 @@ The second example is about focus travel using arrow keys in a Vue component. Th
 
 - `App.vue`:
 
-  ``` vue
+  ```vue
   <template>
     <div role="list" @keydown="keyTravel">
       <ListItem
@@ -277,7 +276,7 @@ The second example is about focus travel using arrow keys in a Vue component. Th
       />
     </div>
   </template>
-
+  
   <script>
   export default {
     mixins: [MixinKeyTravel],
@@ -286,7 +285,7 @@ The second example is about focus travel using arrow keys in a Vue component. Th
       return {
         autofocus: true,
         // Only ArrowUp and ArrowDown keys would work.
-        orientation: 'vertical'
+        orientation: "vertical"
       };
     },
     props: {
@@ -305,11 +304,11 @@ The second example is about focus travel using arrow keys in a Vue component. Th
 
 - `ListItem.vue`:
 
-  ``` vue
+  ```vue
   <template>
     <div role="listitem" tabindex="-1" @click="fireAction">{{ text }}</div>
   </template>
-
+  
   <script>
   export default {
     props: {
@@ -338,7 +337,7 @@ Now you can use ArrowUp and ArrowDown keys to travel each items. When you press 
 
 #### Method you can call
 
-* `keyTravel(event: KeyboardEvent, config?: KeyConfig): void`
+- `keyTravel(event: KeyboardEvent, config?: KeyConfig): void`
 
   The second parameter is optional. The key is the `key` in the keyboard event, and the value if the "travel signal" to trigger when user press the corresponding key.
 
@@ -346,48 +345,47 @@ Now you can use ArrowUp and ArrowDown keys to travel each items. When you press 
 
   Default config:
 
-  * `ArrowUp`: `prev` when `this.orientation` is `vertical` or empty
-  * `ArrowDown`: `next` when `this.orientation` is `vertical` or empty
-  * `ArrowLeft`: `prev` when `this.orientation` is `horizontal` or empty
-  * `ArrowRight`: `next` when `this.orientation` is `horizontal` or empty
-  * `Home`: `first`
-  * `End`: `last`
-  * `Enter`: `action`
-  * `Space`: `action`
-
+  - `ArrowUp`: `prev` when `this.orientation` is `vertical` or empty
+  - `ArrowDown`: `next` when `this.orientation` is `vertical` or empty
+  - `ArrowLeft`: `prev` when `this.orientation` is `horizontal` or empty
+  - `ArrowRight`: `next` when `this.orientation` is `horizontal` or empty
+  - `Home`: `first`
+  - `End`: `last`
+  - `Enter`: `action`
+  - `Space`: `action`
 
 #### Values you can define
 
-* `autofocus: boolean`
-* `orientation: 'horizontal' | 'vertical' | other`
+- `autofocus: boolean`
+- `orientation: 'horizontal' | 'vertical' | other`
 
 #### Methods you can override
 
 _Main method for travel:_
 
-* `getKeyItems(): Array<Vue | HTMLElement>`: return an empty array by default
+- `getKeyItems(): Array<Vue | HTMLElement>`: return an empty array by default
 
 _Main method for auto-focus:_
 
-* `getAutofocusItem(): void`: return first key item by default
+- `getAutofocusItem(): void`: return first key item by default
 
 _Methods you can customize to fire action:_
 
-* `fireAction(item: Vue | HTMLElement): void`: call `item.fireAction()` by default
+- `fireAction(item: Vue | HTMLElement): void`: call `item.fireAction()` by default
 
 _Methods you can customize to travel:_
 
-* `goPrev(): void`: focus previous item
-* `goNext(): void`: focus next item
-* `goFirst(): void`: focus the first item
-* `goLast(): void`: focus the last item
-* `goNextPage(): void`: do nothing by default
-* `goPrevPage(): void`: do nothing by default
-* `goAction(): void`: fire action at the current focused item
+- `goPrev(): void`: focus previous item
+- `goNext(): void`: focus next item
+- `goFirst(): void`: focus the first item
+- `goLast(): void`: focus the last item
+- `goNextPage(): void`: do nothing by default
+- `goPrevPage(): void`: do nothing by default
+- `goAction(): void`: fire action at the current focused item
 
 #### Method you can define in item component
 
-* `fireAction(): void`
+- `fireAction(): void`
 
 ## `Id` Mixin
 
@@ -401,7 +399,7 @@ This mixin help you generate unique id (sometimes as an id prefix) for elements 
 
 `input.vue`:
 
-``` vue
+```vue
 <template>
   <div :id="localId">
     <label ref="label" :id="`${localId}-label`">Username</label>
@@ -430,7 +428,7 @@ Think about you should bind a clear button out of the input component above. For
 
 `foo.vue`:
 
-``` vue
+```vue
 <template>
   <div>
     <VueInput id="foo" />
@@ -439,7 +437,7 @@ Think about you should bind a clear button out of the input component above. For
 </template>
 
 <script>
-import VueInput from 'input.vue';
+import VueInput from "input.vue";
 export default {
   mixins: [MixinId],
   components: { VueInput }
@@ -449,7 +447,7 @@ export default {
 
 Now the final generated DOM tree is:
 
-``` html
+```html
 <div>
   <div id="foo">
     <label id="foo-label">Username</label>
@@ -463,11 +461,11 @@ Now the final generated DOM tree is:
 
 #### Props you can use
 
-* `id: string`
+- `id: string`
 
 #### Values you can get
 
-* `localId: string`
+- `localId: string`
 
 ## `<VueFocusTrap>` Component
 
@@ -479,7 +477,7 @@ Usually, when there is a modal dialog in your Vue app, you should keep the focus
 
 In this example below, after you open the modal dialog by click the trigger button, the focus will always in the 4 control elements in `<form>`, whatever you press <kbd>tab</kbd>, <kbd>tab</kbd> + <kbd>shift</kbd> or click somewhere out of the dialog:
 
-``` vue
+```vue
 <template>
   <div>
     <button ref="trigger" @click="shown = true">
@@ -499,17 +497,28 @@ In this example below, after you open the modal dialog by click the trigger butt
 <script>
 export default {
   components: { VueFocusTrap },
-  data() { return { shown: false }; },
+  data() {
+    return { shown: false };
+  },
   watch: {
     shown(value) {
-      if (value) { this.$nextTick(() => this.goFirst()); }
-      else { this.$nextTick(() => this.goTrigger()); }
+      if (value) {
+        this.$nextTick(() => this.goFirst());
+      } else {
+        this.$nextTick(() => this.goTrigger());
+      }
     }
   },
   methods: {
-    goFirst() { this.$refs.email.focus(); },
-    goLast() { this.$refs.cancel.focus(); },
-    goTrigger() { this.$refs.trigger.focus(); }
+    goFirst() {
+      this.$refs.email.focus();
+    },
+    goLast() {
+      this.$refs.cancel.focus();
+    },
+    goTrigger() {
+      this.$refs.trigger.focus();
+    }
   }
 };
 </script>
@@ -523,18 +532,18 @@ Additionally, as a best practise of managing focus, you'd better auto-focus the 
 
 #### Slots
 
-* default slot: the content you would trap focus in.
+- default slot: the content you would trap focus in.
 
 #### Events
 
-* `gofirst`: when you should manually set focus to the first focusable element
-* `golast`: when you should manually set focus to the last focusable element
+- `gofirst`: when you should manually set focus to the first focusable element
+- `golast`: when you should manually set focus to the last focusable element
 
 ### Using `<VueFocusTrap>` Component and `KeyTravel` Mixin Together
 
 The better thing is: you can combine `<VueFocusTrap>` component and `KeyTravel` mixin together in a widget like actionsheet.
 
-``` vue
+```vue
 <template>
   <div>
     <button ref="trigger" @click="shown = true">
@@ -599,7 +608,7 @@ export default {
 
 Listen <kbd>CMD</kbd> + <kbd>G</kbd>:
 
-``` vue
+```vue
 <template>...</template>
 
 <script>
@@ -607,8 +616,11 @@ export default {
   mixins: [MixinKeyShortcuts],
   shortcuts: [
     {
-      key: 'G', modifiers: { meta: true },
-      handle(event) { alert('trigger: CMD + G'); }
+      key: "G",
+      modifiers: { meta: true },
+      handle(event) {
+        alert("trigger: CMD + G");
+      }
     }
   ]
 };
@@ -617,8 +629,7 @@ export default {
 
 Another way to config <kbd>CMD</kbd> + <kbd>G</kbd> as a `keys` sequence:
 
-
-``` vue
+```vue
 <template>...</template>
 
 <script>
@@ -626,8 +637,10 @@ export default {
   mixins: [MixinKeyShortcuts],
   shortcuts: [
     {
-      keys: [key: 'G', modifiers: { meta: true }],
-      handle(event) { alert('trigger: CMD + G'); }
+      keys: [(key: "G"), (modifiers: { meta: true })],
+      handle(event) {
+        alert("trigger: CMD + G");
+      }
     }
   ]
 };
@@ -636,7 +649,7 @@ export default {
 
 You can also quickly config each key in `keys` as a string if there is no modifiers to declare:
 
-``` vue
+```vue
 <template>...</template>
 
 <script>
@@ -644,8 +657,10 @@ export default {
   mixins: [MixinKeyShortcuts],
   shortcuts: [
     {
-      keys: ['a', 's', 'd', 'f'],
-      handle(event) { alert('trigger: A-S-D-F'); }
+      keys: ["a", "s", "d", "f"],
+      handle(event) {
+        alert("trigger: A-S-D-F");
+      }
     }
   ]
 };
@@ -654,7 +669,7 @@ export default {
 
 At last, if you would like to bind key shortcuts on a certain element, for example an input text box, we also supports named shortcuts like below:
 
-``` vue
+```vue
 <template>
   <div>
     <input
@@ -674,16 +689,20 @@ export default {
   shortcuts: {
     foo: [
       {
-        key: 'g',
+        key: "g",
         modifiers: { meta: true },
-        handle(event) { alert('trigger: CMD + G'); }
+        handle(event) {
+          alert("trigger: CMD + G");
+        }
       }
     ],
     bar: [
       {
-        key: 'k',
+        key: "k",
         modifiers: { meta: true },
-        handle(event) { alert('trigger: CMD + K'); }
+        handle(event) {
+          alert("trigger: CMD + K");
+        }
       }
     ]
   }
@@ -695,13 +714,13 @@ export default {
 
 #### New option you can define
 
-* `shortcuts: Array<ShortcutConfig>`
-* `shortcuts: Record<string, ShortcutConfig>`
-* `shortcuts: Record<string, Array<ShortcutConfig>>`
+- `shortcuts: Array<ShortcutConfig>`
+- `shortcuts: Record<string, ShortcutConfig>`
+- `shortcuts: Record<string, Array<ShortcutConfig>>`
 
   The interface `ShortcutConfig` is like:
 
-  ``` ts
+  ```ts
   {
     key: string,
     modifiers: {
@@ -731,7 +750,7 @@ export default {
 
 ### Methods you can use
 
-* `bindShortcut(event: KeyboardEvent, name: string)`
+- `bindShortcut(event: KeyboardEvent, name: string)`
 
 ## `<VueLive>` Component
 
@@ -743,7 +762,7 @@ This component is actually a wrapper which generates a invisible [WAI-ARIA live 
 
 `App.vue`:
 
-``` vue
+```vue
 <template>
   <VueLive>
     <Foo />
@@ -759,7 +778,7 @@ export default {
 
 `Foo.vue`:
 
-``` vue
+```vue
 <template>
   <div>
     Message: <input type="text" v-model="message" />
@@ -769,9 +788,9 @@ export default {
 
 <script>
 export default {
-  inject: ['announce'],
+  inject: ["announce"],
   data() {
-    return { message: '' };
+    return { message: "" };
   }
 };
 </script>
@@ -783,7 +802,7 @@ The injected method `announce(message)` could announce live message to the scree
 
 But by default the live message will be announced "politely" after other voices have been spoken. If you want to announce the message immediately, you can add a second parameter with a truthy value:
 
-``` vue
+```vue
 <template>
   <div>
     Message: <input type="text" v-model="message" />
@@ -794,12 +813,12 @@ But by default the live message will be announced "politely" after other voices 
 
 <script>
 export default {
-  inject: ['announce'],
+  inject: ["announce"],
   data() {
     return {
-      message: '',
+      message: "",
       immediately: false
-    }
+    };
   }
 };
 </script>
@@ -809,7 +828,7 @@ Also there is a third boolean parameter which could announce the same message by
 
 As the example below, you can choose the way by two parameters: `immediately` and `force`. And another injected method could manually clear the message history. That is another way to ensure the same message could be announced.
 
-``` vue
+```vue
 <template>
   <div>
     Message: <input type="text" v-model="message" />
@@ -822,13 +841,13 @@ As the example below, you can choose the way by two parameters: `immediately` an
 
 <script>
 export default {
-  inject: ['announce', 'clear'],
+  inject: ["announce", "clear"],
   data() {
     return {
-      message: '',
+      message: "",
       immediately: false,
       force: false
-    }
+    };
   }
 };
 </script>
@@ -838,18 +857,18 @@ export default {
 
 #### Props
 
-* `role: string`: `"log"` by default, you can also choose other [live region roles](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Live_Regions#Preferring_Specialized_Live_Region_Roles)
-* `label: string`: the label of the live region
+- `role: string`: `"log"` by default, you can also choose other [live region roles](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Live_Regions#Preferring_Specialized_Live_Region_Roles)
+- `label: string`: the label of the live region
 
 #### Slots
 
-* default slot: the content you would wrap.
+- default slot: the content you would wrap.
 
 #### Provide
 
-* `announce(message: string, immediately: boolean, force: boolean)`: announce message to screen reader
-  * `message`: the message text would be announced
-  * `immediately`: whether announce immediately or "politely"
-  * `force`: whether announce by force whatever the message is same to the previous one
-* `clear()`: clear the previous message history to ensure the next message 100% would be announced
-* `isBusy(busy: boolean)` if you set it true, only the last message you send during that time would be announced after you set it false later  _(experimental, not sure screen readers support that well)_
+- `announce(message: string, immediately: boolean, force: boolean)`: announce message to screen reader
+  - `message`: the message text would be announced
+  - `immediately`: whether announce immediately or "politely"
+  - `force`: whether announce by force whatever the message is same to the previous one
+- `clear()`: clear the previous message history to ensure the next message 100% would be announced
+- `isBusy(busy: boolean)` if you set it true, only the last message you send during that time would be announced after you set it false later _(experimental, not sure screen readers support that well)_
