@@ -71,8 +71,10 @@ export default {
   components: { VueAria },
   data() {
     return {
-      haspopup: true,
-      controls: 'menu2'
+      aria: {
+        haspopup: true,
+        controls: 'menu2'
+      }
     }
   }
 }
