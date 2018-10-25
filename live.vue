@@ -32,6 +32,7 @@ const VueLiveInterface = Vue.extend({
     const self = this;
     return {
       announce(message: string, important: boolean, force: boolean) {
+        console.log("announce", message, important, force);
         if (force) {
           self.assertiveMessage = "";
           self.politeMessage = "";
