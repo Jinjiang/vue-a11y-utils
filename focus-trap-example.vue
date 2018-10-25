@@ -24,19 +24,13 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import Vue from "vue";
+import Component from "vue-class-component";
 import { VueFocusTrap } from "./index";
 
-export default Vue.extend({
-  components: {
-    VueFocusTrap
-  },
-  data() {
-    return {
-      shown: false
-    };
-  },
+@Component({
+  components: { VueFocusTrap },
   watch: {
     shown(value) {
       if (value) {
@@ -49,19 +43,20 @@ export default Vue.extend({
         });
       }
     }
-  },
-  methods: {
-    goFirst() {
-      this.$refs.email.focus();
-    },
-    goLast() {
-      this.$refs.cancel.focus();
-    },
-    goTrigger() {
-      this.$refs.trigger.focus();
-    }
   }
-});
+})
+export default class ExampleVueFocusTrap extends Vue {
+  shown: boolean = false;
+  goFirst() {
+    (<HTMLLinkElement>this.$refs.email).focus();
+  }
+  goLast() {
+    (<HTMLLinkElement>this.$refs.cancel).focus();
+  }
+  goTrigger() {
+    (<HTMLLinkElement>this.$refs.trigger).focus();
+  }
+}
 </script>
 
 <style>
