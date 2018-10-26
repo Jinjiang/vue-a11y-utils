@@ -4,8 +4,8 @@
   "description": "Utilities for accessibility (a11y) in Vue.js",
   "main": "index.js",
   "scripts": {
-    "dev": "parcel examples/index.html",
-    "build:examples": "parcel build examples/index.html -d ./.vuepress/public/examples --public-url /examples/",
+    "dev": "parcel examples/index.html --public-url /examples/",
+    "build:examples": "parcel build examples/index.html --public-url /examples/ -d ./.vuepress/public/examples",
     "build": "parcel build index.js -d dist -o vue-a11y.js",
     "docs": "vuepress dev",
     "docs:build": "npm run build:examples && vuepress build",
