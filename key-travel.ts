@@ -161,7 +161,7 @@ export default class MixinKeyTravel extends Vue {
     }
     const activeIndex = getActiveIndex(items);
     const activeItem = items[activeIndex];
-    return fireItemAction(activeItem);
+    return this.fireAction(activeItem);
   }
 }
 
