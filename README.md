@@ -1,4 +1,4 @@
-# vue-a11y-utils
+# Vue A11y Utils
 
 <div style="display: flex; align-items: center;">
   <img src="https://vuejs.org/images/logo.png" width="200" height="200" />
@@ -10,9 +10,10 @@
 
 Utilities for accessibility (a11y) in Vue.js
 
-## Summary
+## Table of Contents
 
 - [Why](#why)
+- [Getting Started](#getting-started)
 - [`<VueAria>` Component](#vuearia-component)
 - [`v-aria` Custome Directive](#v-aria-custom-directive)
 - [`KeyTravel` Mixin](#keytravel-mixin)
@@ -20,7 +21,6 @@ Utilities for accessibility (a11y) in Vue.js
 - [`<VueFocusTrap>` Component](#vuefocustrap-component)
 - [`KeyShortcuts` Mixin](#keyshortcuts-mixin)
 - [`<VueLive>` Component](#vuelive-component)
-- to be continued ...
 
 ## Why
 
@@ -32,6 +32,38 @@ When you write a Vue app with full accessible control. You may meet some issues 
 - Sometimes you need set a _ID reference_ or _ID reference list_ type aria attribute with _ID_ of another DOM element. But we don't use _ID_ for such a long time right?
 
 Vue A11y Utils try to supply a group of utilities to help Vue developers finish these jobs easier. They are:
+
+## Getting Started
+
+### Install
+
+```bash
+npm install vue-a11y-utils
+```
+
+or
+
+```bash
+yarn add vue-a11y-utils
+```
+
+### Import
+
+```js
+import {
+  VueAria,
+  directiveAria,
+  MixinKeyTravel,
+  MixinId,
+  VueFocusTrap,
+  MixinKeyShortcuts,
+  VueLive
+} from "vue-a11y-utils";
+```
+
+### Usage
+
+See the docs below or some [online](/examples) examples.
 
 ## `<VueAria>` Component
 

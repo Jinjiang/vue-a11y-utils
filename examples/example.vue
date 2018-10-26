@@ -1,6 +1,7 @@
 <template>
   <div id="example" class="content">
     <h1>Vue A11y Utils Examples</h1>
+    <a href="/">Go Back to Homepage</a>
     <h2>VueAria Component</h2>
     <ExampleAria></ExampleAria>
     <h2>KeyTravel Mixin</h2>
