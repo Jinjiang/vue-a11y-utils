@@ -3,13 +3,18 @@
   "version": "0.0.1",
   "description": "Utilities for accessibility (a11y) in Vue.js",
   "main": "./lib/index.js",
+  "files": [
+    "dist",
+    "lib"
+  ],
   "scripts": {
-    "dev": "parcel examples/index.html --public-url /examples/",
-    "build:examples": "parcel build examples/index.html --public-url /examples/ -d ./.vuepress/public/examples",
-    "build:parcel": "parcel build index.js -d dist -o vue-a11y.js",
-    "build": "tsc --build src/tsconfig.json",
+    "build:parcel": "parcel build src/index.ts -d dist -o vue-a11y.js",
+    "build:lib": "tsc --build src/tsconfig.json",
+    "build": "npm run build:parcel && npm run build:lib",
+    "examples": "parcel examples/index.html --public-url /examples/",
+    "examples:build": "parcel build examples/index.html --public-url /examples/ -d ./.vuepress/public/examples",
     "docs": "vuepress dev",
-    "docs:build": "npm run build:examples && vuepress build",
+    "docs:build": "npm run examples:build && vuepress build",
     "lint": "prettier --write .{,/examples,/src}/*.{js,json,css,md,ts,vue}",
     "test": "jest"
   },

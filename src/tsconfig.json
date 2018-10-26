@@ -5,7 +5,7 @@
     "strict": true,
     "noImplicitReturns": true,
     "experimentalDecorators": true,
-    "module": "es2015",
+    "module": "commonjs",
     "moduleResolution": "node",
     "target": "es6",
     "esModuleInterop": true
