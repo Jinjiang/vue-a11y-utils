@@ -68,3 +68,6 @@ dist
 
 # VuePress build files
 .vuepress/dist
+
+# Examples build files
+.vuepress/public/examples

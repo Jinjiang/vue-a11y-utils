@@ -5,9 +5,10 @@
   "main": "index.js",
   "scripts": {
     "dev": "parcel index.html",
+    "build:examples": "parcel build index.html -d ./.vuepress/public/examples --public-url /examples/",
     "build": "parcel build index.js -d dist -o vue-a11y.js",
     "docs": "vuepress dev",
-    "docs:build": "vuepress build",
+    "docs:build": "npm run build:examples && vuepress build",
     "lint": "prettier --write *.{js,json,css,md,ts,vue}",
     "test": "jest"
   },
