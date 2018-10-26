@@ -14,7 +14,7 @@
     "examples": "parcel examples/index.html --public-url /examples/",
     "examples:build": "parcel build examples/index.html --public-url /examples/ -d ./.vuepress/public/examples",
     "docs": "vuepress dev",
-    "docs:build": "npm run examples:build && vuepress build",
+    "docs:build": "npm run examples:build && vuepress build -d docs",
     "lint": "prettier --write .{,/examples,/src}/*.{js,json,css,md,ts,vue}",
     "test": "jest"
   },

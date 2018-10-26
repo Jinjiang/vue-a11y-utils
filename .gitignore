@@ -66,8 +66,8 @@ dist
 # parcel cache
 .cache
 
-# VuePress build files
-.vuepress/dist
+# # VuePress build files
+# docs
 
 # Examples build files
 .vuepress/public/examples
