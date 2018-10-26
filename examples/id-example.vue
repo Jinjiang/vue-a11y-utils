@@ -11,7 +11,7 @@
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
-import { MixinId } from "./index";
+import { MixinId } from "../index";
 import ExampleIdInput from "./id-example-input.vue";
 
 interface ExampleFieldOption {

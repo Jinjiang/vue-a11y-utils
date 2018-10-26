@@ -29,7 +29,7 @@
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
-import { VueFocusTrap } from "./index";
+import { VueFocusTrap } from "../index";
 
 @Component({
   components: { VueFocusTrap },

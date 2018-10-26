@@ -27,7 +27,7 @@ import ExampleId from "./id-example.vue";
 import ExampleFocusTrap from "./focus-trap-example.vue";
 import ExampleKeyShortcuts from "./key-shortcuts-example.vue";
 import ExampleLive from "./live-example.vue";
-import VueLive from "./live.vue";
+import { VueLive } from "../index";
 
 @Component({
   components: {
