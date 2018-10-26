@@ -71,3 +71,7 @@ dist
 
 # Examples build files
 .vuepress/public/examples
+
+# TypeScript build files
+lib
+

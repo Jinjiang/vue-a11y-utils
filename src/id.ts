@@ -14,7 +14,7 @@ const MixinIdInterface = Vue.extend({
  */
 @Component
 export default class MixinId extends MixinIdInterface {
-  get localId() {
+  get localId(): string {
     return this.id || generateNewId();
   }
 }
