@@ -74,9 +74,6 @@ export default class ExampleKeyTravel extends Vue {
 </script>
 
 <style scoped>
-.list:focus {
-  outline: 2px blue solid;
-}
 .current {
   font-weight: bold;
 }

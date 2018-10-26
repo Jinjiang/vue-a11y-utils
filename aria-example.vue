@@ -6,9 +6,9 @@
       <button tabindex="0">Normal button</button><br />
       <button tabindex>Normal button</button><br />
       <button>Normal button</button><br />
-      <span tabindex="-1">Focusable widget which can not be accessed throught TAB key</span><br />
-      <span tabindex="0">Focusable widget</span><br />
-      <span tabindex>Normal text</span><br />
+      <span class="button" tabindex="-1">Focusable widget which can not be accessed throught TAB key</span><br />
+      <span class="button" tabindex="0">Focusable widget</span><br />
+      <span class="button" tabindex>Normal text</span><br />
       <span>Normal text</span>
     </p>
     <h3>Using VueAria Component</h3>
@@ -20,10 +20,10 @@
         <button :tabindex="-1">Button with "none" role</button>
       </VueAria><br />
       <VueAria role="none">
-        <span role="button" tabindex="0">Normal text</span>
+        <span class="button" role="button" tabindex="0">Normal text</span>
       </VueAria><br />
       <VueAria role="none" :tabindex="-1">
-        <span role="button" tabindex="0">Focusable text with "none" role and can not be accessed throught TAB key</span>
+        <span class="button" role="button" tabindex="0">Focusable text with "none" role and can not be accessed throught TAB key</span>
       </VueAria>
     </p>
   </div>

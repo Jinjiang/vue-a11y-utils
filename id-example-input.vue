@@ -5,7 +5,7 @@
       ref="input"
       :id="`${localId}-input`"
       :aria-labelledby="`${localId}-label`"
-      :type="type"
+      :type="type || 'text'"
       v-model="localValue"
     />
   </div>

@@ -1,13 +1,15 @@
 <template>
   <div id="key-shortcuts-example">
-    Press <input
-      type="text" value="CMD + G HERE"
-      @keydown="bindShortcut($event, 'foo')"
-    /> or
-    <input
-      type="text" value="CMD + K HERE"
-      @keydown="bindShortcut($event, 'bar')"
-    /> or A-S-D-F anywhere.
+    <p>
+      Press <input
+        type="text" value="CMD + G HERE"
+        @keydown="bindShortcut($event, 'foo')"
+      /> or
+      <input
+        type="text" value="CMD + K HERE"
+        @keydown="bindShortcut($event, 'bar')"
+      /> or A-S-D-F anywhere.
+    </p>
   </div>
 </template>
 
