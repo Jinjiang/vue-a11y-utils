@@ -11,10 +11,10 @@
     "build:parcel": "parcel build src/index.ts -d dist -o vue-a11y.js",
     "build:lib": "tsc --build src/tsconfig.json",
     "build": "npm run build:parcel && npm run build:lib",
-    "examples": "parcel examples/index.html --public-url /examples/",
-    "examples:build": "parcel build examples/index.html --public-url /examples/ -d ./.vuepress/public/examples",
+    "examples": "parcel examples/index.html",
+    "examples:build": "rm -Rf ./.vuepress/public/examples && parcel build examples/index.html --public-url ./ -d ./.vuepress/public/examples",
     "docs": "vuepress dev",
-    "docs:build": "npm run examples:build && vuepress build -d docs",
+    "docs:build": "rm -Rf docs && npm run examples:build && vuepress build -d docs",
     "lint": "prettier --write .{,/examples,/src}/*.{js,json,css,md,ts,vue}",
     "test": "jest"
   },

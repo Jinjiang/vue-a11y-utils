@@ -63,7 +63,7 @@ import {
 
 ### Usage
 
-See the docs below or some [online](/examples) examples.
+See the docs below or some [online](./examples) examples.
 
 ## `<VueAria>` Component
 
