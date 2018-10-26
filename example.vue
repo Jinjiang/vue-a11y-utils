@@ -5,6 +5,8 @@
     <ExampleAria></ExampleAria>
     <h2>KeyTravel Mixin</h2>
     <ExampleKeyTravel></ExampleKeyTravel>
+    <h2>ID Mixin</h2>
+    <ExampleId></ExampleId>
     <h2>VueFocusTrap Component</h2>
     <ExampleFocusTrap></ExampleFocusTrap>
     <h2>KeyShortcuts Mixin</h2>
@@ -21,6 +23,7 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import ExampleAria from "./aria-example.vue";
 import ExampleKeyTravel from "./key-travel-example.vue";
+import ExampleId from "./id-example.vue";
 import ExampleFocusTrap from "./focus-trap-example.vue";
 import ExampleKeyShortcuts from "./key-shortcuts-example.vue";
 import ExampleLive from "./live-example.vue";
@@ -30,6 +33,7 @@ import VueLive from "./live.vue";
   components: {
     ExampleAria,
     ExampleKeyTravel,
+    ExampleId,
     ExampleFocusTrap,
     ExampleKeyShortcuts,
     ExampleLive,
