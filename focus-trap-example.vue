@@ -59,7 +59,7 @@ export default class ExampleVueFocusTrap extends Vue {
 }
 </script>
 
-<style>
+<style scoped>
 .dialog {
   position: absolute;
   top: 0;

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="live-example">
     <p>
       <label>Message: <input type="text" v-model="value" /></label>
     </p>

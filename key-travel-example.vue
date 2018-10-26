@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="key-travel-example">
     <p>
       <button ref="btn">Auto-focus Button!</button>
     </p>
