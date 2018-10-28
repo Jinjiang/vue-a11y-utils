@@ -2,15 +2,14 @@
   "name": "vue-a11y-utils",
   "version": "0.1.0",
   "description": "Utilities for accessibility (a11y) in Vue.js",
-  "main": "./lib/index.js",
+  "main": "dist/vue-a11y-utils.js",
+  "types": "src/index.ts",
   "files": [
     "dist",
-    "lib"
+    "src"
   ],
   "scripts": {
-    "build:parcel": "parcel build src/index.ts -d dist -o vue-a11y.js",
-    "build:lib": "tsc --build src/tsconfig.json",
-    "build": "npm run build:parcel && npm run build:lib",
+    "build": "parcel build src/index.ts -d dist -o vue-a11y-utils.js",
     "examples": "parcel examples/index.html",
     "examples:build": "rm -Rf ./.vuepress/public/examples && parcel build examples/index.html --public-url ./ -d ./.vuepress/public/examples",
     "docs": "vuepress dev",

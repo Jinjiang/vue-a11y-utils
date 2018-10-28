@@ -2,7 +2,14 @@
   <!-- https://github.com/AlmeroSteyn/react-aria-live -->
   <div>
     <slot></slot>
-    <div class="vue-live">
+    <div style="
+      position: absolute;
+      height: 1px;
+      width: 1px;
+      margin: -1px;
+      clip: rect(0 0 0 0);
+      overflow: hidden
+    ">
       <VueAria :role="localRole" :aria="{ live: 'assertive', label, busy }">
         <div>{{ assertiveMessage }}</div>
       </VueAria>
@@ -63,14 +70,3 @@ export default class VueLive extends VueLiveInterface {
   }
 }
 </script>
-
-<style scoped>
-.vue-live {
-  position: absolute;
-  height: 1px;
-  width: 1px;
-  margin: -1px;
-  clip: rect(0 0 0 0);
-  overflow: hidden;
-}
-</style>
