@@ -12,7 +12,7 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import { MixinId } from "../index";
-import ExampleIdInput from "./id-example-input.vue";
+import ExampleIdInput from "./id-input.vue";
 
 interface ExampleFieldOption {
   label: string;

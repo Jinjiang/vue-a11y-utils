@@ -1,5 +1,5 @@
 <template>
-  <div id="example" class="content">
+  <div id="app" class="content">
     <h1>Vue A11y Utils Examples</h1>
     <a href="/">Go Back to Homepage</a>
     <h2>VueAria Component</h2>
@@ -22,12 +22,12 @@
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
-import ExampleAria from "./aria-example.vue";
-import ExampleKeyTravel from "./key-travel-example.vue";
-import ExampleId from "./id-example.vue";
-import ExampleFocusTrap from "./focus-trap-example.vue";
-import ExampleKeyShortcuts from "./key-shortcuts-example.vue";
-import ExampleLive from "./live-example.vue";
+import ExampleAria from "./aria.vue";
+import ExampleKeyTravel from "./key-travel.vue";
+import ExampleId from "./id.vue";
+import ExampleFocusTrap from "./focus-trap.vue";
+import ExampleKeyShortcuts from "./key-shortcuts.vue";
+import ExampleLive from "./live.vue";
 import { VueLive } from "../index";
 
 @Component({
