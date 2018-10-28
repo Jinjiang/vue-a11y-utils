@@ -1127,7 +1127,7 @@ describe("<VueLive> component", () => {
     expect(wrapper.element.innerHTML).toBe(
       `
       hello 
-      <div class="vue-live">
+      <div style="position: absolute; height: 1px; width: 1px; margin: -1px; overflow: hidden;">
         <div role="log" aria-live="assertive" aria-busy="false"></div> 
         <div role="log" aria-live="polite" aria-busy="false"></div>
       </div>
