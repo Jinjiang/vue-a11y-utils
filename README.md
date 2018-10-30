@@ -505,7 +505,7 @@ Now the final generated DOM tree is:
 
 Usually, when there is a modal dialog in your Vue app, you should keep the focus still in this dialog whatever you navigate with touch, mouse or keyboard.
 
-`<VueFocusTrap>` gives you a easy way to trap focus by just two events `gofirst` and `golast` which should bind handlers to reset the focus to the first or last focusable target in the dialog.
+`<VueFocusTrap>` gives you a easy way to trap focus by just two events `gofirst` and `golast` which should bind handlers to reset the focus to the first or last focusable target in the dialog. It also has a `disabled` prop to stop trapping focus which could be set `true` when the dialog is hidden or disabled.
 
 ### Examples
 
@@ -518,7 +518,7 @@ In this example below, after you open the modal dialog by click the trigger butt
       Open a Modal Dialog
     </button>
     <form class="dialog" v-show="shown">
-      <VueFocusTrap @gofirst="goFirst" @golast="goLast">
+      <VueFocusTrap :disabled="!shown" @gofirst="goFirst" @golast="goLast">
         <label>Email: <input ref="email" type="email" /></label>
         <label>Password: <input ref="password" type="password" /></label>
         <button ref="login" @click="shown = false">Login</button>
@@ -563,6 +563,10 @@ Additionally, as a best practise of managing focus, you'd better auto-focus the 
 :::
 
 ### API
+
+#### Props
+
+- `disabled: boolean`
 
 #### Slots
 
