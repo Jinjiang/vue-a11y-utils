@@ -795,7 +795,7 @@ describe("<VueFocusTrap> component", () => {
           <button class="trigger" ref="trigger" @click="shown = true">
             Open a Modal Dialog
           </button>
-          <div v-show="shown" class="dialog">
+          <div v-if="shown" class="dialog">
             <VueFocusTrap
               @gofirst="goFirst"
               @golast="goLast"
@@ -837,16 +837,151 @@ describe("<VueFocusTrap> component", () => {
       },
       methods: {
         goFirst() {
-          (<HTMLElement>this.$refs.email).focus();
+          const item = this.$refs.email;
+          if (item) {
+            (<HTMLElement>item).focus();
+          }
         },
         goLast() {
-          (<HTMLElement>this.$refs.cancel).focus();
+          const item = this.$refs.cancel;
+          if (item) {
+            (<HTMLElement>item).focus();
+          }
         },
         goTrigger() {
-          (<HTMLElement>this.$refs.trigger).focus();
+          const item = this.$refs.trigger;
+          if (item) {
+            (<HTMLElement>item).focus();
+          }
         }
       }
     });
+
+    // NOTICE:
+    // vue-test-utils doesn't support TAB focus
+    // but still preserve this case.
+
+    // init
+    const wrapper: Wrapper<Vue> = mount(Foo, { attachToDocument: true });
+    const document = <HTMLDocument>wrapper.element.ownerDocument;
+    expect(document).toBeTruthy();
+
+    const trigger = <HTMLElement>wrapper.element.querySelector(".trigger");
+    expect(trigger).toBeTruthy();
+
+    // init state
+    expect(wrapper.vm.shown).toBeFalsy();
+    const dialog = <HTMLElement>wrapper.element.querySelector(".dialog");
+    expect(dialog).toBe(null);
+
+    // click trigger
+    trigger.click();
+    wrapper.vm
+      .$nextTick()
+      .then(() => {
+        const dialog = <HTMLElement>wrapper.element.querySelector(".dialog");
+        const first = <HTMLElement>(
+          wrapper.element.querySelector('.dialog input[type="email"]')
+        );
+        const password = <HTMLElement>(
+          wrapper.element.querySelector('.dialog input[type="password"]')
+        );
+        const login = <HTMLElement>(
+          wrapper.element.querySelectorAll(".dialog button")[0]
+        );
+        const last = <HTMLElement>(
+          wrapper.element.querySelectorAll(".dialog button")[1]
+        );
+        expect(dialog).toBeTruthy();
+        expect(first).toBeTruthy();
+        expect(last).toBeTruthy();
+        expect(wrapper.vm.shown).toBeTruthy();
+        expect(dialog.style.display).toBe("");
+        expect(document.activeElement).toBe(first);
+        login.click();
+        return wrapper.vm.$nextTick();
+      })
+      .then(() => {
+        const dialog = <HTMLElement>wrapper.element.querySelector(".dialog");
+        expect(wrapper.vm.shown).toBeFalsy();
+        expect(dialog).toBe(null);
+        done();
+      });
+  });
+
+  it("will stop trap focus when set disabled as a truthy value", done => {
+    const Foo = Vue.extend({
+      template: `
+        <div id="focus-trap-example">
+          <button class="trigger" ref="trigger" @click="shown = true">
+            Open a Modal Dialog
+          </button>
+          <div v-show="shown" class="dialog">
+            <VueFocusTrap
+              :disabled="!shown"
+              @gofirst="goFirst"
+              @golast="goLast"
+            >
+              <label>
+                Email:
+                <input ref="email" type="email" />
+              </label>
+              <label>
+                Password
+                <input ref="password" type="password" />
+              </label>
+              <button ref="login" @click="shown = false">Login</button>
+              <button ref="cancel">Cancel</button>
+            </VueFocusTrap>
+          </div>
+        </div>
+      `,
+      components: {
+        VueFocusTrap
+      },
+      data() {
+        return {
+          shown: false
+        };
+      },
+      watch: {
+        shown(value) {
+          if (value) {
+            this.$nextTick(() => {
+              this.goFirst();
+            });
+          } else {
+            this.$nextTick(() => {
+              this.goTrigger();
+            });
+          }
+        }
+      },
+      methods: {
+        goFirst() {
+          const item = this.$refs.email;
+          if (item) {
+            (<HTMLElement>item).focus();
+          }
+        },
+        goLast() {
+          const item = this.$refs.cancel;
+          if (item) {
+            (<HTMLElement>item).focus();
+          }
+        },
+        goTrigger() {
+          const item = this.$refs.trigger;
+          if (item) {
+            (<HTMLElement>item).focus();
+          }
+        }
+      }
+    });
+
+    // NOTICE:
+    // vue-test-utils doesn't support TAB focus
+    // but still preserve this case.
 
     // init
     const wrapper: Wrapper<Vue> = mount(Foo, { attachToDocument: true });
