@@ -7,6 +7,7 @@
     </p>
     <div v-show="shown" class="dialog">
       <VueFocusTrap
+        :disabled="!shown"
         @gofirst="goFirst"
         @golast="goLast"
       >
