@@ -65,7 +65,7 @@ import {
 
 ### Usage
 
-See the docs below or some [online](./examples) examples.
+See the docs below or preview some [examples](https://github.com/Jinjiang/vue-a11y-utils/tree/master/examples) [online](https://jinjiang.github.io/vue-a11y-utils/examples).
 
 ## `<VueAria>` Component
 

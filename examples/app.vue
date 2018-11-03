@@ -1,7 +1,7 @@
 <template>
   <div id="app" class="content">
     <h1>Vue A11y Utils Examples</h1>
-    <a href="https://jinjiang.github.io/vue-a11y-utils/">Go Back to Homepage</a>
+    <a href="https://jinjiang.github.io/vue-a11y-utils/">Homepage</a> | <a href="https://github.com/jinjiang/vue-a11y-utils/">GitHub</a>
     <h2>VueAria Component</h2>
     <ExampleAria></ExampleAria>
     <h2>KeyTravel Mixin</h2>
