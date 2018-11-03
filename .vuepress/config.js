@@ -5,14 +5,17 @@ module.exports = {
   themeConfig: {
     nav: [
       { text: "Home", link: "/" },
-      { text: "Examples", link: "/examples/" }
+      {
+        text: "Examples",
+        link: "https://jinjiang.github.io/vue-a11y-utils/examples/"
+      }
     ],
 
     sidebar: ["/"],
     sidebarDepth: 1,
 
     repo: "jinjiang/vue-a11y-utils",
-    repoLabel: "Contribute!",
+    repoLabel: "GitHub",
     docsDir: ".",
     docsBranch: "master",
     editLinks: true,
