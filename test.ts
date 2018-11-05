@@ -9,7 +9,7 @@ import {
   VueFocusTrap,
   MixinKeyShortcuts,
   VueLive
-} from "./index";
+} from "./src/index";
 
 config.logModifiedComponents = false;
 
