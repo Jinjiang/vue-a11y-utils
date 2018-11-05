@@ -16,7 +16,7 @@
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
-import { MixinKeyShortcuts } from "../";
+import { MixinKeyShortcuts } from "../src/index";
 
 @Component({
   mixins: [MixinKeyShortcuts],

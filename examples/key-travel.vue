@@ -28,7 +28,7 @@
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
-import { MixinKeyTravel } from "../";
+import { MixinKeyTravel } from "../src/index";
 
 interface ExampleOption {
   text: string;
