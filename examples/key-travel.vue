@@ -69,6 +69,7 @@ export default class ExampleKeyTravel extends Vue {
     if (index >= 0) {
       this.value = this.options[index].value;
     }
+    return true;
   }
 }
 </script>

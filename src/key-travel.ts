@@ -25,7 +25,8 @@ const defaultKeyToMethod: KeyConfig = {
   Home: "first",
   End: "last",
   Enter: "action",
-  Space: "action"
+  Space: "action",
+  " ": "action"
 };
 
 /**
@@ -94,7 +95,7 @@ export default class MixinKeyTravel extends Vue {
   }
   // could be overrided
   fireAction(item: Vue): void {
-    fireItemAction(item);
+    return fireItemAction(item);
   }
   // could be overrided
   getAutofocusItem(): Vue {
