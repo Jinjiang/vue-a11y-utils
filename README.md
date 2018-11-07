@@ -367,6 +367,7 @@ The second example is about focus travel using <kbd>Arrow</kbd> keys in a Vue co
     methods: {
       fireAction() {
         alert(this.value);
+        return true;
       }
     }
   };
@@ -378,7 +379,7 @@ Here are some points you may notice:
 1. Bind `@keydown="keyTravel"` to the root DOM element of your component.
 2. Put a prop/data/computed named `orientation` to declare which <kbd>Arrow</kbd> keys would work.
 3. Override a `getKeyItems()` method to return all focusable items.
-4. Override a `fireAction()` method in `<ListItem>` for the action when user press <kbd>ENTER</kbd> or <kbd>SPACE</kbd>.
+4. Override a `fireAction()` method in `<ListItem>` for the action when user press <kbd>ENTER</kbd> or <kbd>SPACE</kbd>. The returned truthy value means to prevent the default keyboard event.
 
 Now you can use <kbd>ArrowUp</kbd> and <kbd>ArrowDown</kbd> to travel each items. When you press <kbd>ENTER</kbd> or <kbd>SPACE</kbd>, an alert with the value of the current focused item would be poped up.
 
@@ -401,7 +402,7 @@ Now you can use <kbd>ArrowUp</kbd> and <kbd>ArrowDown</kbd> to travel each items
   - `Home`: `first`
   - `End`: `last`
   - `Enter`: `action`
-  - `Space`: `action`
+  - `` (Space): `action`
 
 #### Values you can declare
 
@@ -420,17 +421,17 @@ _Main method for auto-focus:_
 
 _Methods you can customize to fire action:_
 
-- `fireAction(item: Vue | HTMLElement): void`: call `item.fireAction()` by default
+- `fireAction(item: Vue | HTMLElement): void`: call `item.fireAction()` and return `true` if new element focused by default
 
 _Methods you can customize to travel:_
 
-- `goPrev(): void`: focus previous item
-- `goNext(): void`: focus next item
-- `goFirst(): void`: focus the first item
-- `goLast(): void`: focus the last item
-- `goNextPage(): void`: do nothing by default
-- `goPrevPage(): void`: do nothing by default
-- `goAction(): void`: fire action at the current focused item
+- `goPrev(): any`: focus previous item
+- `goNext(): any`: focus next item
+- `goFirst(): any`: focus the first item
+- `goLast(): any`: focus the last item
+- `goNextPage(): any`: do nothing by default
+- `goPrevPage(): any`: do nothing by default
+- `goAction(): any`: fire action at the current focused item
 
 #### Method you can declare in item component
 
