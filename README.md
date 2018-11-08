@@ -26,6 +26,80 @@ Utilities for accessibility (a11y) in Vue.js
 
 ## Why
 
+### Background
+
+As the [(WIP) Vue accessibility guide page](https://github.com/vuejs/vuejs.org/pull/1002) says:
+
+> The World Health Organization estimate that 15% of the world's population has some form of disability, 2-4% of them severely so ... which can be divided roughly into four categories: _visual impairments_, _motor impairments_, _hearing impairments_ and _cognitive impairments_.
+
+table: issues for different impairments
+| visual | motor | hearing | cognitive |
+| --- | --- | --- | --- |
+| 🖥 🔎 | 🖱 📱 ⌨️ 🕹 🎮 🎙 🖊 🎛 | 🔈 | content, layout, interaction |
+
+or there are some accessibility issues for a normal person who is in such a situation like driving a car, attending a meeting, using a mobile device with a bluetooth keyboard etc.
+
+So actually accessibility is not just for the "less amount of people", but for almost everyone.
+
+But some mistakes we often make in a real project so we'd better ask ourselves repeatly like:
+
+- Is it a mouse-only desktop app?
+- Is it a touch-only mobile app?
+- Is it a remote-control-only TV app?
+- Could it be fully used through keyboard with high efficiency?
+- Does all non-text content have a alternative text?
+- Does it have any fallback way for the creative interaction like e-pencil, audio input, face ID, touch ID, NFC etc.?
+
+Each point of them might block the user flow or lead user to a no-way-out trap in some certain cases.
+
+However, there are already some web standards and best practice to follow which let developers do it better.
+
+### Web Standards
+
+In W3C there are 3 main parts of accessibility standards:
+
+![WAI standard overview](https://www.w3.org/WAI/content-images/wai-std-gl-overview/specs.png)  
+via: [W3C Accessibility Standards Overview](https://www.w3.org/WAI/standards-guidelines/)
+
+- [WCAG](https://www.w3.org/TR/WCAG20/): about web content, targeting websites.
+- [UAAG](https://www.w3.org/TR/UAAG20/): about user agent, targeting browsers, screen readers etc.
+- [ATAG](https://www.w3.org/TR/ATAG20/): about authoring tools, targeting CMS, WYSIWYG editor etc.
+
+and a technical spec which is commonly used:
+
+- [WAI-ARIA](https://w3c.github.io/aria/): targeting web app.
+
+For web developers, we may pay more attention on WCAG and WAI-ARIA. At the same time, we should know which user agents people use most and how about their support and compatibility to the standard.
+
+Here is a survey about most common screen reader and browser combinations table:
+
+| Screen Reader & Browser     | # of Respondents | % of Respondents |
+| --------------------------- | ---------------- | ---------------- |
+| JAWS with Internet Explorer | 424              | 24.7%            |
+| NVDA with Firefox           | 405              | 23.6%            |
+| JAWS with Firefox           | 260              | 15.1%            |
+| VoiceOver with Safari       | 172              | 10.0%            |
+| JAWS with Chrome            | 112              | 6.5%             |
+| NVDA with Chrome            | 102              | 5.9%             |
+| NVDA with IE                | 40               | 2.3%             |
+| VoiceOver with Chrome       | 24               | 1.4%             |
+| Other combinations          | 180              | 10.5%            |
+
+via [Screen Reader User Survey by webaim.org](https://webaim.org/projects/screenreadersurvey7/#browsercombos)
+
+### Recommended Strategy
+
+Inspired from [atomic design](http://atomicdesign.bradfrost.com), we recommend to devide accessibility jobs into different parts:
+
+1. Atoms: like `button`, `textbox`, `image` which needs semantic HTML tag or well-defined WAI-ARIA role.
+1. Groups: like `list`, `tree`, `grid`, `table` which can organize a set of atoms together.
+1. Relationships: more like business logic, put all content in a proper user flow with `aria-labeledby`, `aria-flowto`, `aria-controls`, `aria-owns`, `aria-errormessage` etc.
+1. App Layout: like all `landmark` roles, navigation design, skip-to-content way, `aria-current` state, `aria-live` region(s) etc.
+
+The first two parts usually should be finished by a _component libs_. The last part usually should be finished by a _scaffold generator_. And the third part usually should be finished by a _business dev team_.
+
+### Specific Problems
+
 When you write a Vue app with full accessibility. You may meet some issues frequently. For example:
 
 - Making sure the [W3C WAI-ARIA](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA) roles & properties of each DOM element are set properly.
@@ -33,7 +107,7 @@ When you write a Vue app with full accessibility. You may meet some issues frequ
 - Using a central [live region](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Live_Regions) to read messages right now in a screen reader.
 - Sometimes you need set a _ID reference_ or _ID reference list_ type aria attribute with _ID_ of another DOM element. But we don't use _ID_ in Vue to identify a DOM element right?
 
-Vue A11y Utils try to supply a group of utilities to help Vue developers finish these jobs easier.
+So that's why **Vue A11y Utils** is trying to supply a group of utilities to help Vue developers finish these jobs easier.
 
 ## Getting Started
 
