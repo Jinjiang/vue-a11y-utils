@@ -34,9 +34,9 @@ As the [(WIP) Vue accessibility guide page](https://github.com/vuejs/vuejs.org/p
 
 table: issues for different impairments
 
-| visual | motor | hearing | cognitive |
-| ---- | ---- | ---- | ---- |
-| 🖥 🔎 | 🖱 📱 ⌨️ 🕹 🎮 🎙 🖊 🎛 | 🔈 | content, layout, interaction |
+| visual | motor              | hearing | cognitive                    |
+| ------ | ------------------ | ------- | ---------------------------- |
+| 🖥 🔎   | 🖱 📱 ⌨️ 🕹 🎮 🎙 🖊 🎛 | 🔈      | content, layout, interaction |
 
 or there are some accessibility issues for a normal person who is in such a situation like driving a car, attending a meeting, using a mobile device with a bluetooth keyboard etc.
 
@@ -50,6 +50,7 @@ But some mistakes we often make in a real project so we'd better ask ourselves r
 - Could it be fully used through keyboard with high efficiency?
 - Does all non-text content have a alternative text?
 - Does it have any fallback way for the creative interaction like e-pencil, audio input, face ID, touch ID, NFC etc.?
+- Is the color contrast enough to identify background and the text content?
 
 Each point of them might block the user flow or lead user to a no-way-out trap in some certain cases.
 
@@ -98,6 +99,8 @@ Inspired from [atomic design](http://atomicdesign.bradfrost.com), we recommend t
 1. App Layout: like all `landmark` roles, navigation design, skip-to-content way, `aria-current` state, `aria-live` region(s) etc.
 
 The first two parts usually should be finished by a _component libs_. The last part usually should be finished by a _scaffold generator_. And the third part usually should be finished by a _business dev team_.
+
+At last, please test all of them to make sure it is not wrong or too over to access.
 
 ### Specific Problems
 
