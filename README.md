@@ -33,8 +33,9 @@ As the [(WIP) Vue accessibility guide page](https://github.com/vuejs/vuejs.org/p
 > The World Health Organization estimate that 15% of the world's population has some form of disability, 2-4% of them severely so ... which can be divided roughly into four categories: _visual impairments_, _motor impairments_, _hearing impairments_ and _cognitive impairments_.
 
 table: issues for different impairments
+
 | visual | motor | hearing | cognitive |
-| --- | --- | --- | --- |
+| ---- | ---- | ---- | ---- |
 | 🖥 🔎 | 🖱 📱 ⌨️ 🕹 🎮 🎙 🖊 🎛 | 🔈 | content, layout, interaction |
 
 or there are some accessibility issues for a normal person who is in such a situation like driving a car, attending a meeting, using a mobile device with a bluetooth keyboard etc.
