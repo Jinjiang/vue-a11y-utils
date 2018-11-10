@@ -727,14 +727,17 @@ export default {
 
 ## `KeyShortcuts` Mixin
 
+In an app we may need some keyboard shortcuts to do operations more effectively. Fortunately we have a `KeyShortcuts` mixin.
+
 ### Examples
 
-Listen <kbd>CMD</kbd> + <kbd>G</kbd>:
+In this example, this component will listen shortcut <kbd>CMD</kbd> + <kbd>G</kbd> globally:
 
 ```vue
 <template>...</template>
 
 <script>
+import { MixinKeyShortcuts } from "vue-a11y-utils";
 export default {
   mixins: [MixinKeyShortcuts],
   shortcuts: [
@@ -750,7 +753,7 @@ export default {
 </script>
 ```
 
-Another way to config <kbd>CMD</kbd> + <kbd>G</kbd> as a `keys` sequence:
+Another way to config <kbd>CMD</kbd> + <kbd>K</kbd>, <kbd>CMD</kbd> + <kbd>B</kbd> as a `keys` sequence:
 
 ```vue
 <template>...</template>
@@ -760,9 +763,12 @@ export default {
   mixins: [MixinKeyShortcuts],
   shortcuts: [
     {
-      keys: [(key: "G"), (modifiers: { meta: true })],
+      keys: [
+        { key: "K", modifiers: { meta: true } },
+        { key: "B", modifiers: { meta: true } }
+      ],
       handle(event) {
-        alert("trigger: CMD + G");
+        alert("trigger: CMD + K, B");
       }
     }
   ]
@@ -790,7 +796,7 @@ export default {
 </script>
 ```
 
-At last, if you would like to bind key shortcuts on a certain element, for example an input text box, we also supports named shortcuts like below:
+At last, if you would like to bind key shortcuts on a certain element, for example an input text box, we also supports named shortcuts config like below:
 
 ```vue
 <template>
@@ -827,6 +833,14 @@ export default {
           alert("trigger: CMD + K");
         }
       }
+    ],
+    default: [
+      {
+        keys: ["a", "s", "d", "f"],
+        handle(event) {
+          alert("trigger: A-S-D-F");
+        }
+      }
     ]
   }
 };
@@ -835,7 +849,7 @@ export default {
 
 ### API
 
-#### New option you can define
+#### New option you can declare
 
 - `shortcuts: Array<ShortcutConfig>`
 - `shortcuts: Record<string, ShortcutConfig>`
@@ -845,7 +859,7 @@ export default {
 
   ```ts
   {
-    key: string,
+    key: string, // we will introduce later
     modifiers: {
       ctrl?: boolean,
       shift?: boolean,
@@ -871,7 +885,14 @@ export default {
   }
   ```
 
-### Methods you can use
+  The `key` value in interface `ShortcutConfig` could be one of them below:
+
+  - letter: a-z (case-insensitive)
+  - number: 0-9
+  - common key names: `up`, `down`, `left`, `right`, `home`, `end`, `pagedown`, `pageup` (case-insensitive)
+  - any other valid [`code`](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code) value in [`KeyboardEvent`](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent)
+
+### Methods you can call
 
 - `bindShortcut(event: KeyboardEvent, name: string)`
 
