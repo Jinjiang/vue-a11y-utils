@@ -586,13 +586,13 @@ Now the final generated DOM tree will be:
 
 ## `<VueFocusTrap>` Component
 
-Usually, when there is a modal dialog in your Vue app, you should keep the focus still in this dialog whatever you navigate with touch, mouse or keyboard.
+Usually, when you have a modal dialog in your Vue app, you should keep the focus always in it whatever you navigate with touch, mouse or keyboard.
 
-`<VueFocusTrap>` gives you a easy way to trap focus by just two events `gofirst` and `golast` which should bind handlers to reset the focus to the first or last focusable target in the dialog. It also has a `disabled` prop to stop trapping focus which could be set `true` when the dialog is hidden or disabled.
+`<VueFocusTrap>` gives you a easy way to wrap a modal with trapped focus by just two events: `gofirst` and `golast`, which should bind handlers to reset the focus to the first or last focusable target in the dialog. It also has a `disabled` prop to stop trapping focus which could be set `true` when the dialog is hidden or disabled.
 
 ### Examples
 
-In this example below, after you open the modal dialog by click the trigger button, the focus will always in the 4 control elements in `<form>`, whatever you press <kbd>tab</kbd>, <kbd>tab</kbd> + <kbd>shift</kbd> or click somewhere out of the dialog:
+In this example below, after you open the modal dialog by click the trigger button, the focus will always be in one of the 4 control elements in `<form>`, whatever you press <kbd>tab</kbd>, <kbd>tab</kbd> + <kbd>shift</kbd> or click somewhere out of the dialog:
 
 ```vue
 <template>
@@ -612,6 +612,7 @@ In this example below, after you open the modal dialog by click the trigger butt
 </template>
 
 <script>
+import { VueFocusTrap } from "vue-a11y-utils";
 export default {
   components: { VueFocusTrap },
   data() {
@@ -642,7 +643,7 @@ export default {
 ```
 
 ::: tip
-Additionally, as a best practise of managing focus, you'd better auto-focus the first control element in when the dialog shows up, and auto-focus the trigger button back when the dialog closed. Just like the code logic in the example above.
+Additionally, as a best practise of managing focus, you'd better auto-focus the first control element in when the dialog shows up, and focus the trigger button back when the dialog closed. Just like the code logic in the example above.
 :::
 
 ### API
@@ -684,6 +685,7 @@ The better thing is: you can combine `<VueFocusTrap>` component and `KeyTravel` 
 </template>
 
 <script>
+import { MixinKeyTravel, VueFocusTrap } from "vue-a11y-utils";
 export default {
   mixins: [MixinKeyTravel],
   components: { VueFocusTrap },
