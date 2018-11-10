@@ -32,31 +32,31 @@ As the [(WIP) Vue accessibility guide page](https://github.com/vuejs/vuejs.org/p
 
 > The World Health Organization estimate that 15% of the world's population has some form of disability, 2-4% of them severely so ... which can be divided roughly into four categories: _visual impairments_, _motor impairments_, _hearing impairments_ and _cognitive impairments_.
 
-table: issues for different impairments
+_table: issues for different impairments_
 
-| visual | motor              | hearing | cognitive                    |
-| ------ | ------------------ | ------- | ---------------------------- |
-| 🖥 🔎   | 🖱 📱 ⌨️ 🕹 🎮 🎙 🖊 🎛 | 🔈      | content, layout, interaction |
+| visual  | motor              | hearing | cognitive                    |
+| ------- | ------------------ | ------- | ---------------------------- |
+| 🖥 🔎 🎨 | 🖱 📱 ⌨️ 🕹 🎮 🎙 🖊 🎛 | 🔈      | content, layout, interaction |
 
-or there are some accessibility issues for a normal person who is in such a situation like driving a car, attending a meeting, using a mobile device with a bluetooth keyboard etc.
+Or there are also some accessibility issues for a normal person in such a situation like driving a car, having a meeting, using a mobile device with a bluetooth keyboard etc.
 
 So actually accessibility is not just for the "less amount of people", but for almost everyone.
 
-But some mistakes we often make in a real project so we'd better ask ourselves repeatly like:
+But some mistakes we often make in a real project like:
 
-- Is it a mouse-only desktop app?
-- Is it a touch-only mobile app?
-- Is it a remote-control-only TV app?
-- Could it be fully used through keyboard with high efficiency?
-- Does all non-text content have a alternative text?
-- Does it have any fallback way for the creative interaction like e-pencil, audio input, face ID, touch ID, NFC etc.?
-- Is the color contrast enough to identify background and the text content?
+- Mouse-only in a desktop app
+- Touch-only in a mobile app
+- Remote-control-only in a TV app
+- Operation through keyboard only is not possible or with low efficiency
+- No text alternative for non-text content
+- Have no fallback way for the creative interaction like e-pencil, audio input, face ID, touch ID, NFC etc.
+- The color contrast is not enough
 
-Each point of them might block the user flow or lead user to a no-way-out trap in some certain cases.
-
-However, there are already some web standards and best practice to follow which let developers do it better.
+Each of them might make user confused, block the user flow or lead user to a no-way-out trap in some certain cases.
 
 ### Web Standards
+
+However, there are already some web standards and best practice to follow which let developers do it better.
 
 In W3C there are 3 main parts of accessibility standards:
 
@@ -87,20 +87,7 @@ Here is a survey about most common screen reader and browser combinations table:
 | VoiceOver with Chrome       | 24               | 1.4%             |
 | Other combinations          | 180              | 10.5%            |
 
-via [Screen Reader User Survey by webaim.org](https://webaim.org/projects/screenreadersurvey7/#browsercombos)
-
-### Recommended Strategy
-
-Inspired from [atomic design](http://atomicdesign.bradfrost.com), we recommend to devide accessibility jobs into different parts:
-
-1. Atoms: like `button`, `textbox`, `image` which needs semantic HTML tag or well-defined WAI-ARIA role.
-1. Groups: like `list`, `tree`, `grid`, `table` which can organize a set of atoms together.
-1. Relationships: more like business logic, put all content in a proper user flow with `aria-labeledby`, `aria-flowto`, `aria-controls`, `aria-owns`, `aria-errormessage` etc.
-1. App Layout: like all `landmark` roles, navigation design, skip-to-content way, `aria-current` state, `aria-live` region(s) etc.
-
-The first two parts usually should be finished by a _component libs_. The last part usually should be finished by a _scaffold generator_. And the third part usually should be finished by a _business dev team_.
-
-At last, please test all of them to make sure it is not wrong or too over to access.
+_via [Screen Reader User Survey by webaim.org](https://webaim.org/projects/screenreadersurvey7/#browsercombos)_
 
 ### Specific Problems
 
