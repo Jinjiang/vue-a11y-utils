@@ -759,6 +759,7 @@ Another way to config <kbd>CMD</kbd> + <kbd>K</kbd>, <kbd>CMD</kbd> + <kbd>B</kb
 <template>...</template>
 
 <script>
+import { MixinKeyShortcuts } from "vue-a11y-utils";
 export default {
   mixins: [MixinKeyShortcuts],
   shortcuts: [
@@ -782,6 +783,7 @@ You can also quickly config each key in `keys` as a string if there is no modifi
 <template>...</template>
 
 <script>
+import { MixinKeyShortcuts } from "vue-a11y-utils";
 export default {
   mixins: [MixinKeyShortcuts],
   shortcuts: [
@@ -813,6 +815,7 @@ At last, if you would like to bind key shortcuts on a certain element, for examp
 </template>
 
 <script>
+import { MixinKeyShortcuts } from "vue-a11y-utils";
 export default {
   mixins: [MixinKeyShortcuts],
   shortcuts: {
@@ -904,47 +907,48 @@ This component is actually a wrapper which generates a invisible [WAI-ARIA live 
 
 ### Examples
 
-`App.vue`:
+- `App.vue`:
 
-```vue
-<template>
-  <VueLive>
-    <Foo />
-  </VueLive>
-</template>
+  ```vue
+  <template>
+    <VueLive>
+      <Foo />
+    </VueLive>
+  </template>
+  
+  <script>
+  import { VueLive } from "vue-a11y-utils";
+  export default {
+    components: { VueLive }
+  };
+  </script>
+  ```
 
-<script>
-export default {
-  components: { VueLive }
-};
-</script>
-```
+- `Foo.vue`:
 
-`Foo.vue`:
+  ```vue
+  <template>
+    <div>
+      Message: <input type="text" v-model="message" />
+      <button @click="announce(message)">Announce</button>
+    </div>
+  </template>
+  
+  <script>
+  export default {
+    inject: ["announce"],
+    data() {
+      return { message: "" };
+    }
+  };
+  </script>
+  ```
 
-```vue
-<template>
-  <div>
-    Message: <input type="text" v-model="message" />
-    <button @click="announce(message)">Announce</button>
-  </div>
-</template>
-
-<script>
-export default {
-  inject: ["announce"],
-  data() {
-    return { message: "" };
-  }
-};
-</script>
-```
-
-Now, if you enable VoiceOver of other a11y screen readers, there will be a live message when you input something in the textbox and press the announce button.
+Now, if you enable VoiceOver or other a11y screen readers, there will be a live message announced when you input some text in the textbox and press the "announce" button.
 
 The injected method `announce(message)` could announce live message to the screen reader.
 
-But by default the live message will be announced "politely" after other voices have been spoken. If you want to announce the message immediately, you can add a second parameter with a truthy value:
+But by default the live message will be announced "politely" after other voices spoken. If you want to announce the message immediately, you can add a second parameter with a truthy value:
 
 ```vue
 <template>
