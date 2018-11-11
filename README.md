@@ -472,7 +472,7 @@ Now you can use <kbd>ArrowUp</kbd> and <kbd>ArrowDown</kbd> to travel each items
 #### Values you can declare
 
 - `autofocus: boolean`
-- `orientation: 'horizontal' | 'vertical'`
+- `orientation: "horizontal" | "vertical"`
 
 #### Methods you can override
 
@@ -690,7 +690,9 @@ export default {
   mixins: [MixinKeyTravel],
   components: { VueFocusTrap },
   props: { options: Array, value: String },
-  data() { return { shown: false, orientation: 'vertical' }; },
+  data() {
+    return { shown: false, orientation: "vertical" };
+  },
   watch: {
     shown(value) {
       if (value) {
@@ -701,13 +703,17 @@ export default {
     }
   },
   methods: {
-    getKeyItems() { return this.$refs.items; },
+    getKeyItems() {
+      return this.$refs.items;
+    },
     getAutofocusItem() {
       const items = this.getKeyItems();
       const index = this.options.map(option => option.value).indexOf(value);
       return items[index] || items[0];
     },
-    goTrigger() { this.$refs.trigger.focus(); },
+    goTrigger() {
+      this.$refs.trigger.focus();
+    },
     fireAction(item) {
       const items = this.getKeyItems();
       const index = this.options.map(option => option.value).indexOf(value);
@@ -715,7 +721,7 @@ export default {
       if (index !== currentIndex) {
         const option = this.options[index];
         if (option) {
-          this.$emit('input', .value);
+          this.$emit("input", option.value);
         }
       }
       this.shown = false;
