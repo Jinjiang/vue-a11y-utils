@@ -13,11 +13,11 @@ declare module "vue/types/vue" {
   }
 }
 
-interface KeyConfig {
-  [key: string]: string;
-}
+type NameMap = Record<string, string>;
 
-const defaultKeyToMethod: KeyConfig = {
+type Item = HTMLElement | Vue;
+
+const defaultKeyToMethod: NameMap = {
   ArrowUp: "prev",
   ArrowDown: "next",
   ArrowLeft: "prev",
@@ -57,9 +57,9 @@ const defaultKeyToMethod: KeyConfig = {
 })
 export default class MixinKeyTravel extends Vue {
   // fixed
-  keyTravel(event: KeyboardEvent, config?: KeyConfig): void {
+  keyTravel(event: KeyboardEvent, config?: NameMap): void {
     // get the current key
-    const keyToMethod: KeyConfig = Object.assign(
+    const keyToMethod: NameMap = Object.assign(
       {},
       defaultKeyToMethod,
       this.orientation === "vertical"
@@ -90,15 +90,15 @@ export default class MixinKeyTravel extends Vue {
     }
   }
   // need be overrided
-  getKeyItems(): Array<Vue> {
+  getKeyItems(): Array<Item> {
     return [];
   }
   // could be overrided
-  fireAction(item: Vue): void {
+  fireAction(item: Item): void {
     return fireItemAction(item);
   }
   // could be overrided
-  getAutofocusItem(): Vue {
+  getAutofocusItem(): Item {
     return this.getKeyItems()[0];
   }
   // could be overrided
@@ -168,11 +168,11 @@ export default class MixinKeyTravel extends Vue {
 
 // focus functions
 
-function getActiveIndex(items: Array<Vue>): number {
+function getActiveIndex(items: Array<Item>): number {
   let activeIndex = -1;
   const activeElement = document.activeElement;
-  items.some((item: Vue, index: number) => {
-    const el = item.$el ? item.$el : item;
+  items.some((item: Item, index: number) => {
+    const el = (<Vue>item).$el ? (<Vue>item).$el : <HTMLElement>item;
     if (el === activeElement) {
       activeIndex = index;
       return true;
@@ -182,30 +182,30 @@ function getActiveIndex(items: Array<Vue>): number {
   return activeIndex;
 }
 
-function isActiveItem(item: Vue): boolean {
+function isActiveItem(item: Item): boolean {
   if (!item) {
     return false;
   }
-  const el = item.$el ? item.$el : item;
+  const el = (<Vue>item).$el ? (<Vue>item).$el : <HTMLElement>item;
   return el === document.activeElement;
 }
 
-function focusItem(item: Vue): any {
+function focusItem(item: Item): any {
   if (item) {
     if (typeof item.focus === "function") {
       item.focus();
       return true;
     }
-    if (item.$el && typeof item.$el.focus === "function") {
-      item.$el.focus();
+    if ((<Vue>item).$el && typeof (<Vue>item).$el.focus === "function") {
+      (<Vue>item).$el.focus();
       return true;
     }
   }
 }
 
-function fireItemAction(item: Vue): any {
-  if (item && typeof item.fireAction === "function") {
-    item.fireAction();
+function fireItemAction(item: Item): any {
+  if (item && typeof (<Vue>item).fireAction === "function") {
+    (<Vue>item).fireAction();
     return true;
   }
 }
