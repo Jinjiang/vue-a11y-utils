@@ -37,15 +37,15 @@ const defaultKeyToMethod: NameMap = {
  * - methods: getKeyItems()
  * could be overrided:
  * - methods: // call focus() or $el.focus() by default
- *            goPrev(), goNext(), goFirst(), goLast(),
+ *            goPrev(event), goNext(event), goFirst(event), goLast(event),
  *            // focus first item in key items by default
  *            getAutofocusItem(),
  *            // nothing happen by default
- *            goNextPage(), goPrevPage(),
+ *            goNextPage(event), goPrevPage(event),
  *            // call fireAction(item) by default
- *            goAction()
+ *            goAction(event)
  *            // call fireAction() in the item by default
- *            fireAction(item)
+ *            fireAction(item, event)
  */
 @Component({
   // fixed

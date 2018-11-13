@@ -486,17 +486,17 @@ _Main method for auto-focus:_
 
 _Methods you can customize to fire action:_
 
-- `fireAction(item: Vue | HTMLElement): void`: call `item.fireAction()` and return `true` if new element focused by default
+- `fireAction(item: Vue | HTMLElement, event: KeyboardEvent): void`: call `item.fireAction()` and return `true` if new element focused by default
 
 _Methods you can customize to travel:_
 
-- `goPrev(): any`: focus previous item
-- `goNext(): any`: focus next item
-- `goFirst(): any`: focus the first item
-- `goLast(): any`: focus the last item
-- `goNextPage(): any`: do nothing by default
-- `goPrevPage(): any`: do nothing by default
-- `goAction(): any`: fire action at the current focused item
+- `goPrev(event: KeyboardEvent): any`: focus previous item
+- `goNext(event: KeyboardEvent): any`: focus next item
+- `goFirst(event: KeyboardEvent): any`: focus the first item
+- `goLast(event: KeyboardEvent): any`: focus the last item
+- `goNextPage(event: KeyboardEvent): any`: do nothing by default
+- `goPrevPage(event: KeyboardEvent): any`: do nothing by default
+- `goAction(event: KeyboardEvent): any`: fire action at the current focused item
 
 #### Method you can declare in item component
 
