@@ -94,7 +94,7 @@ export default class MixinKeyTravel extends Vue {
     return [];
   }
   // could be overrided
-  fireAction(item: Item): void {
+  fireAction(item: Item, event: KeyboardEvent): void {
     return fireItemAction(item);
   }
   // could be overrided
@@ -154,7 +154,7 @@ export default class MixinKeyTravel extends Vue {
   // could be overrided
   goPrevPage() {}
   // could be overrided
-  goAction() {
+  goAction(event: KeyboardEvent) {
     const items = this.getKeyItems();
     const length = items.length;
     if (length === 0) {
@@ -162,7 +162,7 @@ export default class MixinKeyTravel extends Vue {
     }
     const activeIndex = getActiveIndex(items);
     const activeItem = items[activeIndex];
-    return this.fireAction(activeItem);
+    return this.fireAction(activeItem, event);
   }
 }
 

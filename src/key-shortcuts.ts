@@ -11,6 +11,10 @@ declare module "vue/types/options" {
   }
 }
 
+interface EndableKeyboardEvent extends KeyboardEvent {
+  ended: boolean;
+}
+
 type ShortcutsOption =
   | Array<ShortcutConfig>
   | Record<string, Array<ShortcutConfig> | ShortcutConfig>;
@@ -43,7 +47,7 @@ interface KeyDescriptor {
   }
 })
 export default class MixinKeyShortcuts extends Vue {
-  bindShortcut(event: KeyboardEvent, name: string = "default"): void {
+  bindShortcut(event: EndableKeyboardEvent, name: string = "default"): void {
     const target: EventTarget | null = event.currentTarget;
     if (!target) {
       return;
@@ -53,7 +57,7 @@ export default class MixinKeyShortcuts extends Vue {
     // match shortcuts
     if (updated) {
       // check whether end rule matched
-      const touchedEndBefore = keyEventIsEnded(target);
+      const touchedEndBefore = keyEventIsEnded(target, event);
       if (!touchedEndBefore) {
         const shortcuts = getShortcutsByName(this.$options.shortcuts, name);
         shortcuts.some((shortcut: ShortcutConfig) => {
@@ -62,9 +66,9 @@ export default class MixinKeyShortcuts extends Vue {
             // do the job and make sure whether to end the matching process
             const ended = shortcut.handle.call(this, event);
             if (ended) {
-              endLastKeyDown(target);
+              endLastKeyDown(target, event);
             }
-            return keyEventIsEnded(target);
+            return keyEventIsEnded(target, event);
           }
           return false;
         });
@@ -236,7 +240,13 @@ function updateKeySeq(event: KeyboardEvent, target: EventTarget): boolean {
   return false;
 }
 
-function keyEventIsEnded(target: EventTarget): boolean {
+function keyEventIsEnded(
+  target: EventTarget,
+  event: EndableKeyboardEvent
+): boolean {
+  if (event.ended) {
+    return true;
+  }
   const keySeq = keySeqMap.get(target) || [];
   if (!keySeqMap.has(target)) {
     keySeqMap.set(target, keySeq);
@@ -286,7 +296,10 @@ function matchShortcut(shortcut: ShortcutConfig, target: EventTarget): boolean {
   return true;
 }
 
-function endLastKeyDown(target: EventTarget): void {
+function endLastKeyDown(
+  target: EventTarget,
+  event: EndableKeyboardEvent
+): void {
   const keySeq = keySeqMap.get(target) || [];
   if (!keySeqMap.has(target)) {
     keySeqMap.set(target, keySeq);
@@ -295,4 +308,5 @@ function endLastKeyDown(target: EventTarget): void {
   if (lastKeyDown) {
     lastKeyDown.ended = true;
   }
+  event.ended = true;
 }
