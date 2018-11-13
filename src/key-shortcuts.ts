@@ -60,7 +60,7 @@ export default class MixinKeyShortcuts extends Vue {
           // match new rules in current shortcut config
           if (matchShortcut(shortcut, target)) {
             // do the job and make sure whether to end the matching process
-            const ended = shortcut.handle(event);
+            const ended = shortcut.handle.call(this, event);
             if (ended) {
               endLastKeyDown(target);
             }
