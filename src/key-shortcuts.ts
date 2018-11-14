@@ -11,8 +11,10 @@ declare module "vue/types/options" {
   }
 }
 
-interface EndableKeyboardEvent extends KeyboardEvent {
-  ended: boolean;
+declare global {
+  interface KeyboardEvent {
+    ended: boolean;
+  }
 }
 
 type ShortcutsOption =
@@ -47,7 +49,7 @@ interface KeyDescriptor {
   }
 })
 export default class MixinKeyShortcuts extends Vue {
-  bindShortcut(event: EndableKeyboardEvent, name: string = "default"): void {
+  bindShortcut(event: KeyboardEvent, name: string = "default"): void {
     const target: EventTarget | null = event.currentTarget;
     if (!target) {
       return;
@@ -240,10 +242,7 @@ function updateKeySeq(event: KeyboardEvent, target: EventTarget): boolean {
   return false;
 }
 
-function keyEventIsEnded(
-  target: EventTarget,
-  event: EndableKeyboardEvent
-): boolean {
+function keyEventIsEnded(target: EventTarget, event: KeyboardEvent): boolean {
   if (event.ended) {
     return true;
   }
@@ -296,10 +295,7 @@ function matchShortcut(shortcut: ShortcutConfig, target: EventTarget): boolean {
   return true;
 }
 
-function endLastKeyDown(
-  target: EventTarget,
-  event: EndableKeyboardEvent
-): void {
+function endLastKeyDown(target: EventTarget, event: KeyboardEvent): void {
   const keySeq = keySeqMap.get(target) || [];
   if (!keySeqMap.has(target)) {
     keySeqMap.set(target, keySeq);
