@@ -1,4 +1,5 @@
 import Vue from "vue";
+import Component from "vue-class-component";
 
 type NameMap = Record<string, string>;
 
@@ -184,6 +185,7 @@ const methodMap: Record<string, Function> = {
   }
 };
 
+@Component
 export default class MixinTravel extends Vue {
   travel(event: KeyboardEvent, name: string = "default"): void {
     const option = this.$options.travel;
