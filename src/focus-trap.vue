@@ -10,16 +10,12 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 
-const VueFocusTrapInterface = Vue.extend({
-  props: {
-    disabled: Boolean
-  }
-});
+const trapStack = [];
 
 /**
- * <VueFocusTrap disabled>
- * - props: disabled
- * - events: gofirst, golast
+ * <VueFocusTrap>
+ * - methods: open(), replace(), close(returnFocus)
+ * - events: open, gofirst, golast
  * - slots: default slot
  */
 @Component({
@@ -38,9 +34,10 @@ const VueFocusTrapInterface = Vue.extend({
     }
   }
 })
-export default class VueFocusTrap extends VueFocusTrapInterface {
+export default class VueFocusTrap extends Vue {
   trapFocus(event: FocusEvent) {
-    if (this.disabled) {
+    const { vm } = trapStack[trapStack.length - 1] || {};
+    if (vm !== this) {
       return;
     }
     const root = this.$el;
@@ -55,6 +52,27 @@ export default class VueFocusTrap extends VueFocusTrapInterface {
     } else if (target === end) {
       event.preventDefault();
       this.$emit("gofirst");
+    }
+  }
+  open() {
+    const prevTraget = document.activeElement;
+    trapStack.push({ vm: this, prevTraget });
+    this.$emit("open");
+  }
+  replace() {
+    const prevTraget = document.activeElement;
+    trapStack.pop();
+    trapStack.push({ vm: this, prevTraget });
+    this.$emit("open");
+  }
+  close(returnFocus) {
+    const { prevTraget } = trapStack.pop();
+    const { vm } = trapStack[trapStack.length - 1] || {};
+    if (returnFocus) {
+      prevTraget.focus();
+    }
+    if (vm) {
+      vm.$emit("open", prevTraget);
     }
   }
 }
