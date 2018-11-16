@@ -7,7 +7,8 @@
     </p>
     <div v-show="shown" class="dialog">
       <VueFocusTrap
-        :disabled="!shown"
+        ref="dialog"
+        @open="open"
         @gofirst="goFirst"
         @golast="goLast"
       >
@@ -34,30 +35,35 @@ import { VueFocusTrap } from "../src/index";
 
 @Component({
   components: { VueFocusTrap },
+  mounted() {
+    (<HTMLElement>this.$refs.trigger).focus();
+  },
   watch: {
     shown(value) {
       if (value) {
-        this.$nextTick(() => {
-          this.goFirst();
-        });
+        setTimeout(() => {
+          const dialog = this.$refs.dialog;
+          (<VueFocusTrap>dialog).open();
+        }, 100);
       } else {
-        this.$nextTick(() => {
-          this.goTrigger();
-        });
+        const dialog = this.$refs.dialog;
+        (<VueFocusTrap>dialog).close(true);
       }
     }
   }
 })
 export default class ExampleVueFocusTrap extends Vue {
   shown: boolean = false;
+  open() {
+    setTimeout(() => {
+      this.goFirst();
+    }, 50);
+  }
   goFirst() {
     (<HTMLElement>this.$refs.email).focus();
   }
   goLast() {
     (<HTMLElement>this.$refs.cancel).focus();
-  }
-  goTrigger() {
-    (<HTMLElement>this.$refs.trigger).focus();
   }
 }
 </script>

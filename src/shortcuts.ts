@@ -7,7 +7,7 @@ import { capitalizeFirstLetter } from "./util";
 
 declare module "vue/types/options" {
   interface ComponentOptions<V extends Vue> {
-    shortcuts?: ShortcutsOption;
+    $shortcuts?: ShortcutsOption;
   }
 }
 
@@ -38,13 +38,19 @@ interface KeyDescriptor {
  */
 @Component({
   beforeMount() {
-    if (this.$options.shortcuts) {
-      window.addEventListener("keydown", this.bindShortcut);
+    if (this.$options.$shortcuts) {
+      window.addEventListener(
+        "keydown",
+        (<MixinKeyShortcuts>this).bindShortcut
+      );
     }
   },
   beforeDestroy() {
-    if (this.$options.shortcuts) {
-      window.removeEventListener("keydown", this.bindShortcut);
+    if (this.$options.$shortcuts) {
+      window.removeEventListener(
+        "keydown",
+        (<MixinKeyShortcuts>this).bindShortcut
+      );
     }
   }
 })
@@ -61,7 +67,7 @@ export default class MixinKeyShortcuts extends Vue {
       // check whether end rule matched
       const touchedEndBefore = keyEventIsEnded(target, event);
       if (!touchedEndBefore) {
-        const shortcuts = getShortcutsByName(this.$options.shortcuts, name);
+        const shortcuts = getShortcutsByName(this.$options.$shortcuts, name);
         shortcuts.some((shortcut: ShortcutConfig) => {
           // match new rules in current shortcut config
           if (matchShortcut(shortcut, target)) {

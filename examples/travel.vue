@@ -1,8 +1,5 @@
 <template>
   <div id="key-travel-example">
-    <p>
-      <button ref="btn">Auto-focus Button!</button>
-    </p>
     <p>Selectable List</p>
     <p class="tip">
       Please active the list first and use <kbd>Arrow</kbd> keys
@@ -11,7 +8,7 @@
     <ul
       class="list"
       tabindex="0"
-      @keydown="keyTravel"
+      @keydown="bindTravel"
       @keydown.enter="goCurrentItem"
     >
       <li
@@ -28,19 +25,41 @@
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
-import { MixinKeyTravel } from "../src/index";
+import { MixinTravel } from "../src/index";
+import { TravelConfig } from "../src/travel";
 
 interface ExampleOption {
   text: string;
   value: string;
 }
 
+const travelOption: TravelConfig = {
+  looped: true,
+  getItems(vm: Vue) {
+    return <HTMLElement[]>vm.$refs.items;
+  },
+  getIndex(vm: Vue) {
+    return vm.activeIndex;
+  },
+  setIndex(vm: Vue, index: number) {
+    this.getItems(vm)[index].focus();
+    vm.activeIndex = index;
+  },
+  move(vm: Vue, event: KeyboardEvent, newIndex) {
+    event.preventDefault();
+    this.setIndex(vm, newIndex);
+  },
+  action(vm: Vue, event: KeyboardEvent, index: number) {
+    vm.value = vm.options[index].value;
+  }
+};
+
 @Component({
-  mixins: [MixinKeyTravel]
+  mixins: [MixinTravel],
+  $travel: travelOption
 })
 export default class ExampleKeyTravel extends Vue {
-  autofocus = true;
-  orientation = "vertical";
+  activeIndex: number = -1;
 
   options: Array<ExampleOption> = [
     { text: "Foo", value: "x" },
@@ -49,27 +68,13 @@ export default class ExampleKeyTravel extends Vue {
   ];
   value: string = "y";
 
-  getAutofocusItem() {
-    return this.$refs.btn;
-  }
-  getKeyItems() {
-    return this.$refs.items;
-  }
   goCurrentItem() {
-    const items = <Array<HTMLElement>>this.getKeyItems();
+    const items = travelOption.getItems(this);
     const index = this.options.map(option => option.value).indexOf(this.value);
     const currentItem = items[index];
     if (currentItem) {
       currentItem.focus();
     }
-  }
-  fireAction(item: any) {
-    const items = <Array<HTMLElement>>this.getKeyItems();
-    const index = items.indexOf(item);
-    if (index >= 0) {
-      this.value = this.options[index].value;
-    }
-    return true;
   }
 }
 </script>

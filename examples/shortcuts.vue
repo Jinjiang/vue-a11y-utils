@@ -16,11 +16,11 @@
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
-import { MixinKeyShortcuts } from "../src/index";
+import { MixinShortcuts } from "../src/index";
 
 @Component({
-  mixins: [MixinKeyShortcuts],
-  shortcuts: {
+  mixins: [MixinShortcuts],
+  $shortcuts: {
     default: {
       keys: ["a", "s", "d", "f"],
       handle() {

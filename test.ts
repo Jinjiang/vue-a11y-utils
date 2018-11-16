@@ -4,12 +4,14 @@ import { mount, Wrapper, config, WrapperArray } from "@vue/test-utils";
 import {
   VueAria,
   directiveAria,
-  MixinKeyTravel,
+  MixinTravel,
   MixinId,
   VueFocusTrap,
-  MixinKeyShortcuts,
+  MixinShortcuts,
   VueLive
 } from "./src/index";
+
+import { TravelConfig } from "./src/travel";
 
 config.logModifiedComponents = false;
 
@@ -524,47 +526,30 @@ describe("v-aria directive", () => {
 });
 
 describe("KeyTravel mixin", () => {
-  it("autofocus", () => {
-    const Foo = Vue.extend({
-      mixins: [MixinKeyTravel],
-      template: `<div><button ref="btn">Hello</button></div>`,
-      props: {
-        autofocus: Boolean
-      },
-      methods: {
-        getAutofocusItem() {
-          return this.$refs.btn;
-        }
-      }
-    });
-
-    const wrapper: Wrapper<Vue> = mount(Foo, {
-      attachToDocument: true
-    });
-    const document: Document | null = wrapper.element.ownerDocument;
-    expect(document).toBeTruthy();
-    if (document) {
-      expect(document.activeElement).toBe(document.body);
-    }
-
-    const wrapperFocus: Wrapper<Vue> = mount(Foo, {
-      propsData: { autofocus: true },
-      attachToDocument: true
-    });
-    const documentFocus: Document | null = wrapperFocus.element.ownerDocument;
-    const btnFocus: any = wrapperFocus.vm.$refs.btn;
-    expect(documentFocus).toBeTruthy();
-    expect(btnFocus).toBeTruthy();
-    if (documentFocus) {
-      expect(documentFocus.activeElement).toBe(btnFocus);
-    }
-  });
-
   it("travel through all focusable items", () => {
+    interface FooVm extends Vue {
+      currentIndex: number;
+    }
+    const travelOption: TravelConfig = {
+      looped: true,
+      getItems(vm: FooVm) {
+        return <Array<HTMLElement>>vm.$refs.items;
+      },
+      getIndex(vm: FooVm) {
+        return vm.currentIndex;
+      },
+      setIndex(vm: FooVm, index: number) {
+        vm.currentIndex = index;
+        travelOption.getItems(vm)[index].focus();
+      },
+      move(vm: FooVm, event: KeyboardEvent, newIndex: number) {
+        this.setIndex(vm, newIndex);
+      }
+    };
+
     const Foo = Vue.extend({
-      mixins: [MixinKeyTravel],
       template: `
-        <ul @keydown="keyTravel">
+        <ul @keydown="bindTravel">
           <li
             tabindex="-1"
             v-for="option in options"
@@ -575,18 +560,18 @@ describe("KeyTravel mixin", () => {
           </li>
         </ul>
       `,
+      mixins: [MixinTravel],
+      $travel: travelOption,
+      mounted() {
+        (<Array<HTMLElement>>this.$refs.items)[0].focus();
+      },
       data() {
         return {
-          autofocus: true
+          currentIndex: 0
         };
       },
       props: {
         options: Array
-      },
-      methods: {
-        getKeyItems() {
-          return this.$refs.items;
-        }
       }
     });
 
@@ -623,6 +608,31 @@ describe("KeyTravel mixin", () => {
   });
 
   it("fire action when enter key down", () => {
+    interface FooVm extends Vue {
+      currentIndex: number;
+    }
+    const travelOption: TravelConfig = {
+      looped: true,
+      getItems(vm: FooVm) {
+        return <Array<Vue>>vm.$refs.items;
+      },
+      getIndex(vm: FooVm) {
+        return vm.currentIndex;
+      },
+      setIndex(vm: FooVm, index: number) {
+        vm.currentIndex = index;
+        const items = travelOption.getItems(vm);
+        const item = items[index];
+        item.$el.focus();
+      },
+      move(vm: FooVm, event: KeyboardEvent, newIndex: number) {
+        this.setIndex(vm, newIndex);
+      },
+      action(vm: FooVm, event: KeyboardEvent, index: number, items: any[]) {
+        items[index].fireAction();
+      }
+    };
+
     let lastAction: string = "";
 
     const ListItem = Vue.extend({
@@ -639,9 +649,9 @@ describe("KeyTravel mixin", () => {
     });
 
     const Foo = Vue.extend({
-      mixins: [MixinKeyTravel],
+      mixins: [MixinTravel],
       template: `
-        <div role="list" @keydown="keyTravel">
+        <div role="list" @keydown="bindTravel">
           <ListItem
             ref="items"
             v-for="option in options"
@@ -651,19 +661,18 @@ describe("KeyTravel mixin", () => {
           />
         </div>
       `,
+      $travel: travelOption,
       components: { ListItem },
-      data() {
-        return {
-          autofocus: true
-        };
+      mounted() {
+        (<Array<Vue>>this.$refs.items)[0].$el.focus();
       },
       props: {
         options: Array
       },
-      methods: {
-        getKeyItems() {
-          return this.$refs.items;
-        }
+      data() {
+        return {
+          currentIndex: 0
+        };
       }
     });
 
@@ -730,15 +739,15 @@ describe("Id mixin", () => {
 
   it("will generate unique new ids for each component instance", () => {
     const wrapper: Wrapper<Vue> = mount(Foo);
-    const label = wrapper.vm.$refs.label;
-    const input = wrapper.vm.$refs.input;
+    const label = <HTMLElement>wrapper.vm.$refs.label;
+    const input = <HTMLElement>wrapper.vm.$refs.input;
     expect(label).toBeTruthy();
     expect(Array.isArray(label)).toBeFalsy();
     expect(input).toBeTruthy();
     expect(Array.isArray(input)).toBeFalsy();
     if (label && input && !Array.isArray(label) && !Array.isArray(input)) {
-      const labelId = label.getAttribute("id");
-      const inputId = input.getAttribute("id");
+      const labelId = label.getAttribute("id") || "";
+      const inputId = input.getAttribute("id") || "";
       const labelledby = input.getAttribute("aria-labelledby");
       expect(labelledby).toBe(labelId);
       expect(labelId.substr(0, labelId.length - 5)).toBe(
@@ -751,8 +760,8 @@ describe("Id mixin", () => {
     const wrapper: Wrapper<Vue> = mount(Foo, {
       propsData: { id: "v-helloworld" }
     });
-    const label = wrapper.vm.$refs.label;
-    const input = wrapper.vm.$refs.input;
+    const label = <HTMLElement>wrapper.vm.$refs.label;
+    const input = <HTMLElement>wrapper.vm.$refs.input;
     expect(label).toBeTruthy();
     expect(Array.isArray(label)).toBeFalsy();
     expect(input).toBeTruthy();
@@ -769,8 +778,8 @@ describe("Id mixin", () => {
 
   it("will update localId after id prop changed", () => {
     const wrapper: Wrapper<Vue> = mount(Foo);
-    const label = wrapper.vm.$refs.label;
-    const input = wrapper.vm.$refs.input;
+    const label = <HTMLElement>wrapper.vm.$refs.label;
+    const input = <HTMLElement>wrapper.vm.$refs.input;
     expect(label).toBeTruthy();
     expect(Array.isArray(label)).toBeFalsy();
     expect(input).toBeTruthy();
@@ -788,6 +797,14 @@ describe("Id mixin", () => {
 });
 
 describe("<VueFocusTrap> component", () => {
+  interface DialogVm extends Vue {
+    open(): void;
+    close(autofocus: boolean): void;
+  }
+  interface FooVm extends Vue {
+    shown: boolean;
+  }
+
   it("will trap focus to a modal dialog", done => {
     const Foo = Vue.extend({
       template: `
@@ -797,6 +814,8 @@ describe("<VueFocusTrap> component", () => {
           </button>
           <div v-if="shown" class="dialog">
             <VueFocusTrap
+              ref="dialog"
+              @open="open"
               @gofirst="goFirst"
               @golast="goLast"
             >
@@ -817,6 +836,9 @@ describe("<VueFocusTrap> component", () => {
       components: {
         VueFocusTrap
       },
+      mounted() {
+        (<HTMLElement>this.$refs.trigger).focus();
+      },
       data() {
         return {
           shown: false
@@ -825,17 +847,22 @@ describe("<VueFocusTrap> component", () => {
       watch: {
         shown(value) {
           if (value) {
-            this.$nextTick(() => {
-              this.goFirst();
-            });
+            setTimeout(() => {
+              const dialog = this.$refs.dialog;
+              (<DialogVm>dialog).open();
+            }, 100);
           } else {
-            this.$nextTick(() => {
-              this.goTrigger();
-            });
+            const dialog = this.$refs.dialog;
+            (<DialogVm>dialog).close(true);
           }
         }
       },
       methods: {
+        open() {
+          setTimeout(() => {
+            this.goFirst();
+          });
+        },
         goFirst() {
           const item = this.$refs.email;
           if (item) {
@@ -844,12 +871,6 @@ describe("<VueFocusTrap> component", () => {
         },
         goLast() {
           const item = this.$refs.cancel;
-          if (item) {
-            (<HTMLElement>item).focus();
-          }
-        },
-        goTrigger() {
-          const item = this.$refs.trigger;
           if (item) {
             (<HTMLElement>item).focus();
           }
@@ -870,163 +891,40 @@ describe("<VueFocusTrap> component", () => {
     expect(trigger).toBeTruthy();
 
     // init state
-    expect(wrapper.vm.shown).toBeFalsy();
+    expect((<FooVm>wrapper.vm).shown).toBeFalsy();
     const dialog = <HTMLElement>wrapper.element.querySelector(".dialog");
     expect(dialog).toBe(null);
 
     // click trigger
     trigger.click();
-    wrapper.vm
-      .$nextTick()
-      .then(() => {
+    setTimeout(() => {
+      const dialog = <HTMLElement>wrapper.element.querySelector(".dialog");
+      const first = <HTMLElement>(
+        wrapper.element.querySelector('.dialog input[type="email"]')
+      );
+      const password = <HTMLElement>(
+        wrapper.element.querySelector('.dialog input[type="password"]')
+      );
+      const login = <HTMLElement>(
+        wrapper.element.querySelectorAll(".dialog button")[0]
+      );
+      const last = <HTMLElement>(
+        wrapper.element.querySelectorAll(".dialog button")[1]
+      );
+      expect(dialog).toBeTruthy();
+      expect(first).toBeTruthy();
+      expect(last).toBeTruthy();
+      expect((<FooVm>wrapper.vm).shown).toBeTruthy();
+      expect(dialog.style.display).toBe("");
+      expect(document.activeElement).toBe(first);
+      login.click();
+      setTimeout(() => {
         const dialog = <HTMLElement>wrapper.element.querySelector(".dialog");
-        const first = <HTMLElement>(
-          wrapper.element.querySelector('.dialog input[type="email"]')
-        );
-        const password = <HTMLElement>(
-          wrapper.element.querySelector('.dialog input[type="password"]')
-        );
-        const login = <HTMLElement>(
-          wrapper.element.querySelectorAll(".dialog button")[0]
-        );
-        const last = <HTMLElement>(
-          wrapper.element.querySelectorAll(".dialog button")[1]
-        );
-        expect(dialog).toBeTruthy();
-        expect(first).toBeTruthy();
-        expect(last).toBeTruthy();
-        expect(wrapper.vm.shown).toBeTruthy();
-        expect(dialog.style.display).toBe("");
-        expect(document.activeElement).toBe(first);
-        login.click();
-        return wrapper.vm.$nextTick();
-      })
-      .then(() => {
-        const dialog = <HTMLElement>wrapper.element.querySelector(".dialog");
-        expect(wrapper.vm.shown).toBeFalsy();
+        expect((<FooVm>wrapper.vm).shown).toBeFalsy();
         expect(dialog).toBe(null);
         done();
-      });
-  });
-
-  it("will stop trap focus when set disabled as a truthy value", done => {
-    const Foo = Vue.extend({
-      template: `
-        <div id="focus-trap-example">
-          <button class="trigger" ref="trigger" @click="shown = true">
-            Open a Modal Dialog
-          </button>
-          <div v-show="shown" class="dialog">
-            <VueFocusTrap
-              :disabled="!shown"
-              @gofirst="goFirst"
-              @golast="goLast"
-            >
-              <label>
-                Email:
-                <input ref="email" type="email" />
-              </label>
-              <label>
-                Password
-                <input ref="password" type="password" />
-              </label>
-              <button ref="login" @click="shown = false">Login</button>
-              <button ref="cancel">Cancel</button>
-            </VueFocusTrap>
-          </div>
-        </div>
-      `,
-      components: {
-        VueFocusTrap
-      },
-      data() {
-        return {
-          shown: false
-        };
-      },
-      watch: {
-        shown(value) {
-          if (value) {
-            this.$nextTick(() => {
-              this.goFirst();
-            });
-          } else {
-            this.$nextTick(() => {
-              this.goTrigger();
-            });
-          }
-        }
-      },
-      methods: {
-        goFirst() {
-          const item = this.$refs.email;
-          if (item) {
-            (<HTMLElement>item).focus();
-          }
-        },
-        goLast() {
-          const item = this.$refs.cancel;
-          if (item) {
-            (<HTMLElement>item).focus();
-          }
-        },
-        goTrigger() {
-          const item = this.$refs.trigger;
-          if (item) {
-            (<HTMLElement>item).focus();
-          }
-        }
-      }
-    });
-
-    // NOTICE:
-    // vue-test-utils doesn't support TAB focus
-    // but still preserve this case.
-
-    // init
-    const wrapper: Wrapper<Vue> = mount(Foo, { attachToDocument: true });
-    const document = <HTMLDocument>wrapper.element.ownerDocument;
-    expect(document).toBeTruthy();
-
-    const trigger = <HTMLElement>wrapper.element.querySelector(".trigger");
-    const dialog = <HTMLElement>wrapper.element.querySelector(".dialog");
-    const first = <HTMLElement>(
-      wrapper.element.querySelector('.dialog input[type="email"]')
-    );
-    const password = <HTMLElement>(
-      wrapper.element.querySelector('.dialog input[type="password"]')
-    );
-    const login = <HTMLElement>(
-      wrapper.element.querySelectorAll(".dialog button")[0]
-    );
-    const last = <HTMLElement>(
-      wrapper.element.querySelectorAll(".dialog button")[1]
-    );
-    expect(trigger).toBeTruthy();
-    expect(dialog).toBeTruthy();
-    expect(first).toBeTruthy();
-    expect(last).toBeTruthy();
-
-    // init state
-    expect(wrapper.vm.shown).toBeFalsy();
-    expect(dialog.style.display).toBe("none");
-
-    // click trigger
-    trigger.click();
-    wrapper.vm
-      .$nextTick()
-      .then(() => {
-        expect(wrapper.vm.shown).toBeTruthy();
-        expect(dialog.style.display).toBe("");
-        expect(document.activeElement).toBe(first);
-        login.click();
-        return wrapper.vm.$nextTick();
-      })
-      .then(() => {
-        expect(wrapper.vm.shown).toBeFalsy();
-        expect(dialog.style.display).toBe("none");
-        done();
-      });
+      }, 200);
+    }, 200);
   });
 });
 
@@ -1041,8 +939,8 @@ describe("KeyShortcuts mixin", () => {
           <kbd>Window</kbd> + <kbd>G</kbd>
         </div>
       `,
-      mixins: [MixinKeyShortcuts],
-      shortcuts: [
+      mixins: [MixinShortcuts],
+      $shortcuts: [
         {
           key: "g",
           modifiers: { meta: true },
@@ -1113,8 +1011,8 @@ describe("KeyShortcuts mixin", () => {
           <kbd>Window</kbd> + <kbd>G</kbd>
         </div>
       `,
-      mixins: [MixinKeyShortcuts],
-      shortcuts: [
+      mixins: [MixinShortcuts],
+      $shortcuts: [
         {
           keys: [{ key: "a" }, { key: "s" }, { key: "d" }, { key: "f" }],
           handle(event: KeyboardEvent) {
@@ -1162,8 +1060,8 @@ describe("KeyShortcuts mixin", () => {
           <kbd>Window</kbd> + <kbd>G</kbd>
         </div>
       `,
-      mixins: [MixinKeyShortcuts],
-      shortcuts: [
+      mixins: [MixinShortcuts],
+      $shortcuts: [
         {
           keys: ["a", "s", "d", "f"],
           handle(event: KeyboardEvent) {
@@ -1210,8 +1108,8 @@ describe("KeyShortcuts mixin", () => {
           <input type="text" value="CMD + K" @keydown="bindShortcut($event, 'second')" />
         </div>
       `,
-      mixins: [MixinKeyShortcuts],
-      shortcuts: {
+      mixins: [MixinShortcuts],
+      $shortcuts: {
         first: [
           {
             key: "g",
@@ -1273,15 +1171,19 @@ describe("<VueLive> component", () => {
   it("will provide announce method", done => {
     let announce: Function = () => {};
     let clear: Function = () => {};
+    interface InjectedVue extends Vue {
+      announce: Function;
+      clear: Function;
+    }
     const Foo = Vue.extend({
       template: `<div>hello</div>`,
       inject: ["announce", "clear"],
       created() {
         announce = (...args: []) => {
-          this.announce(...args);
+          (<InjectedVue>this).announce(...args);
         };
         clear = (...args: []) => {
-          this.clear(...args);
+          (<InjectedVue>this).clear(...args);
         };
       }
     });

@@ -10,7 +10,12 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 
-const trapStack = [];
+interface TrapInfo {
+  vm: Vue;
+  prevTraget: HTMLElement;
+}
+
+const trapStack: Array<TrapInfo> = [];
 
 /**
  * <VueFocusTrap>
@@ -36,8 +41,8 @@ const trapStack = [];
 })
 export default class VueFocusTrap extends Vue {
   trapFocus(event: FocusEvent) {
-    const { vm } = trapStack[trapStack.length - 1] || {};
-    if (vm !== this) {
+    const trap = trapStack[trapStack.length - 1];
+    if (!trap || trap.vm !== this) {
       return;
     }
     const root = this.$el;
@@ -55,24 +60,29 @@ export default class VueFocusTrap extends Vue {
     }
   }
   open() {
-    const prevTraget = document.activeElement;
+    const prevTraget = <HTMLElement>document.activeElement;
     trapStack.push({ vm: this, prevTraget });
     this.$emit("open");
   }
   replace() {
-    const prevTraget = document.activeElement;
+    const prevTraget = <HTMLElement>document.activeElement;
     trapStack.pop();
     trapStack.push({ vm: this, prevTraget });
     this.$emit("open");
   }
-  close(returnFocus) {
-    const { prevTraget } = trapStack.pop();
-    const { vm } = trapStack[trapStack.length - 1] || {};
+  close(returnFocus: any) {
+    const trap = trapStack.pop();
+    if (!trap) {
+      return;
+    }
+    const { prevTraget } = trap;
     if (returnFocus) {
       prevTraget.focus();
     }
-    if (vm) {
-      vm.$emit("open", prevTraget);
+
+    const lastTrap = trapStack[trapStack.length - 1];
+    if (lastTrap) {
+      lastTrap.vm.$emit("open", prevTraget);
     }
   }
 }

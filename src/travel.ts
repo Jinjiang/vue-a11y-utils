@@ -5,7 +5,7 @@ type NameMap = Record<string, string>;
 
 declare module "vue/types/options" {
   interface ComponentOptions<V extends Vue> {
-    travel?: TravelOption;
+    $travel?: TravelOption;
   }
 }
 
@@ -15,10 +15,11 @@ declare global {
   }
 }
 
-type TravelOption = Record<string, TravelConfig> | TravelConfig;
+export type TravelOption = TravelConfig | Record<string, TravelConfig>;
 
-interface TravelConfig {
+export interface TravelConfig {
   orientation?: string;
+  looped?: boolean;
   hasPagination?: boolean;
   hasSearch?: boolean;
   getIndex(vm: Vue): number;
@@ -102,7 +103,10 @@ const methodMap: Record<string, Function> = {
       if (length === 1 && index === 0) {
         return;
       }
-      const newIndex = index === -1 ? length - 1 : index - 1;
+      let newIndex = index === -1 ? length - 1 : index - 1;
+      if (config.looped && index === 0) {
+        newIndex = length - 1;
+      }
       config.move(vm, event, newIndex, index, items) && (event.ended = true);
     }
   },
@@ -114,7 +118,11 @@ const methodMap: Record<string, Function> = {
       if (length === 1 && index === 0) {
         return;
       }
-      config.move(vm, event, index + 1, index, items) && (event.ended = true);
+      let newIndex = index + 1;
+      if (config.looped && newIndex === length) {
+        newIndex = 0;
+      }
+      config.move(vm, event, newIndex, index, items) && (event.ended = true);
     }
   },
   first(vm: Vue, event: KeyboardEvent, config: TravelConfig): void {
@@ -187,8 +195,8 @@ const methodMap: Record<string, Function> = {
 
 @Component
 export default class MixinTravel extends Vue {
-  travel(event: KeyboardEvent, name: string = "default"): void {
-    const option = this.$options.travel;
+  bindTravel(event: KeyboardEvent, name: string = "default"): void {
+    const option = this.$options.$travel;
     const config = getTravelConfig(option, name);
     if (
       !config ||
