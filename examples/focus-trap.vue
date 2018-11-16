@@ -55,9 +55,7 @@ import { VueFocusTrap } from "../src/index";
 export default class ExampleVueFocusTrap extends Vue {
   shown: boolean = false;
   open() {
-    setTimeout(() => {
-      this.goFirst();
-    }, 50);
+    this.goFirst();
   }
   goFirst() {
     (<HTMLElement>this.$refs.email).focus();

@@ -133,6 +133,8 @@ import {
 
 See the docs below or preview some [examples](https://github.com/Jinjiang/vue-a11y-utils/tree/master/examples) [online](https://jinjiang.github.io/vue-a11y-utils/examples).
 
+For more complicated examples, there is another repo in [`Jinjiang/vue-a11y-examples`](https://github.com/Jinjiang/vue-a11y-examples/) you can [preview online](https://jinjiang.github.io/vue-a11y-examples/).
+
 ## `<VueAria>` Component
 
 This component helps you to write `role` and `aria-*` attributes likely in a better way.
@@ -574,9 +576,15 @@ Now the final generated DOM tree will be:
 
 ## `<VueFocusTrap>` Component
 
-Usually, when you have a modal dialog in your Vue app, you should keep the focus always in it whatever you navigate with touch, mouse or keyboard.
+Usually, when you have a modal dialog in your Vue app, you should keep the focus always in it whatever you navigate by touch, mouse or keyboard.
 
-`<VueFocusTrap>` gives you a easy way to wrap a modal with trapped focus by just two events: `gofirst` and `golast`, which should bind handlers to reset the focus to the first or last focusable target in the dialog. It also has a `disabled` prop to stop trapping focus which could be set `true` when the dialog is hidden or disabled.
+`<VueFocusTrap>` gives you a easy way to wrap a modal content with trapped focus by just two events: `gofirst` and `golast`, which should bind handlers to reset the focus to the first or last focusable element in it.
+
+But there must only be one trap in the whole Vue app, so by default the traps of all `<VueFocusTrap>` instances would be disabled by default. To control the enabled trap in one of them, you need instance methods:
+
+- `open()`: enable the current focus trap and push the previous focus trap in an "focus stack" internally. At the same time, save the previous focused element, and then emit a `open` event.
+- `replace()`: enable the current focus trap and replace the last focus trap in the "focus stack" with the current one. At the same time, save the previous focused element, and then emit a `open` event.
+- `close(returnFocus)`: disable the current focus trap and enable the last focus trap in the "focus stack". Also you can determine whether auto-focus the previous focused element in that focus trap. And then emit a `open(prevTraget)` event with the previous focused element whatever you determined.
 
 ### Examples
 
@@ -589,7 +597,7 @@ In this example below, after you open the modal dialog by click the trigger butt
       Open a Modal Dialog
     </button>
     <form class="dialog" v-show="shown">
-      <VueFocusTrap :disabled="!shown" @gofirst="goFirst" @golast="goLast">
+      <VueFocusTrap ref="dialog" @open="open" @gofirst="goFirst" @golast="goLast">
         <label>Email: <input ref="email" type="email" /></label>
         <label>Password: <input ref="password" type="password" /></label>
         <button ref="login" @click="shown = false">Login</button>
@@ -609,21 +617,25 @@ export default {
   watch: {
     shown(value) {
       if (value) {
-        this.$nextTick(() => this.goFirst());
+        setTimeout(() => {
+          const dialog = this.$refs.dialog;
+          dialog.open();
+        }, 50);
       } else {
-        this.$nextTick(() => this.goTrigger());
+        const dialog = this.$refs.dialog;
+        dialog.close(true);
       }
     }
   },
   methods: {
+    open() {
+      this.goFirst();
+    },
     goFirst() {
       this.$refs.email.focus();
     },
     goLast() {
       this.$refs.cancel.focus();
-    },
-    goTrigger() {
-      this.$refs.trigger.focus();
     }
   }
 };
@@ -631,14 +643,16 @@ export default {
 ```
 
 ::: tip
-Additionally, as a best practise of managing focus, you'd better auto-focus the first control element in when the dialog shows up, and focus the trigger button back when the dialog closed. Just like the code logic in the example above.
+Notice that for browser compatibility, please take an about >50ms timeout before focus the modal dialog after its `v-if` or `v-show` directive set truthy.
 :::
 
 ### API
 
-#### Props
+#### Methods
 
-- `disabled: boolean`
+- `open()`
+- `replace()`
+- `close(returnFocus: boolean)`
 
 #### Slots
 
@@ -646,6 +660,7 @@ Additionally, as a best practise of managing focus, you'd better auto-focus the 
 
 #### Events
 
+- `open(prevTarget: HTMLElement | null)`: when it is enabled
 - `gofirst`: when you should manually set focus to the first focusable element
 - `golast`: when you should manually set focus to the last focusable element
 
