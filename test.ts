@@ -525,7 +525,7 @@ describe("v-aria directive", () => {
   });
 });
 
-describe("KeyTravel mixin", () => {
+describe("Travel mixin", () => {
   it("travel through all focusable items", () => {
     interface FooVm extends Vue {
       currentIndex: number;
@@ -928,7 +928,7 @@ describe("<VueFocusTrap> component", () => {
   });
 });
 
-describe("KeyShortcuts mixin", () => {
+describe("Shortcuts mixin", () => {
   it("will trigger a single-key shortcut", () => {
     const messages: Array<string> = [];
     const Foo = Vue.extend({

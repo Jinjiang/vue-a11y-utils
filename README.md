@@ -18,10 +18,10 @@ Utilities for accessibility (a11y) in Vue.js
 - [Getting Started](#getting-started)
 - [`<VueAria>` Component](#vuearia-component)
 - [`v-aria` Custome Directive](#v-aria-custom-directive)
-- [`KeyTravel` Mixin](#keytravel-mixin)
+- [`Travel` Mixin](#travel-mixin)
 - [`Id` Mixin](#id-mixin)
 - [`<VueFocusTrap>` Component](#vuefocustrap-component)
-- [`KeyShortcuts` Mixin](#keyshortcuts-mixin)
+- [`Shortcuts` Mixin](#shortcuts-mixin)
 - [`<VueLive>` Component](#vuelive-component)
 
 ## Why
@@ -89,7 +89,7 @@ Here is a survey about most common screen reader and browser combinations table:
 
 _via [Screen Reader User Survey by webaim.org](https://webaim.org/projects/screenreadersurvey7/#browsercombos)_
 
-### Specific Problems
+### Common Issues
 
 When you write a Vue app with full accessibility. You may meet some issues frequently. For example:
 
@@ -121,10 +121,10 @@ yarn add vue-a11y-utils
 import {
   VueAria,
   directiveAria,
-  MixinKeyTravel,
+  MixinTravel,
   MixinId,
   VueFocusTrap,
-  MixinKeyShortcuts,
+  MixinShortcuts,
   VueLive
 } from "vue-a11y-utils";
 ```
@@ -326,50 +326,26 @@ This example above is same to:
 
 Btw. there is no custom directive such as `v-role` and `v-tabindex` because you can set the two raw attributes directly on the same component or element with `v-aria`.
 
-## `KeyTravel` Mixin
+## `Travel` Mixin
 
-This mixin helps you using <kbd>Arrow</kbd> keys to travel through declared focusable items by overrided `getKeyItems()` in a Vue component. At the same time you could easily fire an action using <kbd>ENTER</kbd> key or <kbd>SPACE</kbd> key.
+This mixin exposes a method named `bindTravel($event: KeyboardEvent)` which helps you use <kbd>Arrow</kbd> keys to travel through a group of focusable items or descendants. At the same time we support you fire some common actions by pressing <kbd>ENTER</kbd>, <kbd>SPACE</kbd> or <kbd>ESC</kbd> key.
 
-It also has an `autofocus` value to determine whether auto-focus an item when _mounted_. The default auto-focused item is the first focusable item you declared. And you can specify it by overrided `getAutofocusItem()` method.
+Beside binding the method to a `@keydown` event, you should also config a special component option: `$travel: TravelConfig`. The config object must contain a `setItems(vm)` method to return an array of items you want to travel, and a pair of `getIndex(vm)`, `setIndex(vm, index)` methods to access the current active index. And also you could define how to `move(vm, event, newIndex, oldIndex, items)` active index, how to fire action by `enter(vm, event, index, items)`, `space(vm, event, index, items)` or `esc(vm, event, index, items)` keys. These 3 methods support returning a truthy value to avoid other following actions happened from the same `event`.
 
-### Examples
+If there are more than one area you want to travel in a Vue component, we also provide another named travel way like: `bindTravel($event, name)` method + `$travel: Record<string, TravelConfig>` config.
 
-#### Auto-focus
+Additionally, this travel config also accepts you define:
 
-The first example is about auto-focus. Make sure where is a value (through a prop/data/computed etc.) named `autofocus` in the component. When it's truthy, the item returned by `getAutofocusItem()` would be focused when component mounted to the DOM.
-
-```vue
-<template>
-  <div>
-    <button ref="btn">Click!</button>
-  </div>
-</template>
-
-<script>
-import { MixinKeyTravel } from "vue-a11y-utils";
-export default {
-  mixins: [MixinKeyTravel],
-  data() {
-    return {
-      // You can also define this value through `prop` or `computed` etc.
-      autofocus: true
-    };
-  },
-  methods: {
-    // The mixin will call this method to find the focus when mounted to the DOM.
-    getAutofocusItem() {
-      return this.$refs.btn;
-    }
-  }
-};
-</script>
-```
+- `looped` to determine whether the travel would be looped back when we go next at the last item or go previously at the first item.
+- `orientation` to determine the orientation of the <kbd>Arrow</kbd> keys: `"horizontal"` or `"vertical"`.
+- `hasPagination` to fire `nextPage(vm, event, index, items)` & `prevPage(vm, event, index, items)` when <kbd>PageDown</kbd> or <kbd>PageUp</kbd> pressed.
+- `hasSearch` to fire `search(vm, next, keyword, index, items)` when a letter or number key pressed.
 
 ::: tip
+We suggest you define all the methods in `TravelConfig` config as pure functions. So the first parameter of each methods are always the Vue component instance object (`vm`). Don't forget to pass the right parameters when using them and using `vm.foo` or `vm.foo()`, not `this.foo` or `this.foo()`, to access the props/data/methods/... Vue component instance members in these methods.
+:::
 
-1. The auto-focus item won't be focused if it is invisible when mounted.
-2. If you want to auto-focus a dialog which will be mounted when you open it, by such as `v-if`, it will also work as you like. But if your dialog is already mounted before open, by such as `v-show`, this mixin won't work. You must set the focus manually.
-   :::
+### Examples
 
 #### Focus Travel Using Arrow Keys
 
@@ -379,7 +355,7 @@ The second example is about focus travel using <kbd>Arrow</kbd> keys in a Vue co
 
   ```vue
   <template>
-    <div role="list" @keydown="keyTravel">
+    <div role="list" @keydown="bindTravel">
       <ListItem
         ref="items"
         v-for="option in options"
@@ -391,26 +367,39 @@ The second example is about focus travel using <kbd>Arrow</kbd> keys in a Vue co
   </template>
   
   <script>
-  import { MixinKeyTravel } from "vue-a11y-utils";
+  import { MixinTravel } from "vue-a11y-utils";
+  const travelConfig = {
+    looped: true,
+    getItems(vm) {
+      return vm.$refs.items;
+    },
+    getIndex(vm) {
+      return vm.currentIndex;
+    },
+    setIndex(vm, index) {
+      vm.currentIndex = index;
+      const items = this.getItems(vm);
+      const item = items[index];
+      item.$el.focus();
+    },
+    move(vm, event, newIndex) {
+      this.setIndex(vm, newIndex);
+    },
+    enter(vm, event, index, items) {
+      items[index].fireAction();
+    }
+  };
   export default {
-    mixins: [MixinKeyTravel],
+    mixins: [MixinTravel],
     components: { ListItem },
+    $travel: travelConfig,
     data() {
       return {
-        autofocus: true,
-        // Only ArrowUp and ArrowDown keys work.
-        orientation: "vertical"
+        currentIndex: 0
       };
     },
     props: {
       options: Array
-    },
-    methods: {
-      // You need to declare all focusable items here. And if you don't override
-      // getAutofocusItem(), the first one you declared will be auto-focused.
-      getKeyItems() {
-        return this.$refs.items;
-      }
     }
   };
   </script>
@@ -432,7 +421,6 @@ The second example is about focus travel using <kbd>Arrow</kbd> keys in a Vue co
     methods: {
       fireAction() {
         alert(this.value);
-        return true;
       }
     }
   };
@@ -441,66 +429,66 @@ The second example is about focus travel using <kbd>Arrow</kbd> keys in a Vue co
 
 Here are some points you may notice:
 
-1. Bind `@keydown="keyTravel"` to the root DOM element of your component.
-2. Put a prop/data/computed named `orientation` to declare which <kbd>Arrow</kbd> keys would work.
-3. Override a `getKeyItems()` method to return all focusable items.
-4. Override a `fireAction()` method in `<ListItem>` for the action when user press <kbd>ENTER</kbd> or <kbd>SPACE</kbd>. The returned truthy value means to prevent the default keyboard event.
+1. Bind `@keydown="bindTravel"` to the root DOM element of your component.
+2. Define `getItems(vm)`, `getIndex(vm)`, `setIndex(vm, index)` methods in `travelConfig` to make the travel runnable.
+3. Define the `move()` method to make the travel worked and define the `looped` travel way.
+4. Define `enter()` method to call `fireAction()` method in the current active `<ListItem>` component when user press <kbd>ENTER</kbd>.
 
-Now you can use <kbd>ArrowUp</kbd> and <kbd>ArrowDown</kbd> to travel each items. When you press <kbd>ENTER</kbd> or <kbd>SPACE</kbd>, an alert with the value of the current focused item would be poped up.
+Now you can focus the list first, and use <kbd>ArrowUp</kbd> and <kbd>ArrowDown</kbd> to travel each items. When you press <kbd>ENTER</kbd>, an alert with the value of the current focused item would be poped up.
 
 ### API
 
 #### Method you can call
 
-- `keyTravel(event: KeyboardEvent, config?: KeyConfig): void`
+- `bindTravel(event: KeyboardEvent[, name: string]): void`
 
-  The second parameter is an optional JS object. The key of this JS object is the [`key` value](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values) in the keyboard event, and the value is the "travel signal" to trigger when corresponding key pressed.
+  The second parameter is optional. When you write `$travel` option like:
 
-  All available "travel signals" are: `prev`, `next`, `prevPage`, `nextPage`, `first`, `last`, `action`.
+  ```js
+  $travel: {
+    foo: travelConfigFoo,
+    bar: travelConfigBar
+  }
+  ```
 
-  Default config:
+  You can use the second parameter like: `bindTravel($event, 'foo')` or `bindTravel($event, 'bar')` to match a certain travel config.
 
-  - `ArrowUp`: `prev` when `this.orientation` is `vertical` or empty
-  - `ArrowDown`: `next` when `this.orientation` is `vertical` or empty
-  - `ArrowLeft`: `prev` when `this.orientation` is `horizontal` or empty
-  - `ArrowRight`: `next` when `this.orientation` is `horizontal` or empty
-  - `Home`: `first`
-  - `End`: `last`
-  - `Enter`: `action`
-  - `` (Space): `action`
+#### Component option you can define
 
-#### Values you can declare
+- `$travel: TravelConfig`
+- `$travel: Record<string, TravelConfig>`
 
-- `autofocus: boolean`
-- `orientation: "horizontal" | "vertical"`
+The format of `TravelConfig`:
 
-#### Methods you can override
+_Basic config_
 
-_Main method for travel:_
+- `getItems(vm): any[]`: required
+- `getIndex(vm): number`: required
+- `setIndex(vm, index)`: required
 
-- `getKeyItems(): Array<Vue | HTMLElement>`: return an empty array by default
+_Basic movement config_
 
-_Main method for auto-focus:_
+- `orientation: string`: optional, `"vertical"` (default value) or `"horizontal"`
+- `looped: boolean`
+- `move(vm, event, newIndex, oldIndex, items)`: optional, if you don't define this method the active index may be not possible to move when <kbd>Arrow</kbd> keys pressed.
 
-- `getAutofocusItem(): Vue`: return first key item by default
+_Action config_
 
-_Methods you can customize to fire action:_
+- `enter(vm, event, index, items)`: optional, will be fired when <kbd>ENTER</kbd> key pressed.
+- `space(vm, event, index, items)`: optional, will be fired when <kbd>SPACE</kbd> key pressed.
+- `action(vm, event, index, items)`: optional, will be fired when <kbd>ENTER</kbd> or <kbd>SPACE</kbd> key pressed.
+- `esc(vm, event, index, items)`: optional, will be fired when <kbd>Escape</kbd> key pressed.
 
-- `fireAction(item: Vue | HTMLElement, event: KeyboardEvent): void`: call `item.fireAction()` and return `true` if new element focused by default
+_Pagination config_
 
-_Methods you can customize to travel:_
+- `hasPagination: boolean`: optional
+- `nextPage(vm, event, index, items)`: optional
+- `prevPage(vm, event, index, items)`: optional
 
-- `goPrev(event: KeyboardEvent): any`: focus previous item
-- `goNext(event: KeyboardEvent): any`: focus next item
-- `goFirst(event: KeyboardEvent): any`: focus the first item
-- `goLast(event: KeyboardEvent): any`: focus the last item
-- `goNextPage(event: KeyboardEvent): any`: do nothing by default
-- `goPrevPage(event: KeyboardEvent): any`: do nothing by default
-- `goAction(event: KeyboardEvent): any`: fire action at the current focused item
+_Search config_
 
-#### Method you can declare in item component
-
-- `fireAction(): void`
+- `hasSearch: boolean`: optional
+- `search(vm, event, keyword, index, items)`: optional
 
 ## `Id` Mixin
 
@@ -661,79 +649,9 @@ Additionally, as a best practise of managing focus, you'd better auto-focus the 
 - `gofirst`: when you should manually set focus to the first focusable element
 - `golast`: when you should manually set focus to the last focusable element
 
-### Using `<VueFocusTrap>` Component and `KeyTravel` Mixin Together
+## `Shortcuts` Mixin
 
-The better thing is: you can combine `<VueFocusTrap>` component and `KeyTravel` mixin together in a widget like actionsheet.
-
-```vue
-<template>
-  <div>
-    <button ref="trigger" @click="shown = true">
-      Open a Modal Dialog
-    </button>
-    <ul class="actionsheet" v-show="shown" @keydown="keyTravel">
-      <VueFocusTrap @gofirst="goFirst" @golast="goLast">
-        <li
-          v-for="option in options"
-          :key="option.value"
-          ref="items"
-          tabindex="0"
-        >{{ option.text }}</li>
-      </VueFocusTrap>
-    </ul>
-  </div>
-</template>
-
-<script>
-import { MixinKeyTravel, VueFocusTrap } from "vue-a11y-utils";
-export default {
-  mixins: [MixinKeyTravel],
-  components: { VueFocusTrap },
-  props: { options: Array, value: String },
-  data() {
-    return { shown: false, orientation: "vertical" };
-  },
-  watch: {
-    shown(value) {
-      if (value) {
-        this.$nextTick(() => this.getAutofocusItem().focus());
-      } else {
-        this.$nextTick(() => this.goTrigger());
-      }
-    }
-  },
-  methods: {
-    getKeyItems() {
-      return this.$refs.items;
-    },
-    getAutofocusItem() {
-      const items = this.getKeyItems();
-      const index = this.options.map(option => option.value).indexOf(value);
-      return items[index] || items[0];
-    },
-    goTrigger() {
-      this.$refs.trigger.focus();
-    },
-    fireAction(item) {
-      const items = this.getKeyItems();
-      const index = this.options.map(option => option.value).indexOf(value);
-      const currentIndex = items.indexOf(item);
-      if (index !== currentIndex) {
-        const option = this.options[index];
-        if (option) {
-          this.$emit("input", option.value);
-        }
-      }
-      this.shown = false;
-    }
-  }
-};
-</script>
-```
-
-## `KeyShortcuts` Mixin
-
-In an app we may need some keyboard shortcuts to do operations more effectively. Fortunately we have a `KeyShortcuts` mixin.
+In an app we may need some keyboard shortcuts to do operations more effectively. Fortunately we have a `Shortcuts` mixin.
 
 ### Examples
 
@@ -743,10 +661,10 @@ In this example, this component will listen shortcut <kbd>CMD</kbd> + <kbd>G</kb
 <template>...</template>
 
 <script>
-import { MixinKeyShortcuts } from "vue-a11y-utils";
+import { MixinShortcuts } from "vue-a11y-utils";
 export default {
-  mixins: [MixinKeyShortcuts],
-  shortcuts: [
+  mixins: [MixinShortcuts],
+  $shortcuts: [
     {
       key: "G",
       modifiers: { meta: true },
@@ -765,10 +683,10 @@ Another way to config <kbd>CMD</kbd> + <kbd>K</kbd>, <kbd>CMD</kbd> + <kbd>B</kb
 <template>...</template>
 
 <script>
-import { MixinKeyShortcuts } from "vue-a11y-utils";
+import { MixinShortcuts } from "vue-a11y-utils";
 export default {
-  mixins: [MixinKeyShortcuts],
-  shortcuts: [
+  mixins: [MixinShortcuts],
+  $shortcuts: [
     {
       keys: [
         { key: "K", modifiers: { meta: true } },
@@ -789,9 +707,9 @@ You can also quickly config each key in `keys` as a string if there is no modifi
 <template>...</template>
 
 <script>
-import { MixinKeyShortcuts } from "vue-a11y-utils";
+import { MixinShortcuts } from "vue-a11y-utils";
 export default {
-  mixins: [MixinKeyShortcuts],
+  mixins: [MixinShortcuts],
   shortcuts: [
     {
       keys: ["a", "s", "d", "f"],
@@ -821,10 +739,10 @@ At last, if you would like to bind key shortcuts on a certain element, for examp
 </template>
 
 <script>
-import { MixinKeyShortcuts } from "vue-a11y-utils";
+import { MixinShortcuts } from "vue-a11y-utils";
 export default {
-  mixins: [MixinKeyShortcuts],
-  shortcuts: {
+  mixins: [MixinShortcuts],
+  $shortcuts: {
     foo: [
       {
         key: "g",
@@ -860,9 +778,9 @@ export default {
 
 #### New option you can declare
 
-- `shortcuts: Array<ShortcutConfig>`
-- `shortcuts: Record<string, ShortcutConfig>`
-- `shortcuts: Record<string, Array<ShortcutConfig>>`
+- `$shortcuts: Array<ShortcutConfig>`
+- `$shortcuts: Record<string, ShortcutConfig>`
+- `$shortcuts: Record<string, Array<ShortcutConfig>>`
 
   The interface `ShortcutConfig` is like:
 
