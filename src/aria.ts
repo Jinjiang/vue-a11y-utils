@@ -14,7 +14,8 @@ const VueAriaInterface = Vue.extend({
  * - props: role, aria, tabindex
  * - slots: default slot
  */
-@Component({
+@Component
+export class VueAria extends VueAriaInterface {
   render(h: CreateElement): VNode {
     const { role, aria, tabindex } = this;
     const rootVNode = this.$slots.default[0];
@@ -40,8 +41,7 @@ const VueAriaInterface = Vue.extend({
     }
     return rootVNode;
   }
-})
-export class VueAria extends VueAriaInterface {}
+}
 
 /**
  * <Foo v-aria>
