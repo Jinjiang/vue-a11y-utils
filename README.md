@@ -117,7 +117,7 @@ yarn add vue-a11y-utils
 ### Import
 
 ```js
-// choose the utils below as you like
+// choose the utils you need
 import {
   VueAria,
   directiveAria,
@@ -147,7 +147,7 @@ Another thing important is the [`tabindex` attribute](https://developer.mozilla.
 
 #### For Props `role` And `aria`
 
-```vue
+```vue{2-4,8,10}
 <template>
   <VueAria role="menubutton" :aria="aria">
     <button>WAI-ARIA Quick Links</button>
@@ -184,7 +184,7 @@ So the content and structure in template is more clear than which with a lot of 
 
 The `aria` prop could also be an Array which is convenient to merge multiple `aria-*` attribute from different places:
 
-```vue
+```vue{4-8}
 <template>
   <VueAria
     role="menubutton"
@@ -201,7 +201,7 @@ The `aria` prop could also be an Array which is convenient to merge multiple `ar
 
 And this component could be nested like:
 
-```vue
+```vue{2-4}
 <template>
   <VueAria :aria="otherAriaFromSomewhereElse">
     <VueAria :aria="ariaProps">
@@ -215,7 +215,7 @@ And this component could be nested like:
 
 or:
 
-```vue
+```vue{2-3}
 <template>
   <VueAria role="menubutton">
     <VueAria :aria="aria">
@@ -229,7 +229,7 @@ or:
 
 If you want to make a `<div>` focusable. You should give it a `tabindex` attribute. For example:
 
-```vue
+```vue{4}
 <template>
   <VueAria
     role="menubutton"
@@ -242,7 +242,7 @@ If you want to make a `<div>` focusable. You should give it a `tabindex` attribu
 
 When you pass `"none"` or `"appearance"` value into `role` prop but without a `tabindex` prop. The `tabindex` attribute on the root element will finally be `""` by default. For examples:
 
-```vue
+```vue{3}
 <template>
   <!-- won't be focused by click or TAB key -->
   <VueAria role="none">
@@ -251,7 +251,7 @@ When you pass `"none"` or `"appearance"` value into `role` prop but without a `t
 </template>
 ```
 
-```vue
+```vue{3}
 <template>
   <!-- won't be focused TAB key but could be focused by click -->
   <VueAria role="none" :tabindex="-1">
@@ -290,7 +290,7 @@ Because the custom directive would modify the DOM element. It is different from 
 
 ### Examples
 
-```vue
+```vue{2,6,8-10}
 <template>
   <i class="icon-save" role="button" v-aria="aria" />
 </template>
@@ -298,6 +298,9 @@ Because the custom directive would modify the DOM element. It is different from 
 <script>
 import { directiveAria } from "vue-a11y-utils";
 export default {
+  directives: {
+    aria: directiveAria
+  },
   data() {
     return {
       aria: {
@@ -305,9 +308,6 @@ export default {
         controls: "id-of-a-textbox"
       }
     };
-  },
-  directives: {
-    aria: directiveAria
   }
 };
 </script>
@@ -355,7 +355,7 @@ The second example is about focus travel using <kbd>Arrow</kbd> keys in a Vue co
 
 - `App.vue`:
 
-  ```vue
+  ```vue{2,14,16-36,38,40}
   <template>
     <div role="list" @keydown="bindTravel">
       <ListItem
@@ -370,6 +370,7 @@ The second example is about focus travel using <kbd>Arrow</kbd> keys in a Vue co
   
   <script>
   import { MixinTravel } from "vue-a11y-utils";
+
   const travelConfig = {
     looped: true,
     getItems(vm) {
@@ -409,7 +410,7 @@ The second example is about focus travel using <kbd>Arrow</kbd> keys in a Vue co
 
 - `ListItem.vue`:
 
-  ```vue
+  ```vue{2}
   <template>
     <div role="listitem" tabindex="-1" @click="fireAction">{{ text }}</div>
   </template>
@@ -504,7 +505,7 @@ This mixin helps you generate unique id (sometimes as an id prefix) for HTML ele
 
 `input.vue`:
 
-```vue
+```vue{2,3,6,7,13,15}
 <template>
   <div :id="localId">
     <label ref="label" :id="`${localId}-label`">Username</label>
@@ -534,7 +535,7 @@ Think about you should bind a clear button out of the input component above. Now
 
 `foo.vue`:
 
-```vue
+```vue{3,4,10,12}
 <template>
   <div>
     <VueInput id="foo" />
@@ -590,7 +591,7 @@ But there must only be one trap in the whole Vue app, so by default the traps of
 
 In this example below, after you open the modal dialog by click the trigger button, the focus will always be in one of the 4 control elements in `<form>`, whatever you press <kbd>tab</kbd>, <kbd>tab</kbd> + <kbd>shift</kbd> or click somewhere out of the dialog:
 
-```vue
+```vue{7-12,18,20,29,33,42,45}
 <template>
   <div>
     <button ref="trigger" @click="shown = true">
@@ -672,7 +673,7 @@ In an app we may need some keyboard shortcuts to do operations more effectively.
 
 In this example, this component will listen shortcut <kbd>CMD</kbd> + <kbd>G</kbd> globally:
 
-```vue
+```vue{4,6,7-15}
 <template>...</template>
 
 <script>
@@ -694,7 +695,7 @@ export default {
 
 Another way to config <kbd>CMD</kbd> + <kbd>K</kbd>, <kbd>CMD</kbd> + <kbd>B</kbd> as a `keys` sequence:
 
-```vue
+```vue{9-12}
 <template>...</template>
 
 <script>
@@ -718,7 +719,7 @@ export default {
 
 You can also quickly config each key in `keys` as a string if there is no modifiers to declare:
 
-```vue
+```vue{9}
 <template>...</template>
 
 <script>
@@ -739,7 +740,7 @@ export default {
 
 At last, if you would like to bind key shortcuts on a certain element, for example an input text box, we also supports named shortcuts config like below:
 
-```vue
+```vue{5,9,18-45}
 <template>
   <div>
     <input
@@ -788,6 +789,8 @@ export default {
 };
 </script>
 ```
+
+And the `default` shortcuts config is still globally avaliable.
 
 ### API
 
@@ -848,7 +851,7 @@ This component is actually a wrapper which generates a invisible [WAI-ARIA live 
 
 - `App.vue`:
 
-  ```vue
+  ```vue{2-4,8,10}
   <template>
     <VueLive>
       <Foo />
@@ -865,7 +868,7 @@ This component is actually a wrapper which generates a invisible [WAI-ARIA live 
 
 - `Foo.vue`:
 
-  ```vue
+  ```vue{4,10}
   <template>
     <div>
       Message: <input type="text" v-model="message" />
@@ -887,9 +890,9 @@ Now, if you enable VoiceOver or other a11y screen readers, there will be a live 
 
 The injected method `announce(message)` could announce live message to the screen reader.
 
-But by default the live message will be announced "politely" after other voices spoken. If you want to announce the message immediately, you can add a second parameter with a truthy value:
+But by default the live message will be announced "politely" after other voices spoken. If you want to announce the message immediately, you can pass a second parameter with a truthy value:
 
-```vue
+```vue{5}
 <template>
   <div>
     Message: <input type="text" v-model="message" />
@@ -911,35 +914,6 @@ export default {
 </script>
 ```
 
-Also there is a third boolean parameter which could announce the same message by force if the current message is same to the previous one.
-
-As the example below, you can choose the way by two parameters: `immediately` and `force`. And another injected method could manually clear the message history. That is another way to ensure the same message could be announced.
-
-```vue
-<template>
-  <div>
-    Message: <input type="text" v-model="message" />
-    <input type="checkbox" v-model="immediately" />: immediately
-    <input type="checkbox" v-model="force" />: force
-    <button @click="announce(message, immediately, force)">Announce</button>
-    <button @click="clear()">Clear</button>
-  </div>
-</template>
-
-<script>
-export default {
-  inject: ["announce", "clear"],
-  data() {
-    return {
-      message: "",
-      immediately: false,
-      force: false
-    };
-  }
-};
-</script>
-```
-
 ### API
 
 #### Props
@@ -953,9 +927,7 @@ export default {
 
 #### Provide
 
-- `announce(message: string, immediately: boolean, force: boolean)`: announce message to screen reader
+- `announce(message: string, immediately: boolean)`: announce message to screen reader
   - `message`: the message text would be announced
   - `immediately`: whether announce immediately or "politely"
-  - `force`: whether announce by force whatever the message is same to the previous one
-- `clear()`: clear the previous message history to ensure the next message 100% would be announced
-- `isBusy(busy: boolean)` if you set it true, only the last message you send during that time would be announced after you set it false later _(experimental, not sure screen readers support that well)_
+- `isBusy(busy: boolean)` if you set it `true`, only the last message you send during that time would be announced after you set it `false` later. _(experimental, not sure screen readers support that well)_
