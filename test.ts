@@ -1162,6 +1162,8 @@ describe("<VueLive> component", () => {
       hello 
       <div style="position: absolute; height: 1px; width: 1px; margin: -1px; overflow: hidden;">
         <div role="log" aria-live="assertive" aria-busy="false"></div> 
+        <div role="log" aria-live="assertive" aria-busy="false"></div> 
+        <div role="log" aria-live="polite" aria-busy="false"></div> 
         <div role="log" aria-live="polite" aria-busy="false"></div>
       </div>
     `.replace(/(  |\n)/g, "")
@@ -1170,20 +1172,15 @@ describe("<VueLive> component", () => {
 
   it("will provide announce method", done => {
     let announce: Function = () => {};
-    let clear: Function = () => {};
     interface InjectedVue extends Vue {
       announce: Function;
-      clear: Function;
     }
     const Foo = Vue.extend({
       template: `<div>hello</div>`,
-      inject: ["announce", "clear"],
+      inject: ["announce"],
       created() {
         announce = (...args: []) => {
           (<InjectedVue>this).announce(...args);
-        };
-        clear = (...args: []) => {
-          (<InjectedVue>this).clear(...args);
         };
       }
     });
@@ -1195,11 +1192,15 @@ describe("<VueLive> component", () => {
     const logs: WrapperArray<Vue> = wrapper.findAll('[role="log"]');
     expect(logs.at(0).text()).toBe("");
     expect(logs.at(1).text()).toBe("");
+    expect(logs.at(2).text()).toBe("");
+    expect(logs.at(3).text()).toBe("");
     announce("A");
     new Promise(resolve => {
       setTimeout(() => {
         expect(logs.at(0).text()).toBe("");
-        expect(logs.at(1).text()).toBe("A");
+        expect(logs.at(1).text()).toBe("");
+        expect(logs.at(2).text()).toBe("A");
+        expect(logs.at(3).text()).toBe("");
         announce("B");
         resolve();
       });
@@ -1209,7 +1210,9 @@ describe("<VueLive> component", () => {
           new Promise(resolve => {
             setTimeout(() => {
               expect(logs.at(0).text()).toBe("");
-              expect(logs.at(1).text()).toBe("B");
+              expect(logs.at(1).text()).toBe("");
+              expect(logs.at(2).text()).toBe("");
+              expect(logs.at(3).text()).toBe("B");
               announce("C", true);
               resolve();
             });
@@ -1220,7 +1223,9 @@ describe("<VueLive> component", () => {
           new Promise(resolve => {
             setTimeout(() => {
               expect(logs.at(0).text()).toBe("C");
-              expect(logs.at(1).text()).toBe("B");
+              expect(logs.at(1).text()).toBe("");
+              expect(logs.at(2).text()).toBe("");
+              expect(logs.at(3).text()).toBe("B");
               announce("D", true);
               resolve();
             });
@@ -1230,19 +1235,10 @@ describe("<VueLive> component", () => {
         () =>
           new Promise(resolve => {
             setTimeout(() => {
-              expect(logs.at(0).text()).toBe("D");
-              expect(logs.at(1).text()).toBe("B");
-              clear();
-              resolve();
-            });
-          })
-      )
-      .then(
-        () =>
-          new Promise(resolve => {
-            setTimeout(() => {
               expect(logs.at(0).text()).toBe("");
-              expect(logs.at(1).text()).toBe("");
+              expect(logs.at(1).text()).toBe("D");
+              expect(logs.at(2).text()).toBe("");
+              expect(logs.at(3).text()).toBe("B");
               resolve();
               done();
             });

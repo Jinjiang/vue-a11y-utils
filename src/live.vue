@@ -11,17 +11,23 @@
       overflow: hidden
     ">
       <VueAria :role="localRole" :aria="{ live: 'assertive', label, busy }">
-        <div>{{ assertiveMessage }}</div>
+        <div>{{ assertive.alternate ? assertive.message : '' }}</div>
+      </VueAria>
+      <VueAria :role="localRole" :aria="{ live: 'assertive', label, busy }">
+        <div>{{ !assertive.alternate ? assertive.message : '' }}</div>
       </VueAria>
       <VueAria :role="localRole" :aria="{ live: 'polite', label, busy }">
-        <div>{{ politeMessage }}</div>
+        <div>{{ polite.alternate ? polite.message : '' }}</div>
+      </VueAria>
+      <VueAria :role="localRole" :aria="{ live: 'polite', label, busy }">
+        <div>{{ !polite.alternate ? polite.message : '' }}</div>
       </VueAria>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue, { VueConstructor } from "vue";
 import Component from "vue-class-component";
 
 import { VueAria } from "./aria";
@@ -33,37 +39,40 @@ const VueLiveInterface = Vue.extend({
   }
 });
 
+interface LiveData {
+  message: string;
+  alternate: boolean;
+}
+
 @Component({
   components: { VueAria },
   provide() {
-    const self = this;
+    const self = <VueLive>this;
     return {
-      announce(message: string, important: boolean, force: boolean) {
-        if (force) {
-          self.assertiveMessage = "";
-          self.politeMessage = "";
+      announce(message: string, important: boolean) {
+        if (important) {
+          self.assertive.message = message;
+          self.assertive.alternate = !self.assertive.alternate;
+        } else {
+          self.polite.message = message;
+          self.polite.alternate = !self.polite.alternate;
         }
-        setTimeout(() => {
-          if (important) {
-            self.assertiveMessage = message;
-          } else {
-            self.politeMessage = message;
-          }
-        }, force ? 300 : 0);
       },
       setBusy(busy: boolean) {
         self.busy = busy;
-      },
-      clear() {
-        self.assertiveMessage = "";
-        self.politeMessage = "";
       }
     };
   }
 })
 export default class VueLive extends VueLiveInterface {
-  assertiveMessage: string = "";
-  politeMessage: string = "";
+  assertive: LiveData = {
+    message: "",
+    alternate: false
+  };
+  polite: LiveData = {
+    message: "",
+    alternate: false
+  };
   busy: boolean = false;
   get localRole(): string {
     return this.role || "log";
