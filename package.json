@@ -1,6 +1,6 @@
 {
   "name": "vue-a11y-utils",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "Utilities for accessibility (a11y) in Vue.js",
   "main": "dist/vue-a11y-utils.js",
   "types": "src/index.ts",
