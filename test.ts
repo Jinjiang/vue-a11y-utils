@@ -17,7 +17,7 @@ config.logModifiedComponents = false;
 
 const NothingHappen = Vue.extend({
   render() {
-    return this.$slots.default[0];
+    return this.$slots.default![0];
   }
 });
 
@@ -392,7 +392,7 @@ describe("v-aria directive", () => {
     expect(wrapper.attributes()).toEqual({
       class: "icon-save",
       role: "button",
-      "aria-label": "save your changes",
+      "aria-label": "Save Your Changes",
       "aria-pressed": "false",
       "aria-controls": "id-of-a-textbox"
     });
@@ -664,7 +664,7 @@ describe("Travel mixin", () => {
       $travel: travelOption,
       components: { ListItem },
       mounted() {
-        (<Array<Vue>>this.$refs.items)[0].$el.focus();
+        ((<Array<Vue>>this.$refs.items)[0].$el as HTMLElement).focus();
       },
       props: {
         options: Array

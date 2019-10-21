@@ -16,9 +16,9 @@ const VueAriaInterface = Vue.extend({
  */
 @Component
 export class VueAria extends VueAriaInterface {
-  render(h: CreateElement): VNode {
+  render(h: CreateElement): VNode | undefined {
     const { role, aria, tabindex } = this;
-    const rootVNode = this.$slots.default[0];
+    const rootVNode = this.$slots.default && this.$slots.default[0];
     if (rootVNode) {
       if (!rootVNode.data) {
         rootVNode.data = {};
