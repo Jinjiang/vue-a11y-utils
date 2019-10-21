@@ -3,9 +3,10 @@
   "version": "0.6.2",
   "description": "Utilities for accessibility (a11y) in Vue.js",
   "main": "dist/vue-a11y-utils.js",
-  "types": "src/index.ts",
+  "types": "types/index.d.ts",
   "files": [
     "dist",
+    "types",
     "src"
   ],
   "scripts": {
@@ -50,6 +51,7 @@
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-typescript": "^1.0.0",
+    "rollup-plugin-typescript2": "^0.24.3",
     "rollup-plugin-vue": "^5.0.1",
     "ts-jest": "^23.10.4",
     "typescript": "^3.1.3",
