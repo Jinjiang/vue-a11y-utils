@@ -392,7 +392,7 @@ describe("v-aria directive", () => {
     expect(wrapper.attributes()).toEqual({
       class: "icon-save",
       role: "button",
-      "aria-label": "Save Your Changes",
+      "aria-label": "save your changes",
       "aria-pressed": "false",
       "aria-controls": "id-of-a-textbox"
     });
