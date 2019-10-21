@@ -1,7 +1,7 @@
 import commonjs from "rollup-plugin-commonjs";
 import nodeResolve from "rollup-plugin-node-resolve";
 import vue from "rollup-plugin-vue";
-import typescript from "rollup-plugin-typescript";
+import typescript from "rollup-plugin-typescript2";
 
 export default {
   input: "src/index.ts",
@@ -14,9 +14,20 @@ export default {
     nodeResolve({ jsnext: true }),
     commonjs(),
     typescript({
-      tsconfig: false,
-      experimentalDecorators: true,
-      module: "es2015"
+      clean: true,
+      objectHashIgnoreUnknownHack: true,
+      tsconfigOverride: {
+        compilerOptions: {
+          declaration: true,
+          declarationDir: "./types",
+          experimentalDecorators: true,
+          module: "es2015",
+          esModuleInterop: false,
+          strict: false
+        },
+        exclude: ["test.ts", "examples/**", "types/**"]
+      },
+      useTsconfigDeclarationDir: true
     }),
     vue()
   ]

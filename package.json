@@ -50,7 +50,6 @@
     "rollup": "^1.21.0",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-node-resolve": "^5.2.0",
-    "rollup-plugin-typescript": "^1.0.0",
     "rollup-plugin-typescript2": "^0.24.3",
     "rollup-plugin-vue": "^5.0.1",
     "ts-jest": "^23.10.4",
@@ -62,6 +61,11 @@
   },
   "dependencies": {
     "vue-class-component": "^6.3.2"
+  },
+  "resolutions": {
+    "vue": "^2.6.10",
+    "vue-template-compiler": "^2.6.10",
+    "vue-server-renderer": "^2.6.10"
   },
   "jest": {
     "moduleFileExtensions": [
