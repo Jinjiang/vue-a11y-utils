@@ -37,7 +37,7 @@
   "homepage": "https://github.com/Jinjiang/vue-a11y-utils#readme",
   "devDependencies": {
     "@types/jest": "^23.3.5",
-    "@vue/test-utils": "^1.0.0-beta.25",
+    "@vue/test-utils": "1.0.0-beta.25",
     "babel-core": "^6.26.3",
     "babel-jest": "^23.6.0",
     "babel-plugin-transform-decorators-legacy": "^1.3.5",
