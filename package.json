@@ -20,13 +20,15 @@
   ],
   "scripts": {
     "dev": "vite",
+    "examples:build": "vite build",
+    "examples:preview": "vite preview",
     "build": "vue-tsc --noEmit && vite build --config vite.config.lib.ts",
     "build:force": "vite build --config vite.config.lib.ts",
     "lint": "vue-tsc --noEmit",
     "format": "prettier --write .{,/examples,/src}/*.{js,json,css,md,ts,vue}",
     "test": "vitest",
     "docs": "vuepress dev docs-src",
-    "docs:build": "vuepress build docs-src -d docs"
+    "docs:build": "vuepress build docs-src -d docs && vite build"
   },
   "repository": {
     "type": "git",
@@ -59,7 +61,7 @@
     "vuepress": "^1.9.7"
   },
   "dependencies": {
-    "vue-class-component": "^6.3.2"
+    "vue-class-component": "^7.2.6"
   },
   "husky": {
     "hooks": {
