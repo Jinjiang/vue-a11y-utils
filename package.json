@@ -20,13 +20,13 @@
   ],
   "scripts": {
     "dev": "vite",
-    "examples:build": "vite build",
-    "examples:preview": "vite preview",
     "build": "vue-tsc --noEmit && vite build --config vite.config.lib.ts",
     "build:force": "vite build --config vite.config.lib.ts",
     "lint": "vue-tsc --noEmit",
     "format": "prettier --write .{,/examples,/src}/*.{js,json,css,md,ts,vue}",
     "test": "vitest",
+    "examples:build": "vite build",
+    "examples:preview": "vite preview",
     "docs": "vuepress dev docs-src",
     "docs:build": "vuepress build docs-src -d docs && vite build"
   },

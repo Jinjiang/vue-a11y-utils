@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   base: "/vue-a11y-utils/",
   title: "Vue A11y Utils",
   description: "Utilities for accessibility (a11y) in Vue.js",
