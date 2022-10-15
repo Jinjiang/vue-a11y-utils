@@ -1,3 +1,4 @@
+import { describe, it } from "vitest";
 import Vue from "vue";
 import { mount, Wrapper, config, WrapperArray } from "@vue/test-utils";
 
@@ -9,9 +10,9 @@ import {
   VueFocusTrap,
   MixinShortcuts,
   VueLive
-} from "./src/index";
+} from "../src/index";
 
-import { TravelConfig } from "./src/travel";
+import { TravelConfig } from "../src/travel";
 
 config.logModifiedComponents = false;
 
