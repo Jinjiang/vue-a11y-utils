@@ -2,22 +2,30 @@
   "name": "vue-a11y-utils",
   "version": "0.7.0",
   "description": "Utilities for accessibility (a11y) in Vue.js",
-  "main": "dist/vue-a11y-utils.js",
+  "type": "module",
+  "main": "./dist/vue-a11y-utils.umd.js",
+  "module": "./dist/vue-a11y-utils.mjs",
+  "exports": {
+    ".": {
+      "import": "./dist/vue-a11y-utils.mjs",
+      "require": "./dist/vue-a11y-utils.umd.js"
+    }
+  },
   "types": "types/index.d.ts",
   "files": [
-    "dist",
+    "dist/*",
+    "README.md",
     "types",
     "src"
   ],
   "scripts": {
     "dev": "vite",
-    "dev~": "rm -Rf dist && rollup -c -w",
-    "build~": "rm -Rf dist && rollup -c --environment BUILD:production",
-    "examples~": "parcel examples/index.html -d tmp",
-    "examples:build~": "rm -Rf ./.vuepress/public/examples && parcel build examples/index.html --public-url ./ -d ./.vuepress/public/examples",
+    "build": "vue-tsc --noEmit && vite build --config vite.config.lib.ts",
+    "build:force": "vite build --config vite.config.lib.ts",
+    "lint": "vue-tsc --noEmit",
+    "format": "prettier --write .{,/examples,/src}/*.{js,json,css,md,ts,vue}",
     "docs~": "vuepress dev",
     "docs:build~": "rm -Rf docs && npm run examples:build && vuepress build -d docs",
-    "lint": "prettier --write .{,/examples,/src}/*.{js,json,css,md,ts,vue}",
     "test~": "jest"
   },
   "repository": {
@@ -60,6 +68,7 @@
     "vue": "^2.7.10",
     "vue-jest": "^3.0.0",
     "vue-template-compiler": "^2.7.10",
+    "vue-tsc": "^1.0.7",
     "vuepress": "^0.14.4"
   },
   "dependencies": {
