@@ -2,25 +2,39 @@
   <!-- https://github.com/AlmeroSteyn/react-aria-live -->
   <div>
     <slot></slot>
-    <div style="
+    <div
+      style="
       position: absolute;
       height: 1px;
       width: 1px;
       margin: -1px;
       clip: rect(0 0 0 0);
       overflow: hidden
-    ">
-      <VueAria :role="localRole" :aria="{ live: 'assertive', label, busy }">
-        <div>{{ assertive.alternate ? assertive.message : '' }}</div>
+    "
+    >
+      <VueAria
+        :role="localRole"
+        :aria="{ live: 'assertive', label: localLabel, busy }"
+      >
+        <div>{{ assertive.alternate ? assertive.message : "" }}</div>
       </VueAria>
-      <VueAria :role="localRole" :aria="{ live: 'assertive', label, busy }">
-        <div>{{ !assertive.alternate ? assertive.message : '' }}</div>
+      <VueAria
+        :role="localRole"
+        :aria="{ live: 'assertive', label: localLabel, busy }"
+      >
+        <div>{{ !assertive.alternate ? assertive.message : "" }}</div>
       </VueAria>
-      <VueAria :role="localRole" :aria="{ live: 'polite', label, busy }">
-        <div>{{ polite.alternate ? polite.message : '' }}</div>
+      <VueAria
+        :role="localRole"
+        :aria="{ live: 'polite', label: localLabel, busy }"
+      >
+        <div>{{ polite.alternate ? polite.message : "" }}</div>
       </VueAria>
-      <VueAria :role="localRole" :aria="{ live: 'polite', label, busy }">
-        <div>{{ !polite.alternate ? polite.message : '' }}</div>
+      <VueAria
+        :role="localRole"
+        :aria="{ live: 'polite', label: localLabel, busy }"
+      >
+        <div>{{ !polite.alternate ? polite.message : "" }}</div>
       </VueAria>
     </div>
   </div>
@@ -76,6 +90,9 @@ export default class VueLive extends VueLiveInterface {
   busy: boolean = false;
   get localRole(): string {
     return this.role || "log";
+  }
+  get localLabel(): string | undefined {
+    return this.label;
   }
 }
 </script>

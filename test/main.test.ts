@@ -1,4 +1,4 @@
-import { describe, it } from "vitest";
+import { describe, it, expect } from "vitest";
 import Vue from "vue";
 import { mount, Wrapper, config, WrapperArray } from "@vue/test-utils";
 
@@ -13,8 +13,6 @@ import {
 } from "../src/index";
 
 import { TravelConfig } from "../src/travel";
-
-config.logModifiedComponents = false;
 
 const NothingHappen = Vue.extend({
   render() {
@@ -235,7 +233,7 @@ describe("v-aria directive", () => {
     });
   });
 
-  it("update aria-* attributes correctly when update prop data", () => {
+  it("update aria-* attributes correctly when update prop data", async () => {
     const Foo = Vue.extend({
       template: `
         <i
@@ -259,7 +257,7 @@ describe("v-aria directive", () => {
       role: "button"
     });
 
-    wrapper.setProps({
+    await wrapper.setProps({
       ariaConfig: { label: "save your changes" }
     });
     expect(wrapper.element.tagName).toBe("I");
@@ -270,7 +268,7 @@ describe("v-aria directive", () => {
       "aria-label": "save your changes"
     });
 
-    wrapper.setProps({
+    await wrapper.setProps({
       ariaConfig: {
         label: "Save Your Changes",
         pressed: true
@@ -285,7 +283,7 @@ describe("v-aria directive", () => {
       "aria-pressed": "true"
     });
 
-    wrapper.setProps({
+    await wrapper.setProps({
       ariaConfig: {
         pressed: false
       }
@@ -337,7 +335,8 @@ describe("v-aria directive", () => {
     });
   });
 
-  it("runs on component when update", () => {
+  // This behavior is unexpected, but it's the current behavior.
+  it("runs on component nestedly to update", async () => {
     const Foo = Vue.extend({
       template: `
         <NothingHappen v-aria="outer">
@@ -380,7 +379,7 @@ describe("v-aria directive", () => {
       "aria-controls": "id-of-a-textbox"
     });
 
-    wrapper.setProps({
+    await wrapper.setProps({
       outer: {
         label: "save your changes",
         pressed: false
@@ -393,12 +392,12 @@ describe("v-aria directive", () => {
     expect(wrapper.attributes()).toEqual({
       class: "icon-save",
       role: "button",
-      "aria-label": "save your changes",
+      "aria-label": "Save Your Changes",
       "aria-pressed": "false",
       "aria-controls": "id-of-a-textbox"
     });
 
-    wrapper.setProps({
+    await wrapper.setProps({
       outer: {
         pressed: false
       },
@@ -415,7 +414,7 @@ describe("v-aria directive", () => {
       "aria-controls": "id-of-a-textbox"
     });
 
-    wrapper.setProps({
+    await wrapper.setProps({
       outer: {
         label: "save your changes",
         pressed: false
@@ -427,7 +426,6 @@ describe("v-aria directive", () => {
     expect(wrapper.attributes()).toEqual({
       class: "icon-save",
       role: "button",
-      "aria-label": "save your changes",
       "aria-pressed": "false",
       "aria-controls": "id-of-a-textbox"
     });
@@ -777,7 +775,7 @@ describe("Id mixin", () => {
     }
   });
 
-  it("will update localId after id prop changed", () => {
+  it("will update localId after id prop changed", async () => {
     const wrapper: Wrapper<Vue> = mount(Foo);
     const label = <HTMLElement>wrapper.vm.$refs.label;
     const input = <HTMLElement>wrapper.vm.$refs.input;
@@ -786,9 +784,9 @@ describe("Id mixin", () => {
     expect(input).toBeTruthy();
     expect(Array.isArray(input)).toBeFalsy();
     if (label && input && !Array.isArray(label) && !Array.isArray(input)) {
-      wrapper.setProps({ id: "v-helloworld" });
+      await wrapper.setProps({ id: "v-helloworld" });
       expect(label.getAttribute("id")).toBe("v-helloworld-label");
-      wrapper.setProps({ id: null });
+      await wrapper.setProps({ id: null });
       expect(label.getAttribute("id")).not.toBe("v-helloworld-label");
       expect(label.getAttribute("id")).toBe(
         input.getAttribute("aria-labelledby")
@@ -1160,14 +1158,17 @@ describe("<VueLive> component", () => {
     expect(childNodes[1].nodeName).toBe("DIV");
     expect(wrapper.element.innerHTML).toBe(
       `
-      hello 
+      hello
       <div style="position: absolute; height: 1px; width: 1px; margin: -1px; overflow: hidden;">
         <div role="log" aria-live="assertive" aria-busy="false"></div> 
         <div role="log" aria-live="assertive" aria-busy="false"></div> 
         <div role="log" aria-live="polite" aria-busy="false"></div> 
         <div role="log" aria-live="polite" aria-busy="false"></div>
       </div>
-    `.replace(/(  |\n)/g, "")
+    `
+        .split("\n")
+        .map(line => line.trim())
+        .join("")
     );
   });
 

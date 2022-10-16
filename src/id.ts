@@ -1,23 +1,15 @@
 import Vue from "vue";
-import Component from "vue-class-component";
 
-const MixinIdInterface = Vue.extend({
+const MixinId = Vue.extend({
   props: {
     id: String
+  },
+  computed: {
+    localId(): string {
+      return this.id || generateNewId();
+    }
   }
 });
-
-/**
- * Mixin: Id
- * - prop: id
- * - data: localId
- */
-@Component
-export default class MixinId extends MixinIdInterface {
-  get localId(): string {
-    return this.id || generateNewId();
-  }
-}
 
 let lastId = Date.now();
 
@@ -30,3 +22,5 @@ function generateNewId() {
   }
   return `v-${lastId}`;
 }
+
+export default MixinId;

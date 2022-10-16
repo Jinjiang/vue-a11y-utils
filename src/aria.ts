@@ -1,21 +1,17 @@
 import Vue, { CreateElement, VNode, VNodeData, DirectiveOptions } from "vue";
-import Component from "vue-class-component";
 
-const VueAriaInterface = Vue.extend({
+export interface VueAriaProps {
+  role: string;
+  aria: Record<string, string> | string[];
+  tabindex: number;
+}
+
+export const VueAria = Vue.extend({
   props: {
     role: String,
     aria: [Object, Array],
     tabindex: Number
-  }
-});
-
-/**
- * <VueAria role aria tabindex>
- * - props: role, aria, tabindex
- * - slots: default slot
- */
-@Component
-export class VueAria extends VueAriaInterface {
+  },
   render(h: CreateElement): VNode | undefined {
     const { role, aria, tabindex } = this;
     const rootVNode = this.$slots.default && this.$slots.default[0];
@@ -41,7 +37,7 @@ export class VueAria extends VueAriaInterface {
     }
     return rootVNode;
   }
-}
+});
 
 /**
  * <Foo v-aria>
