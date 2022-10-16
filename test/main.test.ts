@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import Vue from "vue";
-import { mount, Wrapper, config, WrapperArray } from "@vue/test-utils";
+import { mount, Wrapper, WrapperArray } from "@vue/test-utils";
 
 import {
   VueAria,
