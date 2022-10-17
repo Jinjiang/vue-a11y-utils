@@ -26,6 +26,10 @@ Utilities for accessibility (a11y) in Vue.js
 
 ## Why
 
+TL;DR: when you write a Vue app with full accessibility, you may meet some common issues to deal with. So we built this project to help you.
+
+<details>
+
 ### Background
 
 As the [(WIP) Vue accessibility guide page](https://github.com/vuejs/vuejs.org/pull/1002) says:
@@ -99,6 +103,8 @@ When you write a Vue app with full accessibility. You may meet some issues frequ
 - Sometimes you need set a _ID reference_ or _ID reference list_ type aria attribute with _ID_ of another DOM element. But we don't use _ID_ in Vue to identify a DOM element right?
 
 So that's why **Vue A11y Utils** is trying to supply a group of utilities to help Vue developers finish these jobs easier.
+
+</details>
 
 ## Getting Started
 
@@ -923,3 +929,8 @@ export default {
   - `message`: the message text would be announced
   - `immediately`: whether announce immediately or "politely"
 - `isBusy(busy: boolean)` if you set it `true`, only the last message you send during that time would be announced after you set it `false` later. _(experimental, not sure screen readers support that well)_
+
+## Further resources
+
+- [Vue I18n](https://kazupon.github.io/vue-i18n/): the internationalization plugin for Vue.js.
+- [Vue A11y](https://vue-a11y.com/): Vue.js community effort to improve web accessibility.
