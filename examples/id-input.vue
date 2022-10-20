@@ -13,18 +13,19 @@
 
 <script lang="ts">
 import Vue from "vue";
-import Component from "vue-class-component";
 import { MixinId } from "../src/index";
 
-const ExampleIdInputInterface = Vue.extend({
+export default Vue.extend({
   props: {
     label: String,
     type: String,
     value: String
-  }
-});
-
-@Component({
+  },
+  data() {
+    return {
+      localValue: ""
+    };
+  },
   mixins: [MixinId],
   created() {
     this.localValue = this.value;
@@ -39,8 +40,5 @@ const ExampleIdInputInterface = Vue.extend({
       }
     }
   }
-})
-export default class ExampleIdInput extends ExampleIdInputInterface {
-  localValue: string = "";
-}
+});
 </script>

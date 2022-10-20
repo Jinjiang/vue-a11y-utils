@@ -1,7 +1,7 @@
 <template>
   <div id="live-example">
     <p>
-      <label>Message: <input type="text" v-model="value" /></label>
+      <label>Message: <input type="text" v-model="value"/></label>
     </p>
     <!-- <p>
       <label><input type="checkbox" v-model="busy" /> Busy</label>
@@ -19,18 +19,28 @@
 
 <script lang="ts">
 import Vue from "vue";
-import Component from "vue-class-component";
 
-@Component({
+const LiveInjected = Vue.extend<
+  {},
+  {
+    announce: (message: string, important: boolean) => void;
+    setBusy: (busy: boolean) => void;
+  },
+  {}
+>({});
+
+export default LiveInjected.extend({
+  data() {
+    return {
+      value: "",
+      busy: false
+    };
+  },
   inject: ["announce", "setBusy"],
   watch: {
     busy(value) {
       this.setBusy(value);
     }
   }
-})
-export default class VueLiveExample extends Vue {
-  value: string = "";
-  busy: boolean = false;
-}
+});
 </script>

@@ -1,24 +1,36 @@
 <template>
   <div id="key-shortcuts-example">
     <p>
-      Press <input
-        type="text" value="CMD + G HERE"
-        @keydown="bindShortcut($event, 'foo')"
-      /> or
+      Press
       <input
-        type="text" value="CMD + K HERE"
+        type="text"
+        value="CMD + G HERE"
+        @keydown="bindShortcut($event, 'foo')"
+      />
+      or
+      <input
+        type="text"
+        value="CMD + K HERE"
         @keydown="bindShortcut($event, 'bar')"
-      /> or A-S-D-F anywhere.
+      />
+      or A-S-D-F anywhere.
     </p>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import Component from "vue-class-component";
 import { MixinShortcuts } from "../src/index";
 
-@Component({
+const ShortcutsMixed = Vue.extend<
+  {},
+  {
+    bindShortcut: (event: KeyboardEvent, name: string) => void;
+  },
+  {}
+>({});
+
+export default ShortcutsMixed.extend({
   mixins: [MixinShortcuts],
   $shortcuts: {
     default: {
@@ -46,6 +58,5 @@ import { MixinShortcuts } from "../src/index";
       }
     ]
   }
-})
-export default class ExampleKeyShortcuts extends Vue {}
+});
 </script>

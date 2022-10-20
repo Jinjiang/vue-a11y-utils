@@ -41,27 +41,43 @@
 </template>
 
 <script lang="ts">
-import Vue, { VueConstructor } from "vue";
-import Component from "vue-class-component";
-
+import Vue from "vue";
 import { VueAria } from "./aria";
-
-const VueLiveInterface = Vue.extend({
-  props: {
-    role: String,
-    label: String
-  }
-});
 
 interface LiveData {
   message: string;
   alternate: boolean;
 }
 
-@Component({
+const VueLive = Vue.extend({
   components: { VueAria },
+  props: {
+    role: String,
+    label: String
+  },
+  data(): { assertive: LiveData; polite: LiveData; busy: boolean } {
+    return {
+      assertive: {
+        message: "",
+        alternate: false
+      },
+      polite: {
+        message: "",
+        alternate: false
+      },
+      busy: false
+    };
+  },
+  computed: {
+    localRole(): string {
+      return this.role || "log";
+    },
+    localLabel(): string {
+      return this.label;
+    }
+  },
   provide() {
-    const self = <VueLive>this;
+    const self = this;
     return {
       announce(message: string, important: boolean) {
         if (important) {
@@ -77,22 +93,7 @@ interface LiveData {
       }
     };
   }
-})
-export default class VueLive extends VueLiveInterface {
-  assertive: LiveData = {
-    message: "",
-    alternate: false
-  };
-  polite: LiveData = {
-    message: "",
-    alternate: false
-  };
-  busy: boolean = false;
-  get localRole(): string {
-    return this.role || "log";
-  }
-  get localLabel(): string | undefined {
-    return this.label;
-  }
-}
+});
+
+export default VueLive;
 </script>
