@@ -30,11 +30,26 @@
 
 <script lang="ts">
 import Vue from "vue";
-import Component from "vue-class-component";
 import { VueFocusTrap } from "../src/index";
 
-@Component({
+const ExampleVueFocusTrap = Vue.extend({
   components: { VueFocusTrap },
+  data() {
+    return {
+      shown: false
+    };
+  },
+  methods: {
+    open() {
+      this.goFirst();
+    },
+    goFirst() {
+      (<HTMLElement>this.$refs.email).focus();
+    },
+    goLast() {
+      (<HTMLElement>this.$refs.cancel).focus();
+    }
+  },
   mounted() {
     (<HTMLElement>this.$refs.trigger).focus();
   },
@@ -42,28 +57,18 @@ import { VueFocusTrap } from "../src/index";
     shown(value) {
       if (value) {
         setTimeout(() => {
-          const dialog = this.$refs.dialog;
-          (<VueFocusTrap>dialog).open();
+          const dialog = this.$refs.dialog as InstanceType<typeof VueFocusTrap>;
+          dialog.open();
         }, 100);
       } else {
-        const dialog = this.$refs.dialog;
-        (<VueFocusTrap>dialog).close(true);
+        const dialog = this.$refs.dialog as InstanceType<typeof VueFocusTrap>;
+        dialog.close(true);
       }
     }
   }
-})
-export default class ExampleVueFocusTrap extends Vue {
-  shown: boolean = false;
-  open() {
-    this.goFirst();
-  }
-  goFirst() {
-    (<HTMLElement>this.$refs.email).focus();
-  }
-  goLast() {
-    (<HTMLElement>this.$refs.cancel).focus();
-  }
-}
+});
+
+export default ExampleVueFocusTrap;
 </script>
 
 <style scoped>

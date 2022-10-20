@@ -723,6 +723,9 @@ describe("Travel mixin", () => {
 
 describe("Id mixin", () => {
   const Foo = Vue.extend({
+    props: {
+      id: String
+    },
     mixins: [MixinId],
     template: `
       <div>
@@ -921,6 +924,7 @@ describe("<VueFocusTrap> component", () => {
         const dialog = <HTMLElement>wrapper.element.querySelector(".dialog");
         expect((<FooVm>wrapper.vm).shown).toBeFalsy();
         expect(dialog).toBe(null);
+        // @ts-ignore
         done();
       }, 200);
     }, 200);
@@ -1204,7 +1208,7 @@ describe("<VueLive> component", () => {
         expect(logs.at(2).text()).toBe("A");
         expect(logs.at(3).text()).toBe("");
         announce("B");
-        resolve();
+        resolve(undefined);
       });
     })
       .then(
@@ -1216,7 +1220,7 @@ describe("<VueLive> component", () => {
               expect(logs.at(2).text()).toBe("");
               expect(logs.at(3).text()).toBe("B");
               announce("C", true);
-              resolve();
+              resolve(undefined);
             });
           })
       )
@@ -1229,7 +1233,7 @@ describe("<VueLive> component", () => {
               expect(logs.at(2).text()).toBe("");
               expect(logs.at(3).text()).toBe("B");
               announce("D", true);
-              resolve();
+              resolve(undefined);
             });
           })
       )
@@ -1241,7 +1245,8 @@ describe("<VueLive> component", () => {
               expect(logs.at(1).text()).toBe("D");
               expect(logs.at(2).text()).toBe("");
               expect(logs.at(3).text()).toBe("B");
-              resolve();
+              resolve(undefined);
+              // @ts-ignore
               done();
             });
           })

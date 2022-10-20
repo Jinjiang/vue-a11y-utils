@@ -1,11 +1,12 @@
 <template>
   <div id="app" class="content">
     <h1>Vue A11y Utils Examples</h1>
-    <a href="https://jinjiang.github.io/vue-a11y-utils/">Homepage</a> | <a href="https://github.com/jinjiang/vue-a11y-utils/">GitHub</a>
+    <a href="https://jinjiang.github.io/vue-a11y-utils/">Homepage</a> |
+    <a href="https://github.com/jinjiang/vue-a11y-utils/">GitHub</a>
     <h2>VueAria Component</h2>
     <ExampleAria></ExampleAria>
     <h2>KeyTravel Mixin</h2>
-    <ExampleKeyTravel ></ExampleKeyTravel>
+    <ExampleKeyTravel></ExampleKeyTravel>
     <h2>ID Mixin</h2>
     <ExampleId></ExampleId>
     <h2>VueFocusTrap Component</h2>
@@ -21,7 +22,6 @@
 
 <script lang="ts">
 import Vue from "vue";
-import Component from "vue-class-component";
 import ExampleAria from "./aria.vue";
 import ExampleKeyTravel from "./travel.vue";
 import ExampleId from "./id.vue";
@@ -30,7 +30,7 @@ import ExampleKeyShortcuts from "./shortcuts.vue";
 import ExampleLive from "./live.vue";
 import { VueLive } from "../src/index";
 
-@Component({
+export default Vue.extend({
   components: {
     ExampleAria,
     ExampleKeyTravel,
@@ -40,8 +40,7 @@ import { VueLive } from "../src/index";
     ExampleLive,
     VueLive
   }
-})
-export default class Example extends Vue {}
+});
 </script>
 
 <style lang="stylus">

@@ -1,5 +1,4 @@
 import Vue from "vue";
-import Component from "vue-class-component";
 
 import { capitalizeFirstLetter } from "./util";
 
@@ -31,59 +30,50 @@ interface KeyDescriptor {
   modifiers?: KeyModifiers;
 }
 
-/**
- * Mixin: KeyShortcuts
- * - option: shortcuts: Array<ShortcutConfig>
- * - methods: bindShortcut(KeyboardEvent, name)
- */
-@Component({
+const MixinKeyShortcuts = Vue.extend({
   beforeMount() {
     if (this.$options.$shortcuts) {
-      window.addEventListener(
-        "keydown",
-        (<MixinKeyShortcuts>this).bindShortcut
-      );
+      window.addEventListener("keydown", this.bindShortcut);
     }
   },
   beforeDestroy() {
     if (this.$options.$shortcuts) {
-      window.removeEventListener(
-        "keydown",
-        (<MixinKeyShortcuts>this).bindShortcut
-      );
+      window.removeEventListener("keydown", this.bindShortcut);
     }
-  }
-})
-export default class MixinKeyShortcuts extends Vue {
-  bindShortcut(event: KeyboardEvent, name: string = "default"): void {
-    const target: EventTarget | null = event.currentTarget;
-    if (!target) {
-      return;
-    }
-    // update global unique key seq
-    const updated = updateKeySeq(event, target);
-    // match shortcuts
-    if (updated) {
-      // check whether end rule matched
-      const touchedEndBefore = keyEventIsEnded(target, event);
-      if (!touchedEndBefore) {
-        const shortcuts = getShortcutsByName(this.$options.$shortcuts, name);
-        shortcuts.some((shortcut: ShortcutConfig) => {
-          // match new rules in current shortcut config
-          if (matchShortcut(shortcut, target)) {
-            // do the job and make sure whether to end the matching process
-            const ended = shortcut.handle.call(this, event);
-            if (ended) {
-              endLastKeyDown(target, event);
+  },
+  methods: {
+    bindShortcut(event: KeyboardEvent, name: string = "default"): void {
+      const target: EventTarget | null = event.currentTarget;
+      if (!target) {
+        return;
+      }
+      // update global unique key seq
+      const updated = updateKeySeq(event, target);
+      // match shortcuts
+      if (updated) {
+        // check whether end rule matched
+        const touchedEndBefore = keyEventIsEnded(target, event);
+        if (!touchedEndBefore) {
+          const shortcuts = getShortcutsByName(this.$options.$shortcuts, name);
+          shortcuts.some((shortcut: ShortcutConfig) => {
+            // match new rules in current shortcut config
+            if (matchShortcut(shortcut, target)) {
+              // do the job and make sure whether to end the matching process
+              const ended = shortcut.handle.call(this, event);
+              if (ended) {
+                endLastKeyDown(target, event);
+              }
+              return keyEventIsEnded(target, event);
             }
-            return keyEventIsEnded(target, event);
-          }
-          return false;
-        });
+            return false;
+          });
+        }
       }
     }
   }
-}
+});
+
+export default MixinKeyShortcuts;
 
 // keydown class
 

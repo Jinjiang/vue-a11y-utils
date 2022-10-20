@@ -1,5 +1,4 @@
 import Vue from "vue";
-import Component from "vue-class-component";
 
 type NameMap = Record<string, string>;
 
@@ -193,57 +192,60 @@ const methodMap: Record<string, Function> = {
   }
 };
 
-@Component
-export default class MixinTravel extends Vue {
-  bindTravel(event: KeyboardEvent, name: string = "default"): void {
-    const option = this.$options.$travel;
-    const config = getTravelConfig(option, name);
-    if (
-      !config ||
-      typeof config.getIndex !== "function" ||
-      typeof config.setIndex !== "function" ||
-      typeof config.getItems !== "function"
-    ) {
-      return;
-    }
-    if (event.ended) {
-      return;
-    }
-
-    // get the current key and corresponding method
-    const keyToMethod: NameMap = Object.assign(
-      {},
-      defaultKeyToMethod,
-      config.orientation === "horizontal"
-        ? horizontalKeyToMethod
-        : verticalKeyToMethod,
-      config.hasPagination ? paginationKeyToMethod : {}
-    );
-    const methodName: string = keyToMethod[event.key];
-
-    // make sure what to do next
-    const method = methodMap[methodName];
-    if (typeof method === "function") {
-      method(this, event, config);
-    }
-
-    // make sure whether to search
-    if (config.hasSearch && typeof config.search === "function") {
-      let keyword = "";
-      if (event.key.match(/^Digit\d$/)) {
-        keyword = event.key.substr(5);
-      } else if (event.code.match(/^Key\w$/)) {
-        keyword = event.code.substr(3).toLowerCase();
+const MixinTravel = Vue.extend({
+  methods: {
+    bindTravel(event: KeyboardEvent, name: string = "default"): void {
+      const option = this.$options.$travel;
+      const config = getTravelConfig(option, name);
+      if (
+        !config ||
+        typeof config.getIndex !== "function" ||
+        typeof config.setIndex !== "function" ||
+        typeof config.getItems !== "function"
+      ) {
+        return;
       }
-      if (keyword) {
-        config.search(
-          this,
-          event,
-          keyword,
-          config.getIndex(this),
-          config.getItems(this)
-        ) && (event.ended = true);
+      if (event.ended) {
+        return;
+      }
+
+      // get the current key and corresponding method
+      const keyToMethod: NameMap = Object.assign(
+        {},
+        defaultKeyToMethod,
+        config.orientation === "horizontal"
+          ? horizontalKeyToMethod
+          : verticalKeyToMethod,
+        config.hasPagination ? paginationKeyToMethod : {}
+      );
+      const methodName: string = keyToMethod[event.key];
+
+      // make sure what to do next
+      const method = methodMap[methodName];
+      if (typeof method === "function") {
+        method(this, event, config);
+      }
+
+      // make sure whether to search
+      if (config.hasSearch && typeof config.search === "function") {
+        let keyword = "";
+        if (event.key.match(/^Digit\d$/)) {
+          keyword = event.key.substr(5);
+        } else if (event.code.match(/^Key\w$/)) {
+          keyword = event.code.substr(3).toLowerCase();
+        }
+        if (keyword) {
+          config.search(
+            this,
+            event,
+            keyword,
+            config.getIndex(this),
+            config.getItems(this)
+          ) && (event.ended = true);
+        }
       }
     }
   }
-}
+});
+
+export default MixinTravel;

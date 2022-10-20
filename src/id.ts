@@ -1,9 +1,12 @@
 import Vue from "vue";
 
-const MixinId = Vue.extend({
-  props: {
-    id: String
+const MixinId = Vue.extend<
+  {
+    id: string;
   },
+  {},
+  { localId: string }
+>({
   computed: {
     localId(): string {
       return this.id || generateNewId();
