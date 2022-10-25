@@ -12,88 +12,78 @@
       overflow: hidden
     "
     >
-      <VueAria
-        :role="localRole"
-        :aria="{ live: 'assertive', label: localLabel, busy }"
-      >
-        <div>{{ assertive.alternate ? assertive.message : "" }}</div>
-      </VueAria>
-      <VueAria
-        :role="localRole"
-        :aria="{ live: 'assertive', label: localLabel, busy }"
-      >
-        <div>{{ !assertive.alternate ? assertive.message : "" }}</div>
-      </VueAria>
-      <VueAria
-        :role="localRole"
-        :aria="{ live: 'polite', label: localLabel, busy }"
-      >
-        <div>{{ polite.alternate ? polite.message : "" }}</div>
-      </VueAria>
-      <VueAria
-        :role="localRole"
-        :aria="{ live: 'polite', label: localLabel, busy }"
-      >
-        <div>{{ !polite.alternate ? polite.message : "" }}</div>
-      </VueAria>
+      <div v-bind="assertiveAttrs">
+        {{ assertive.alternate ? assertive.message : "" }}
+      </div>
+      <div v-bind="assertiveAttrs">
+        {{ !assertive.alternate ? assertive.message : "" }}
+      </div>
+      <div v-bind="politeAttrs">
+        {{ polite.alternate ? polite.message : "" }}
+      </div>
+      <div v-bind="politeAttrs">
+        {{ !polite.alternate ? polite.message : "" }}
+      </div>
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import Vue from "vue";
-import { VueAria } from "./aria";
+<script setup lang="ts">
+import { computed, provide, reactive, ref } from "vue";
+import { ariaToAttrs } from "./aria";
+import { Announce, SetBusy, keyAnnounce, keySetBusy } from "./live";
 
-interface LiveData {
+type LiveData = {
   message: string;
   alternate: boolean;
-}
+};
 
-const VueLive = Vue.extend({
-  components: { VueAria },
-  props: {
-    role: String,
-    label: String
-  },
-  data(): { assertive: LiveData; polite: LiveData; busy: boolean } {
-    return {
-      assertive: {
-        message: "",
-        alternate: false
-      },
-      polite: {
-        message: "",
-        alternate: false
-      },
-      busy: false
-    };
-  },
-  computed: {
-    localRole(): string {
-      return this.role || "log";
-    },
-    localLabel(): string {
-      return this.label;
-    }
-  },
-  provide() {
-    const self = this;
-    return {
-      announce(message: string, important: boolean) {
-        if (important) {
-          self.assertive.message = message;
-          self.assertive.alternate = !self.assertive.alternate;
-        } else {
-          self.polite.message = message;
-          self.polite.alternate = !self.polite.alternate;
-        }
-      },
-      setBusy(busy: boolean) {
-        self.busy = busy;
-      }
-    };
-  }
+const { role, label } = defineProps<{
+  role: string;
+  label: string;
+}>();
+
+const assertive = reactive<LiveData>({
+  message: "",
+  alternate: false
 });
 
-export default VueLive;
+const polite = reactive<LiveData>({
+  message: "",
+  alternate: false
+});
+
+const busy = ref(false);
+
+const assertiveAttrs = computed(() =>
+  ariaToAttrs(
+    {
+      live: "assertive",
+      label: label,
+      busy: busy.value
+    },
+    role || "log"
+  )
+);
+
+const politeAttrs = computed(() =>
+  ariaToAttrs(
+    {
+      live: "polite",
+      label: label,
+      busy: busy.value
+    },
+    role || "log"
+  )
+);
+
+provide<Announce>(keyAnnounce, (message, important) => {
+  const live = important ? assertive : polite;
+  live.alternate = !live.alternate;
+  live.message = message;
+});
+
+provide<SetBusy>(keySetBusy, value => {
+  busy.value = value;
+});
 </script>
