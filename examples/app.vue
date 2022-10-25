@@ -5,14 +5,14 @@
     <a href="https://github.com/jinjiang/vue-a11y-utils/">GitHub</a>
     <h2>VueAria Component</h2>
     <ExampleAria></ExampleAria>
-    <h2>KeyTravel Mixin</h2>
+    <!-- <h2>KeyTravel Mixin</h2>
     <ExampleKeyTravel></ExampleKeyTravel>
     <h2>ID Mixin</h2>
     <ExampleId></ExampleId>
     <h2>VueFocusTrap Component</h2>
     <ExampleFocusTrap></ExampleFocusTrap>
     <h2>KeyShortcuts Mixin</h2>
-    <ExampleKeyShortcuts></ExampleKeyShortcuts>
+    <ExampleKeyShortcuts></ExampleKeyShortcuts> -->
     <h2>VueLive Component</h2>
     <VueLive>
       <ExampleLive></ExampleLive>
@@ -20,27 +20,14 @@
   </div>
 </template>
 
-<script lang="ts">
-import Vue from "vue";
+<script setup lang="ts">
 import ExampleAria from "./aria.vue";
-import ExampleKeyTravel from "./travel.vue";
-import ExampleId from "./id.vue";
-import ExampleFocusTrap from "./focus-trap.vue";
-import ExampleKeyShortcuts from "./shortcuts.vue";
+// import ExampleKeyTravel from "./travel.vue";
+// import ExampleId from "./id.vue";
+// import ExampleFocusTrap from "./focus-trap.vue";
+// import ExampleKeyShortcuts from "./shortcuts.vue";
 import ExampleLive from "./live.vue";
 import { VueLive } from "../src/index";
-
-export default Vue.extend({
-  components: {
-    ExampleAria,
-    ExampleKeyTravel,
-    ExampleId,
-    ExampleFocusTrap,
-    ExampleKeyShortcuts,
-    ExampleLive,
-    VueLive
-  }
-});
 </script>
 
 <style lang="stylus">

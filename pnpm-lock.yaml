@@ -5,7 +5,7 @@ specifiers:
   '@vue/test-utils': ^2.2.0
   husky: ^3.0.5
   jsdom: ^20.0.1
-  prettier: ^1.18.2
+  prettier: ^2.7.1
   pretty-quick: ^1.11.1
   typescript: ^4.8.4
   vite: ^3.0.9
@@ -19,8 +19,8 @@ devDependencies:
   '@vue/test-utils': 2.2.0_vue@3.2.41
   husky: 3.1.0
   jsdom: 20.0.1
-  prettier: 1.19.1
-  pretty-quick: 1.11.1_prettier@1.19.1
+  prettier: 2.7.1
+  pretty-quick: 1.11.1_prettier@2.7.1
   typescript: 4.8.4
   vite: 3.1.8
   vitest: 0.24.3_jsdom@20.0.1
@@ -8044,18 +8044,11 @@ packages:
     engines: {node: '>=4'}
     dev: true
 
-  /prettier/1.19.1:
-    resolution: {integrity: sha512-s7PoyDv/II1ObgQunCbB9PdLmUcBZcnWOcxDh7O0N/UwDEsHyqkW+Qh28jW+mVuCdx7gLB0BotYI1Y6uI9iyew==}
-    engines: {node: '>=4'}
-    hasBin: true
-    dev: true
-
   /prettier/2.7.1:
     resolution: {integrity: sha512-ujppO+MkdPqoVINuDFDRLClm7D78qbDt0/NR+wp5FqEZOoTNAjPHWj17QRhu7geIHJfcNhRk1XVQmF8Bp3ye+g==}
     engines: {node: '>=10.13.0'}
     hasBin: true
     dev: true
-    optional: true
 
   /pretty-error/2.1.2:
     resolution: {integrity: sha512-EY5oDzmsX5wvuynAByrmY0P0hcp+QpnAKbJng2A2MPjVKXCxrDSUkzghVJ4ZGPIv+JC4gX8fPUWscC0RtjsWGw==}
@@ -8064,7 +8057,7 @@ packages:
       renderkid: 2.0.7
     dev: true
 
-  /pretty-quick/1.11.1_prettier@1.19.1:
+  /pretty-quick/1.11.1_prettier@2.7.1:
     resolution: {integrity: sha512-kSXCkcETfak7EQXz6WOkCeCqpbC4GIzrN/vaneTGMP/fAtD8NerA9bPhCUqHAks1geo7biZNl5uEMPceeneLuA==}
     hasBin: true
     peerDependencies:
@@ -8076,7 +8069,7 @@ packages:
       ignore: 3.3.10
       mri: 1.2.0
       multimatch: 3.0.0
-      prettier: 1.19.1
+      prettier: 2.7.1
     dev: true
 
   /pretty-time/1.1.0:

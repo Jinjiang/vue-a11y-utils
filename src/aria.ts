@@ -14,7 +14,7 @@ export const directiveAria: Directive<any, Aria> = {
   },
   updated(el: HTMLElement, { value, oldValue }) {
     mergeAriaAttrsToElement(el, value, oldValue || {});
-  }
+  },
 };
 
 /**
@@ -26,7 +26,7 @@ export const getTabindexByRole = (
 ): string => {
   const isAppearance: boolean = role === "none" || role === "appearance";
   if (isAppearance || typeof tabindex === "undefined" || isNaN(tabindex)) {
-    return "";
+    return "-1";
   }
   return tabindex.toString();
 };
@@ -102,7 +102,7 @@ const flattenAria = (aria: Aria): AriaFlat => {
   const result = {};
   if (aria) {
     if (Array.isArray(aria)) {
-      aria.forEach(ariaItem => {
+      aria.forEach((ariaItem) => {
         Object.assign(result, ariaItem);
       });
     } else {

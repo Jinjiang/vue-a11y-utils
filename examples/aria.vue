@@ -14,32 +14,23 @@
       <span class="button" tabindex>Normal text</span><br />
       <span>Normal text</span>
     </p>
-    <h3>Using VueAria Component</h3>
+    <h3>Using <code>ariaToAttrs(aria, role, tabindex)</code></h3>
     <p>
-      <VueAria role="none" :tabindex="-1">
-        <button>Button can not be accessed throught TAB key</button> </VueAria
+      <button v-bind="aria1">
+        Button with "none" role can not be accessed throught TAB key</button
       ><br />
-      <VueAria role="none">
-        <button :tabindex="-1">Button with "none" role</button> </VueAria
+      <span class="button" v-bind="aria2">
+        Normal text with "none" role can not be accessed throught TAB key </span
       ><br />
-      <VueAria role="none">
-        <span class="button" role="button" tabindex="0"
-          >Normal text</span
-        > </VueAria
-      ><br />
-      <VueAria role="none" :tabindex="-1">
-        <span class="button" role="button" tabindex="0"
-          >Focusable text with "none" role and can not be accessed throught TAB
-          key</span
-        >
-      </VueAria>
+      <span class="button" v-bind="aria1">
+        Focusable text with "none" role and can not be accessed throught TAB key
+      </span>
     </p>
   </div>
 </template>
 
-<script lang="ts">
-import Vue from "vue";
-import { VueAria } from "../src/index";
-
-export default Vue.extend({ components: { VueAria } });
+<script setup lang="ts">
+import { ariaToAttrs } from "../src/index";
+const aria1 = ariaToAttrs({}, "none", -1);
+const aria2 = ariaToAttrs({}, "none", 0);
 </script>
