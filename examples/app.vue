@@ -3,7 +3,7 @@
     <h1>Vue A11y Utils Examples</h1>
     <a href="https://jinjiang.github.io/vue-a11y-utils/">Homepage</a> |
     <a href="https://github.com/jinjiang/vue-a11y-utils/">GitHub</a>
-    <h2>VueAria Component</h2>
+    <h2>Aria Component</h2>
     <ExampleAria></ExampleAria>
     <!-- <h2>KeyTravel Mixin</h2>
     <ExampleKeyTravel></ExampleKeyTravel>
@@ -13,10 +13,10 @@
     <ExampleFocusTrap></ExampleFocusTrap>
     <h2>KeyShortcuts Mixin</h2>
     <ExampleKeyShortcuts></ExampleKeyShortcuts> -->
-    <h2>VueLive Component</h2>
-    <VueLive>
+    <h2>Live Component</h2>
+    <Live>
       <ExampleLive></ExampleLive>
-    </VueLive>
+    </Live>
   </div>
 </template>
 
@@ -27,7 +27,7 @@ import ExampleAria from "./aria.vue";
 // import ExampleFocusTrap from "./focus-trap.vue";
 // import ExampleKeyShortcuts from "./shortcuts.vue";
 import ExampleLive from "./live.vue";
-import { VueLive } from "../src/index";
+import { Live } from "../src/index";
 </script>
 
 <style lang="stylus">

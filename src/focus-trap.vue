@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div ref="root">
     <div tabindex="0" ref="start"></div>
     <slot></slot>
     <div tabindex="0" ref="end"></div>
@@ -7,78 +7,93 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-
-interface TrapInfo {
-  vm: Vue;
-  prevTraget: HTMLElement;
-}
-
+type TrapInfo = {
+  open: () => void;
+  root: HTMLElement;
+  prevTarget: HTMLElement;
+};
 const trapStack: Array<TrapInfo> = [];
+</script>
 
-const VueFocusTrap = Vue.extend({
-  data() {
-    return {
-      mounted: false
-    };
-  },
-  mounted() {
-    this.mounted = true;
-    document.addEventListener("focus", this.trapFocus, true);
-  },
-  beforeDestroy() {
-    if (this.mounted) {
-      document.removeEventListener("focus", this.trapFocus, true);
-    }
-  },
-  methods: {
-    trapFocus(event: FocusEvent) {
-      const trap = trapStack[trapStack.length - 1];
-      if (!trap || trap.vm !== this) {
-        return;
-      }
-      const root = this.$el;
-      const { start, end } = this.$refs;
-      const { target } = event;
-      if (!root.contains(<HTMLElement>target)) {
-        event.preventDefault();
-        this.$emit("gofirst");
-      } else if (target === start) {
-        event.preventDefault();
-        this.$emit("golast");
-      } else if (target === end) {
-        event.preventDefault();
-        this.$emit("gofirst");
-      }
-    },
-    open() {
-      const prevTraget = <HTMLElement>document.activeElement;
-      trapStack.push({ vm: this, prevTraget });
-      this.$emit("open");
-    },
-    replace() {
-      const prevTraget = <HTMLElement>document.activeElement;
-      trapStack.pop();
-      trapStack.push({ vm: this, prevTraget });
-      this.$emit("open");
-    },
-    close(returnFocus: any) {
-      const trap = trapStack.pop();
-      if (!trap) {
-        return;
-      }
-      const { prevTraget } = trap;
-      if (returnFocus) {
-        prevTraget.focus();
-      }
+<script setup lang="ts">
+import { onMounted, onUnmounted, ref } from "vue";
 
-      const lastTrap = trapStack[trapStack.length - 1];
-      if (lastTrap) {
-        lastTrap.vm.$emit("open", prevTraget);
-      }
-    }
+const emit = defineEmits<{
+  (event: "open", prevTarget?: HTMLElement): void;
+  (event: "gofirst"): void;
+  (event: "golast"): void;
+}>();
+
+const root = ref<HTMLElement>();
+const start = ref<HTMLElement>();
+const end = ref<HTMLElement>();
+
+const trapFocus = (event: FocusEvent): void => {
+  const trap = trapStack[trapStack.length - 1];
+  if (!trap || trap.open !== open) {
+    return;
   }
+  const target = event.target as HTMLElement;
+  if (!root.value?.contains(target)) {
+    event.preventDefault();
+    emit("gofirst");
+  } else if (target === start.value) {
+    event.preventDefault();
+    emit("golast");
+  } else if (target === end.value) {
+    event.preventDefault();
+    emit("gofirst");
+  }
+};
+
+onMounted(() => {
+  document.addEventListener("focus", trapFocus, true);
+});
+onUnmounted(() => {
+  document.removeEventListener("focus", trapFocus, true);
 });
 
-export default VueFocusTrap;
+const open = (): void => {
+  const target = document.activeElement as HTMLElement;
+  if (target) {
+    trapStack.push({
+      open: () => emit("open", target),
+      root: root.value!,
+      prevTarget: target,
+    });
+  }
+  emit("open");
+};
+const replace = (): void => {
+  const target = document.activeElement as HTMLElement;
+  if (target) {
+    trapStack.pop();
+    trapStack.push({
+      open: () => emit("open", target),
+      root: root.value!,
+      prevTarget: target,
+    });
+  }
+  emit("open");
+};
+const close = (returnFocus: boolean): void => {
+  const trap = trapStack.pop();
+  if (!trap) {
+    return;
+  }
+  const { prevTarget } = trap;
+  if (returnFocus) {
+    prevTarget.focus();
+  }
+  const lastTrap = trapStack[trapStack.length - 1];
+  if (lastTrap) {
+    lastTrap.open();
+  }
+};
+
+defineExpose({
+  open,
+  replace,
+  close,
+});
 </script>
