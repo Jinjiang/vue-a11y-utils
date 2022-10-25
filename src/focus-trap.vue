@@ -30,7 +30,7 @@ const end = ref<HTMLElement>();
 
 const trapFocus = (event: FocusEvent): void => {
   const trap = trapStack[trapStack.length - 1];
-  if (!trap || trap.open !== open) {
+  if (!trap || trap.root !== root.value) {
     return;
   }
   const target = event.target as HTMLElement;

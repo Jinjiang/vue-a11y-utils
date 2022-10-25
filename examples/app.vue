@@ -8,10 +8,10 @@
     <!-- <h2>KeyTravel Mixin</h2>
     <ExampleKeyTravel></ExampleKeyTravel>
     <h2>ID Mixin</h2>
-    <ExampleId></ExampleId>
+    <ExampleId></ExampleId> -->
     <h2>VueFocusTrap Component</h2>
     <ExampleFocusTrap></ExampleFocusTrap>
-    <h2>KeyShortcuts Mixin</h2>
+    <!-- <h2>KeyShortcuts Mixin</h2>
     <ExampleKeyShortcuts></ExampleKeyShortcuts> -->
     <h2>Live Component</h2>
     <Live>
@@ -24,7 +24,7 @@
 import ExampleAria from "./aria.vue";
 // import ExampleKeyTravel from "./travel.vue";
 // import ExampleId from "./id.vue";
-// import ExampleFocusTrap from "./focus-trap.vue";
+import ExampleFocusTrap from "./focus-trap.vue";
 // import ExampleKeyShortcuts from "./shortcuts.vue";
 import ExampleLive from "./live.vue";
 import { Live } from "../src/index";

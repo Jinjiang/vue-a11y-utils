@@ -6,9 +6,9 @@
       </button>
     </p>
     <div v-show="shown" class="dialog">
-      <VueFocusTrap
+      <FocusTrap
         ref="dialog"
-        @open="open"
+        @open="goFirst"
         @gofirst="goFirst"
         @golast="goLast"
       >
@@ -23,52 +23,44 @@
         </label>
         <button ref="login" @click="shown = false">Login</button>
         <button ref="cancel" @click="shown = false">Cancel</button>
-      </VueFocusTrap>
+      </FocusTrap>
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import Vue from "vue";
-import { VueFocusTrap } from "../src/index";
+<script setup lang="ts">
+import { onMounted, ref, watch } from "vue";
+import { FocusTrap } from "../src/index";
 
-const ExampleVueFocusTrap = Vue.extend({
-  components: { VueFocusTrap },
-  data() {
-    return {
-      shown: false
-    };
-  },
-  methods: {
-    open() {
-      this.goFirst();
-    },
-    goFirst() {
-      (<HTMLElement>this.$refs.email).focus();
-    },
-    goLast() {
-      (<HTMLElement>this.$refs.cancel).focus();
-    }
-  },
-  mounted() {
-    (<HTMLElement>this.$refs.trigger).focus();
-  },
-  watch: {
-    shown(value) {
-      if (value) {
-        setTimeout(() => {
-          const dialog = this.$refs.dialog as InstanceType<typeof VueFocusTrap>;
-          dialog.open();
-        }, 100);
-      } else {
-        const dialog = this.$refs.dialog as InstanceType<typeof VueFocusTrap>;
-        dialog.close(true);
-      }
-    }
-  }
+const trigger = ref<HTMLElement>();
+const dialog = ref<typeof FocusTrap>();
+const email = ref<HTMLInputElement>();
+const password = ref<HTMLInputElement>();
+const login = ref<HTMLButtonElement>();
+const cancel = ref<HTMLInputElement>();
+
+const shown = ref(false);
+
+const goFirst = (): void => {
+  email.value?.focus();
+};
+const goLast = (): void => {
+  cancel.value?.focus();
+};
+
+onMounted(() => {
+  trigger.value?.focus();
 });
 
-export default ExampleVueFocusTrap;
+watch(shown, (value) => {
+  if (value) {
+    setTimeout(() => {
+      dialog.value?.open();
+    }, 100);
+  } else {
+    dialog.value?.close(true);
+  }
+});
 </script>
 
 <style scoped>
