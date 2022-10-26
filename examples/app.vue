@@ -3,17 +3,17 @@
     <h1>Vue A11y Utils Examples</h1>
     <a href="https://jinjiang.github.io/vue-a11y-utils/">Homepage</a> |
     <a href="https://github.com/jinjiang/vue-a11y-utils/">GitHub</a>
-    <h2>Aria Component</h2>
+    <h2>Aria utils</h2>
     <ExampleAria></ExampleAria>
-    <h2>KeyTravel Mixin</h2>
+    <h2>Travel utils</h2>
     <ExampleKeyTravel></ExampleKeyTravel>
-    <h2>ID generator</h2>
+    <h2>ID utils</h2>
     <ExampleId></ExampleId>
-    <h2>VueFocusTrap Component</h2>
+    <h2>FocusTrap utils</h2>
     <ExampleFocusTrap></ExampleFocusTrap>
-    <!-- <h2>KeyShortcuts Mixin</h2>
-    <ExampleKeyShortcuts></ExampleKeyShortcuts> -->
-    <h2>Live Component</h2>
+    <h2>Hotkey utils</h2>
+    <ExampleHotkey></ExampleHotkey>
+    <h2>Live utils</h2>
     <Live>
       <ExampleLive></ExampleLive>
     </Live>
@@ -25,7 +25,7 @@ import ExampleAria from "./aria.vue";
 import ExampleKeyTravel from "./travel.vue";
 import ExampleId from "./id.vue";
 import ExampleFocusTrap from "./focus-trap.vue";
-// import ExampleKeyShortcuts from "./shortcuts.vue";
+import ExampleHotkey from "./hotkey.vue";
 import ExampleLive from "./live.vue";
 import { Live } from "../src/index";
 </script>
