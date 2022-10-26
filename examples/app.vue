@@ -5,8 +5,8 @@
     <a href="https://github.com/jinjiang/vue-a11y-utils/">GitHub</a>
     <h2>Aria Component</h2>
     <ExampleAria></ExampleAria>
-    <!-- <h2>KeyTravel Mixin</h2>
-    <ExampleKeyTravel></ExampleKeyTravel> -->
+    <h2>KeyTravel Mixin</h2>
+    <ExampleKeyTravel></ExampleKeyTravel>
     <h2>ID generator</h2>
     <ExampleId></ExampleId>
     <h2>VueFocusTrap Component</h2>
@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
 import ExampleAria from "./aria.vue";
-// import ExampleKeyTravel from "./travel.vue";
+import ExampleKeyTravel from "./travel.vue";
 import ExampleId from "./id.vue";
 import ExampleFocusTrap from "./focus-trap.vue";
 // import ExampleKeyShortcuts from "./shortcuts.vue";
