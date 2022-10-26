@@ -6,9 +6,9 @@
     <h2>Aria Component</h2>
     <ExampleAria></ExampleAria>
     <!-- <h2>KeyTravel Mixin</h2>
-    <ExampleKeyTravel></ExampleKeyTravel>
-    <h2>ID Mixin</h2>
-    <ExampleId></ExampleId> -->
+    <ExampleKeyTravel></ExampleKeyTravel> -->
+    <h2>ID generator</h2>
+    <ExampleId></ExampleId>
     <h2>VueFocusTrap Component</h2>
     <ExampleFocusTrap></ExampleFocusTrap>
     <!-- <h2>KeyShortcuts Mixin</h2>
@@ -23,7 +23,7 @@
 <script setup lang="ts">
 import ExampleAria from "./aria.vue";
 // import ExampleKeyTravel from "./travel.vue";
-// import ExampleId from "./id.vue";
+import ExampleId from "./id.vue";
 import ExampleFocusTrap from "./focus-trap.vue";
 // import ExampleKeyShortcuts from "./shortcuts.vue";
 import ExampleLive from "./live.vue";

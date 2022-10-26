@@ -11,34 +11,24 @@
   </div>
 </template>
 
-<script lang="ts">
-import Vue from "vue";
-import { MixinId } from "../src/index";
+<script setup lang="ts">
+import { ref, watch } from "vue";
+import { genId } from "../src/index";
 
-export default Vue.extend({
-  props: {
-    label: String,
-    type: String,
-    value: String
-  },
-  data() {
-    return {
-      localValue: ""
-    };
-  },
-  mixins: [MixinId],
-  created() {
-    this.localValue = this.value;
-  },
-  watch: {
-    value(v) {
-      this.localValue = v;
-    },
-    localValue(v) {
-      if (this.value !== v) {
-        this.$emit("input", v);
-      }
-    }
+const emit = defineEmits(["update:modelValue"]);
+const { id, modelValue } = defineProps<{
+  id?: string;
+  label?: string;
+  type?: string;
+  modelValue?: string;
+}>();
+
+const localId = genId(id);
+const localValue = ref(modelValue);
+
+watch(localValue, (newValue) => {
+  if (newValue !== modelValue) {
+    emit("update:modelValue", newValue);
   }
 });
 </script>

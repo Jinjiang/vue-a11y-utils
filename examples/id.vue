@@ -14,29 +14,26 @@
   </div>
 </template>
 
-<script lang="ts">
-import Vue from "vue";
-import { MixinId } from "../src/index";
+<script setup lang="ts">
 import ExampleIdInput from "./id-input.vue";
 
-interface ExampleFieldOption {
+type ExampleFieldOption = {
   label: string;
   name: string;
   type: string;
   value: string;
-}
+};
 
-export default Vue.extend({
-  data(): { fieldList: Array<ExampleFieldOption> } {
-    return {
-      fieldList: [
-        { name: "name", label: "Name", type: "text", value: "" },
-        { name: "email", label: "Email", type: "email", value: "" },
-        { name: "password", label: "Password", type: "password", value: "" }
-      ]
-    };
+const fieldList: ExampleFieldOption[] = [
+  { label: "First Name", name: "firstName", type: "text", value: "" },
+  { label: "Last Name", name: "lastName", type: "text", value: "" },
+  { label: "Email", name: "email", type: "email", value: "" },
+  { label: "Password", name: "password", type: "password", value: "" },
+  {
+    label: "Confirm Password",
+    name: "confirmPassword",
+    type: "password",
+    value: "",
   },
-  mixins: [MixinId],
-  components: { ExampleIdInput }
-});
+];
 </script>

@@ -8,6 +8,7 @@ export { default as Live, useLive } from "./live.vue";
 
 export { default as FocusTrap } from "./focus-trap.vue";
 
+export { genId } from "./id";
+
 // export { default as MixinTravel } from "./travel";
-// export { default as MixinId } from "./id";
 // export { default as MixinShortcuts } from "./shortcuts";
