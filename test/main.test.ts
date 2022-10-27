@@ -1,28 +1,34 @@
 import { describe, it, expect } from "vitest";
-import Vue from "vue";
-import { mount, Wrapper, WrapperArray } from "@vue/test-utils";
+import {
+  ComponentPublicInstance,
+  defineComponent,
+  nextTick,
+  onMounted,
+  PropType,
+  Ref,
+  ref,
+} from "vue";
+import { mount, VueWrapper } from "@vue/test-utils";
 
 import {
-  VueAria,
   directiveAria,
-  MixinTravel,
-  MixinId,
-  VueFocusTrap,
-  MixinShortcuts,
-  VueLive
+  useTravel,
+  // genId,
+  FocusTrap,
+  // useHotkey,
+  Live,
 } from "../src/index";
 
-import { TravelConfig } from "../src/travel";
-
-const NothingHappen = Vue.extend({
-  render() {
-    return this.$slots.default![0];
-  }
+const NothingHappen = defineComponent({
+  template: `<slot />`,
 });
 
-describe("<VueAria> component", () => {
+// TODO
+const VueAria = NothingHappen;
+
+describe.skip("<VueAria> component", () => {
   it("set role and aria props correctly", () => {
-    const Foo = Vue.extend({
+    const Foo = defineComponent({
       template: `
         <VueAria
           role="button"
@@ -32,21 +38,21 @@ describe("<VueAria> component", () => {
         </VueAria>
       `,
       components: {
-        VueAria
-      }
+        VueAria,
+      },
     });
-    const wrapper: Wrapper<Vue> = mount(Foo);
+    const wrapper = mount(Foo);
     expect(wrapper.element.tagName).toBe("I");
     expect(wrapper.text()).toBe("");
     expect(wrapper.attributes()).toEqual({
       class: "icon-save",
       role: "button",
-      "aria-label": "save your changes"
+      "aria-label": "save your changes",
     });
   });
 
   it("set array-type aria props correctly", () => {
-    const Foo = Vue.extend({
+    const Foo = defineComponent({
       template: `
         <VueAria
           role="button"
@@ -56,18 +62,18 @@ describe("<VueAria> component", () => {
         </VueAria>
       `,
       components: {
-        VueAria
+        VueAria,
       },
       props: {
-        otherAriaProps: Object
-      }
+        otherAriaProps: Object,
+      },
     });
-    const wrapper: Wrapper<Vue> = mount(Foo, {
-      propsData: {
+    const wrapper = mount(Foo, {
+      props: {
         otherAriaProps: {
-          pressed: true
-        }
-      }
+          pressed: true,
+        },
+      },
     });
     expect(wrapper.element.tagName).toBe("I");
     expect(wrapper.text()).toBe("");
@@ -75,12 +81,12 @@ describe("<VueAria> component", () => {
       class: "icon-save",
       role: "button",
       "aria-label": "save your changes",
-      "aria-pressed": "true"
+      "aria-pressed": "true",
     });
   });
 
   it("nested using", () => {
-    const Foo = Vue.extend({
+    const Foo = defineComponent({
       template: `
         <VueAria
           role="button"
@@ -94,19 +100,19 @@ describe("<VueAria> component", () => {
         </VueAria>
       `,
       components: {
-        VueAria
+        VueAria,
       },
       props: {
-        otherAriaProps: Object
-      }
+        otherAriaProps: Object,
+      },
     });
-    const wrapper: Wrapper<Vue> = mount(Foo, {
-      propsData: {
+    const wrapper = mount(Foo, {
+      props: {
         otherAriaProps: {
           pressed: true,
-          label: "changed label"
-        }
-      }
+          label: "changed label",
+        },
+      },
     });
     expect(wrapper.element.tagName).toBe("I");
     expect(wrapper.text()).toBe("");
@@ -114,12 +120,12 @@ describe("<VueAria> component", () => {
       class: "icon-save",
       role: "button",
       "aria-label": "changed label",
-      "aria-pressed": "true"
+      "aria-pressed": "true",
     });
   });
 
   it("set tabindex correctly", () => {
-    const Foo = Vue.extend({
+    const Foo = defineComponent({
       template: `
       <VueAria
         role="button"
@@ -129,41 +135,41 @@ describe("<VueAria> component", () => {
       </VueAria>
     `,
       components: {
-        VueAria
-      }
+        VueAria,
+      },
     });
-    const wrapper: Wrapper<Vue> = mount(Foo);
+    const wrapper = mount(Foo);
     expect(wrapper.element.tagName).toBe("I");
     expect(wrapper.text()).toBe("");
     expect(wrapper.attributes()).toEqual({
       class: "icon-save",
       role: "button",
-      tabindex: "0"
+      tabindex: "0",
     });
   });
 
   it("not set tabindex when when it is not a number", () => {
-    const Foo = Vue.extend({
+    const Foo = defineComponent({
       template: `
       <VueAria role="button" :tabindex="NaN">
         <i class="icon-save" />
       </VueAria>
     `,
       components: {
-        VueAria
-      }
+        VueAria,
+      },
     });
-    const wrapper: Wrapper<Vue> = mount(Foo);
+    const wrapper = mount(Foo);
     expect(wrapper.element.tagName).toBe("I");
     expect(wrapper.text()).toBe("");
     expect(wrapper.attributes()).toEqual({
       class: "icon-save",
-      role: "button"
+      role: "button",
     });
   });
 
   it("reset tabindex in child when the role is none", () => {
-    const Foo = Vue.extend({
+    const Foo = defineComponent({
       template: `
       <VueAria role="none">
         <VueAria role="button" :tabindex="0">
@@ -172,21 +178,21 @@ describe("<VueAria> component", () => {
       </VueAria>
     `,
       components: {
-        VueAria
-      }
+        VueAria,
+      },
     });
-    const wrapper: Wrapper<Vue> = mount(Foo);
+    const wrapper = mount(Foo);
     expect(wrapper.element.tagName).toBe("I");
     expect(wrapper.text()).toBe("");
     expect(wrapper.attributes()).toEqual({
       class: "icon-save",
       role: "none",
-      tabindex: ""
+      tabindex: "",
     });
   });
 
   it("set tabindex correctly even when the role is none", () => {
-    const Foo = Vue.extend({
+    const Foo = defineComponent({
       template: `
       <VueAria role="none" :tabindex="-1">
         <VueAria role="button" :tabindex="0">
@@ -195,23 +201,23 @@ describe("<VueAria> component", () => {
       </VueAria>
     `,
       components: {
-        VueAria
-      }
+        VueAria,
+      },
     });
-    const wrapper: Wrapper<Vue> = mount(Foo);
+    const wrapper = mount(Foo);
     expect(wrapper.element.tagName).toBe("I");
     expect(wrapper.text()).toBe("");
     expect(wrapper.attributes()).toEqual({
       class: "icon-save",
       role: "none",
-      tabindex: "-1"
+      tabindex: "-1",
     });
   });
 });
 
-describe("v-aria directive", () => {
+describe("Aria utils", () => {
   it("set aria-* attributes correctly when init", () => {
-    const Foo = Vue.extend({
+    const Foo = defineComponent({
       template: `
         <i
           class="icon-save"
@@ -220,21 +226,21 @@ describe("v-aria directive", () => {
         />
       `,
       directives: {
-        aria: directiveAria
-      }
+        aria: directiveAria,
+      },
     });
-    const wrapper: Wrapper<Vue> = mount(Foo);
+    const wrapper = mount(Foo);
     expect(wrapper.element.tagName).toBe("I");
     expect(wrapper.text()).toBe("");
     expect(wrapper.attributes()).toEqual({
       class: "icon-save",
       role: "button",
-      "aria-label": "save your changes"
+      "aria-label": "save your changes",
     });
   });
 
   it("update aria-* attributes correctly when update prop data", async () => {
-    const Foo = Vue.extend({
+    const Foo = defineComponent({
       template: `
         <i
           class="icon-save"
@@ -243,36 +249,36 @@ describe("v-aria directive", () => {
         />
       `,
       directives: {
-        aria: directiveAria
+        aria: directiveAria,
       },
       props: {
-        ariaConfig: Object
-      }
+        ariaConfig: Object,
+      },
     });
-    const wrapper: Wrapper<Vue> = mount(Foo);
+    const wrapper = mount(Foo);
     expect(wrapper.element.tagName).toBe("I");
     expect(wrapper.text()).toBe("");
     expect(wrapper.attributes()).toEqual({
       class: "icon-save",
-      role: "button"
+      role: "button",
     });
 
     await wrapper.setProps({
-      ariaConfig: { label: "save your changes" }
+      ariaConfig: { label: "save your changes" },
     });
     expect(wrapper.element.tagName).toBe("I");
     expect(wrapper.text()).toBe("");
     expect(wrapper.attributes()).toEqual({
       class: "icon-save",
       role: "button",
-      "aria-label": "save your changes"
+      "aria-label": "save your changes",
     });
 
     await wrapper.setProps({
       ariaConfig: {
         label: "Save Your Changes",
-        pressed: true
-      }
+        pressed: true,
+      },
     });
     expect(wrapper.element.tagName).toBe("I");
     expect(wrapper.text()).toBe("");
@@ -280,25 +286,25 @@ describe("v-aria directive", () => {
       class: "icon-save",
       role: "button",
       "aria-label": "Save Your Changes",
-      "aria-pressed": "true"
+      "aria-pressed": "true",
     });
 
     await wrapper.setProps({
       ariaConfig: {
-        pressed: false
-      }
+        pressed: false,
+      },
     });
     expect(wrapper.element.tagName).toBe("I");
     expect(wrapper.text()).toBe("");
     expect(wrapper.attributes()).toEqual({
       class: "icon-save",
       role: "button",
-      "aria-pressed": "false"
+      "aria-pressed": "false",
     });
   });
 
-  it("runs on component", () => {
-    const Foo = Vue.extend({
+  it.todo("runs on component", () => {
+    const Foo = defineComponent({
       template: `
         <NothingHappen
           v-aria="{
@@ -317,13 +323,13 @@ describe("v-aria directive", () => {
         </NothingHappen>
       `,
       components: {
-        NothingHappen
+        NothingHappen,
       },
       directives: {
-        aria: directiveAria
-      }
+        aria: directiveAria,
+      },
     });
-    const wrapper: Wrapper<Vue> = mount(Foo);
+    const wrapper = mount(Foo).get("[data-v-app] > *");
     expect(wrapper.element.tagName).toBe("I");
     expect(wrapper.text()).toBe("");
     expect(wrapper.attributes()).toEqual({
@@ -331,13 +337,13 @@ describe("v-aria directive", () => {
       role: "button",
       "aria-label": "save your changes",
       "aria-pressed": "true",
-      "aria-controls": "id-of-a-textbox"
+      "aria-controls": "id-of-a-textbox",
     });
   });
 
   // This behavior is unexpected, but it's the current behavior.
-  it("runs on component nestedly to update", async () => {
-    const Foo = Vue.extend({
+  it.todo("runs on componeant nestedly to update", async () => {
+    const Foo = defineComponent({
       template: `
         <NothingHappen v-aria="outer">
           <NothingHappen v-aria="inner">
@@ -346,28 +352,28 @@ describe("v-aria directive", () => {
         </NothingHappen>
       `,
       components: {
-        NothingHappen
+        NothingHappen,
       },
       directives: {
-        aria: directiveAria
+        aria: directiveAria,
       },
       props: {
         outer: Object,
-        inner: Object
-      }
+        inner: Object,
+      },
     });
 
-    const wrapper: Wrapper<Vue> = mount(Foo, {
-      propsData: {
+    const wrapper = mount(Foo, {
+      props: {
         outer: {
           label: "save your changes",
-          pressed: true
+          pressed: true,
         },
         inner: {
           label: "Save Your Changes",
-          controls: "id-of-a-textbox"
-        }
-      }
+          controls: "id-of-a-textbox",
+        },
+      },
     });
     expect(wrapper.element.tagName).toBe("I");
     expect(wrapper.text()).toBe("");
@@ -376,63 +382,63 @@ describe("v-aria directive", () => {
       role: "button",
       "aria-label": "save your changes",
       "aria-pressed": "true",
-      "aria-controls": "id-of-a-textbox"
+      "aria-controls": "id-of-a-textbox",
     });
 
     await wrapper.setProps({
       outer: {
         label: "save your changes",
-        pressed: false
+        pressed: false,
       },
       inner: {
         label: "Save Your Changes",
-        controls: "id-of-a-textbox"
-      }
+        controls: "id-of-a-textbox",
+      },
     });
     expect(wrapper.attributes()).toEqual({
       class: "icon-save",
       role: "button",
       "aria-label": "Save Your Changes",
       "aria-pressed": "false",
-      "aria-controls": "id-of-a-textbox"
+      "aria-controls": "id-of-a-textbox",
     });
 
     await wrapper.setProps({
       outer: {
-        pressed: false
+        pressed: false,
       },
       inner: {
         label: "Save Your Changes",
-        controls: "id-of-a-textbox"
-      }
+        controls: "id-of-a-textbox",
+      },
     });
     expect(wrapper.attributes()).toEqual({
       class: "icon-save",
       role: "button",
       "aria-label": "Save Your Changes",
       "aria-pressed": "false",
-      "aria-controls": "id-of-a-textbox"
+      "aria-controls": "id-of-a-textbox",
     });
 
     await wrapper.setProps({
       outer: {
         label: "save your changes",
-        pressed: false
+        pressed: false,
       },
       inner: {
-        controls: "id-of-a-textbox"
-      }
+        controls: "id-of-a-textbox",
+      },
     });
     expect(wrapper.attributes()).toEqual({
       class: "icon-save",
       role: "button",
       "aria-pressed": "false",
-      "aria-controls": "id-of-a-textbox"
+      "aria-controls": "id-of-a-textbox",
     });
   });
 
-  it("runs after all parent <VueAria> components", () => {
-    const Foo = Vue.extend({
+  it.skip("runs after all parent <VueAria> components", () => {
+    const Foo = defineComponent({
       template: `
         <VueAria
           role="menubutton"
@@ -449,19 +455,19 @@ describe("v-aria directive", () => {
         </VueAria>
       `,
       components: { VueAria },
-      directives: { aria: directiveAria }
+      directives: { aria: directiveAria },
     });
-    const wrapper: Wrapper<Vue> = mount(Foo);
+    const wrapper = mount(Foo);
     expect(wrapper.element.tagName).toBe("I");
     expect(wrapper.text()).toBe("");
     expect(wrapper.attributes()).toEqual({
       class: "icon-save",
       role: "menubutton",
       "aria-label": "save your changes",
-      "aria-pressed": "false"
+      "aria-pressed": "false",
     });
 
-    const Bar = Vue.extend({
+    const Bar = defineComponent({
       template: `
         <VueAria
           role="menubutton"
@@ -478,19 +484,19 @@ describe("v-aria directive", () => {
         </VueAria>
       `,
       components: { VueAria },
-      directives: { aria: directiveAria }
+      directives: { aria: directiveAria },
     });
-    const wrapperBar: Wrapper<Vue> = mount(Bar);
+    const wrapperBar = mount(Bar);
     expect(wrapperBar.element.tagName).toBe("I");
     expect(wrapperBar.text()).toBe("");
     expect(wrapperBar.attributes()).toEqual({
       class: "icon-save",
       role: "menubutton",
       "aria-label": "save your changes",
-      "aria-pressed": "false"
+      "aria-pressed": "false",
     });
 
-    const Baz = Vue.extend({
+    const Baz = defineComponent({
       template: `
         <NothingHappen
           v-aria="{
@@ -510,43 +516,28 @@ describe("v-aria directive", () => {
         </NothingHappen>
       `,
       components: { VueAria, NothingHappen },
-      directives: { aria: directiveAria }
+      directives: { aria: directiveAria },
     });
-    const wrapperBaz: Wrapper<Vue> = mount(Baz);
+    const wrapperBaz = mount(Baz);
     expect(wrapperBaz.element.tagName).toBe("I");
     expect(wrapperBaz.text()).toBe("");
     expect(wrapperBaz.attributes()).toEqual({
       class: "icon-save",
       role: "menubutton",
       "aria-label": "save your changes",
-      "aria-pressed": "false"
+      "aria-pressed": "false",
     });
   });
 });
 
-describe("Travel mixin", () => {
-  it("travel through all focusable items", () => {
-    interface FooVm extends Vue {
-      currentIndex: number;
-    }
-    const travelOption: TravelConfig = {
-      looped: true,
-      getItems(vm: FooVm) {
-        return <Array<HTMLElement>>vm.$refs.items;
-      },
-      getIndex(vm: FooVm) {
-        return vm.currentIndex;
-      },
-      setIndex(vm: FooVm, index: number) {
-        vm.currentIndex = index;
-        travelOption.getItems(vm)[index].focus();
-      },
-      move(vm: FooVm, event: KeyboardEvent, newIndex: number) {
-        this.setIndex(vm, newIndex);
-      }
-    };
+describe("Travel utils", () => {
+  type TravelOptionExample = {
+    text: string;
+    value: string;
+  };
 
-    const Foo = Vue.extend({
+  it.todo("travel through all focusable items", async () => {
+    const Foo = defineComponent({
       template: `
         <ul @keydown="bindTravel">
           <li
@@ -559,38 +550,59 @@ describe("Travel mixin", () => {
           </li>
         </ul>
       `,
-      mixins: [MixinTravel],
-      $travel: travelOption,
-      mounted() {
-        (<Array<HTMLElement>>this.$refs.items)[0].focus();
-      },
-      data() {
+      setup() {
+        const index = ref(0);
+        const items = ref<HTMLElement[]>([]);
+        onMounted(async () => {
+          console.log(items.value);
+          items.value[0].focus();
+          // TODO
+          await nextTick();
+          console.log(items.value[0].ownerDocument.activeElement);
+          console.log("focused");
+        });
+        const bindTravel = useTravel({
+          looped: true,
+          items,
+          index,
+          onMove(event, newIndex) {
+            event.preventDefault();
+            index.value = newIndex;
+            items.value[newIndex].focus();
+          },
+        });
         return {
-          currentIndex: 0
+          items,
+          bindTravel,
         };
       },
       props: {
-        options: Array
-      }
+        options: Array as PropType<TravelOptionExample[]>,
+      },
     });
 
-    const wrapper: Wrapper<Vue> = mount(Foo, {
+    const wrapper = mount(Foo, {
       attachToDocument: true,
-      propsData: {
+      props: {
         options: [
           { text: "First", value: "foo" },
           { text: "Second", value: "bar" },
-          { text: "Third", value: "baz" }
-        ]
-      }
+          { text: "Third", value: "baz" },
+        ],
+      },
     });
-    const document: Document | null = wrapper.element.ownerDocument;
-    const items: any = wrapper.vm.$refs.items;
+
+    // TODO
+    await nextTick();
+
+    const document = wrapper.element.ownerDocument;
+    const items = wrapper.vm.items;
     expect(document).toBeTruthy();
     expect(Array.isArray(items)).toBeTruthy();
     if (!document || !Array.isArray(items)) {
       return;
     }
+    console.log(document.activeElement);
     expect(document.activeElement).toBe(items[0]);
 
     wrapper.trigger("keydown", { key: "ArrowDown" });
@@ -606,49 +618,24 @@ describe("Travel mixin", () => {
     expect(document.activeElement).toBe(items[2]);
   });
 
-  it("fire action when enter key down", () => {
-    interface FooVm extends Vue {
-      currentIndex: number;
-    }
-    const travelOption: TravelConfig = {
-      looped: true,
-      getItems(vm: FooVm) {
-        return <Array<Vue>>vm.$refs.items;
-      },
-      getIndex(vm: FooVm) {
-        return vm.currentIndex;
-      },
-      setIndex(vm: FooVm, index: number) {
-        vm.currentIndex = index;
-        const items = travelOption.getItems(vm);
-        const item = items[index];
-        item.$el.focus();
-      },
-      move(vm: FooVm, event: KeyboardEvent, newIndex: number) {
-        this.setIndex(vm, newIndex);
-      },
-      action(vm: FooVm, event: KeyboardEvent, index: number, items: any[]) {
-        items[index].fireAction();
-      }
-    };
+  it.todo("fire action when enter key down", () => {
+    let lastAction: string | undefined = "";
 
-    let lastAction: string = "";
-
-    const ListItem = Vue.extend({
+    const ListItem = defineComponent({
       template: `<div role="listitem" tabindex="-1">{{ text }}</div>`,
       props: {
         text: String,
-        value: String
+        value: String,
       },
       methods: {
         fireAction() {
           lastAction = this.value;
-        }
-      }
+        },
+      },
+      expose: ["fireAction"],
     });
 
-    const Foo = Vue.extend({
-      mixins: [MixinTravel],
+    const Foo = defineComponent({
       template: `
         <div role="list" @keydown="bindTravel">
           <ListItem
@@ -660,33 +647,49 @@ describe("Travel mixin", () => {
           />
         </div>
       `,
-      $travel: travelOption,
       components: { ListItem },
-      mounted() {
-        ((<Array<Vue>>this.$refs.items)[0].$el as HTMLElement).focus();
+      setup() {
+        const index = ref(0);
+        const items = ref<InstanceType<typeof ListItem>[]>([]);
+        onMounted(() => {
+          items.value[0].$el.focus();
+        });
+        const bindTravel = useTravel({
+          looped: true,
+          items,
+          index,
+          onMove(event, newIndex) {
+            event.preventDefault();
+            index.value = newIndex;
+            items.value[newIndex].$el.focus();
+          },
+          onAction(_, index, items) {
+            const item = items[index] as InstanceType<typeof ListItem>;
+            item.fireAction();
+          },
+        });
+        return {
+          items,
+          bindTravel,
+        };
       },
       props: {
-        options: Array
+        options: Array,
       },
-      data() {
-        return {
-          currentIndex: 0
-        };
-      }
     });
 
-    const wrapper: Wrapper<Vue> = mount(Foo, {
+    const wrapper = mount(Foo, {
       attachToDocument: true,
-      propsData: {
+      props: {
         options: [
           { text: "First", value: "foo" },
           { text: "Second", value: "bar" },
-          { text: "Third", value: "baz" }
-        ]
-      }
+          { text: "Third", value: "baz" },
+        ],
+      },
     });
     const document: Document | null = wrapper.element.ownerDocument;
-    const items: any = wrapper.vm.$refs.items;
+    const items = wrapper.vm.items;
     expect(document).toBeTruthy();
     expect(Array.isArray(items)).toBeTruthy();
     if (!document || !Array.isArray(items)) {
@@ -721,12 +724,12 @@ describe("Travel mixin", () => {
   });
 });
 
-describe("Id mixin", () => {
-  const Foo = Vue.extend({
+describe.todo("Id utils", () => {
+  const Foo = defineComponent({
     props: {
-      id: String
+      id: String,
     },
-    mixins: [MixinId],
+    // mixins: [MixinId],
     template: `
       <div>
         <label ref="label" :id="\`\${localId}-label\`">Username</label>
@@ -736,11 +739,11 @@ describe("Id mixin", () => {
           :aria-labelledby="\`\${localId}-label\`"
         />
       </div>
-    `
+    `,
   });
 
   it("will generate unique new ids for each component instance", () => {
-    const wrapper: Wrapper<Vue> = mount(Foo);
+    const wrapper = mount(Foo);
     const label = <HTMLElement>wrapper.vm.$refs.label;
     const input = <HTMLElement>wrapper.vm.$refs.input;
     expect(label).toBeTruthy();
@@ -759,8 +762,8 @@ describe("Id mixin", () => {
   });
 
   it("will use an id prop to assign sub ids", () => {
-    const wrapper: Wrapper<Vue> = mount(Foo, {
-      propsData: { id: "v-helloworld" }
+    const wrapper = mount(Foo, {
+      props: { id: "v-helloworld" },
     });
     const label = <HTMLElement>wrapper.vm.$refs.label;
     const input = <HTMLElement>wrapper.vm.$refs.input;
@@ -779,7 +782,7 @@ describe("Id mixin", () => {
   });
 
   it("will update localId after id prop changed", async () => {
-    const wrapper: Wrapper<Vue> = mount(Foo);
+    const wrapper = mount(Foo);
     const label = <HTMLElement>wrapper.vm.$refs.label;
     const input = <HTMLElement>wrapper.vm.$refs.input;
     expect(label).toBeTruthy();
@@ -798,17 +801,17 @@ describe("Id mixin", () => {
   });
 });
 
-describe("<VueFocusTrap> component", () => {
-  interface DialogVm extends Vue {
+describe.todo("FocusTrap utils", () => {
+  interface DialogVm extends ComponentPublicInstance {
     open(): void;
     close(autofocus: boolean): void;
   }
-  interface FooVm extends Vue {
+  interface FooVm extends ComponentPublicInstance {
     shown: boolean;
   }
 
-  it("will trap focus to a modal dialog", done => {
-    const Foo = Vue.extend({
+  it("will trap focus to a modal dialog", (done) => {
+    const Foo = defineComponent({
       template: `
         <div id="focus-trap-example">
           <button class="trigger" ref="trigger" @click="shown = true">
@@ -836,14 +839,14 @@ describe("<VueFocusTrap> component", () => {
         </div>
       `,
       components: {
-        VueFocusTrap
+        FocusTrap,
       },
       mounted() {
         (<HTMLElement>this.$refs.trigger).focus();
       },
       data() {
         return {
-          shown: false
+          shown: false,
         };
       },
       watch: {
@@ -857,7 +860,7 @@ describe("<VueFocusTrap> component", () => {
             const dialog = this.$refs.dialog;
             (<DialogVm>dialog).close(true);
           }
-        }
+        },
       },
       methods: {
         open() {
@@ -876,8 +879,8 @@ describe("<VueFocusTrap> component", () => {
           if (item) {
             (<HTMLElement>item).focus();
           }
-        }
-      }
+        },
+      },
     });
 
     // NOTICE:
@@ -885,7 +888,7 @@ describe("<VueFocusTrap> component", () => {
     // but still preserve this case.
 
     // init
-    const wrapper: Wrapper<Vue> = mount(Foo, { attachToDocument: true });
+    const wrapper = mount(Foo, { attachToDocument: true });
     const document = <HTMLDocument>wrapper.element.ownerDocument;
     expect(document).toBeTruthy();
 
@@ -931,10 +934,10 @@ describe("<VueFocusTrap> component", () => {
   });
 });
 
-describe("Shortcuts mixin", () => {
+describe.todo("Hotkey mixin", () => {
   it("will trigger a single-key shortcut", () => {
     const messages: Array<string> = [];
-    const Foo = Vue.extend({
+    const Foo = defineComponent({
       template: `
         <div>
           Please press:
@@ -942,25 +945,25 @@ describe("Shortcuts mixin", () => {
           <kbd>Window</kbd> + <kbd>G</kbd>
         </div>
       `,
-      mixins: [MixinShortcuts],
-      $shortcuts: [
-        {
-          key: "g",
-          modifiers: { meta: true },
-          handle(event: KeyboardEvent) {
-            messages.push("trigger: CMD + G");
-          }
-        }
-      ]
+      // mixins: [MixinShortcuts],
+      // $shortcuts: [
+      //   {
+      //     key: "g",
+      //     modifiers: { meta: true },
+      //     handle(event: KeyboardEvent) {
+      //       messages.push("trigger: CMD + G");
+      //     }
+      //   }
+      // ]
     });
-    const wrapper: Wrapper<Vue> = mount(Foo, {
-      attachToDocument: true
+    const wrapper = mount(Foo, {
+      attachToDocument: true,
     });
     // { key, code, ctrlKey, shiftKey, altKey, metaKey }
     expect(messages.length).toBe(0);
     wrapper.trigger("keydown", {
       key: "g",
-      code: "KeyG"
+      code: "KeyG",
     });
     expect(messages.length).toBe(0);
     wrapper.trigger("keydown", {
@@ -969,7 +972,7 @@ describe("Shortcuts mixin", () => {
       metaKey: true,
       ctrlKey: false,
       shiftKey: false,
-      altKey: false
+      altKey: false,
     });
     expect(messages.length).toBe(0);
     wrapper.trigger("keydown", {
@@ -978,7 +981,7 @@ describe("Shortcuts mixin", () => {
       metaKey: true,
       ctrlKey: true,
       shiftKey: false,
-      altKey: false
+      altKey: false,
     });
     expect(messages.length).toBe(0);
     wrapper.trigger("keydown", {
@@ -987,7 +990,7 @@ describe("Shortcuts mixin", () => {
       metaKey: true,
       ctrlKey: false,
       shiftKey: false,
-      altKey: false
+      altKey: false,
     });
     expect(messages.length).toBe(1);
     expect(messages[0]).toBe("trigger: CMD + G");
@@ -997,16 +1000,16 @@ describe("Shortcuts mixin", () => {
       metaKey: true,
       ctrlKey: false,
       shiftKey: false,
-      altKey: false
+      altKey: false,
     });
     expect(messages.length).toBe(2);
     expect(messages[1]).toBe("trigger: CMD + G");
-    wrapper.destroy();
+    wrapper.unmount();
   });
 
   it("will trigger a key seq shortcut", () => {
     const messages: Array<string> = [];
-    const Foo = Vue.extend({
+    const Foo = defineComponent({
       template: `
         <div>
           Please press:
@@ -1014,48 +1017,48 @@ describe("Shortcuts mixin", () => {
           <kbd>Window</kbd> + <kbd>G</kbd>
         </div>
       `,
-      mixins: [MixinShortcuts],
-      $shortcuts: [
-        {
-          keys: [{ key: "a" }, { key: "s" }, { key: "d" }, { key: "f" }],
-          handle(event: KeyboardEvent) {
-            messages.push("trigger: seems you are so boring");
-          }
-        }
-      ]
+      // mixins: [MixinShortcuts],
+      // $shortcuts: [
+      //   {
+      //     keys: [{ key: "a" }, { key: "s" }, { key: "d" }, { key: "f" }],
+      //     handle(event: KeyboardEvent) {
+      //       messages.push("trigger: seems you are so boring");
+      //     }
+      //   }
+      // ]
     });
-    const wrapper: Wrapper<Vue> = mount(Foo, {
-      attachToDocument: true
+    const wrapper = mount(Foo, {
+      attachToDocument: true,
     });
     // { key, code, ctrlKey, shiftKey, altKey, metaKey }
     expect(messages.length).toBe(0);
     wrapper.trigger("keydown", {
       key: "a",
-      code: "KeyA"
+      code: "KeyA",
     });
     expect(messages.length).toBe(0);
     wrapper.trigger("keydown", {
       key: "s",
-      code: "KeyS"
+      code: "KeyS",
     });
     expect(messages.length).toBe(0);
     wrapper.trigger("keydown", {
       key: "d",
-      code: "KeyD"
+      code: "KeyD",
     });
     expect(messages.length).toBe(0);
     wrapper.trigger("keydown", {
       key: "f",
-      code: "KeyF"
+      code: "KeyF",
     });
     expect(messages.length).toBe(1);
     expect(messages[0]).toBe("trigger: seems you are so boring");
-    wrapper.destroy();
+    wrapper.unmount();
   });
 
   it("will trigger a key seq shortcut which keys is declared by string array", () => {
     const messages: Array<string> = [];
-    const Foo = Vue.extend({
+    const Foo = defineComponent({
       template: `
         <div>
           Please press:
@@ -1063,99 +1066,99 @@ describe("Shortcuts mixin", () => {
           <kbd>Window</kbd> + <kbd>G</kbd>
         </div>
       `,
-      mixins: [MixinShortcuts],
-      $shortcuts: [
-        {
-          keys: ["a", "s", "d", "f"],
-          handle(event: KeyboardEvent) {
-            messages.push("trigger: seems you are so boring");
-          }
-        }
-      ]
+      // mixins: [MixinShortcuts],
+      // $shortcuts: [
+      //   {
+      //     keys: ["a", "s", "d", "f"],
+      //     handle(event: KeyboardEvent) {
+      //       messages.push("trigger: seems you are so boring");
+      //     }
+      //   }
+      // ]
     });
-    const wrapper: Wrapper<Vue> = mount(Foo, {
-      attachToDocument: true
+    const wrapper = mount(Foo, {
+      attachToDocument: true,
     });
     // { key, code, ctrlKey, shiftKey, altKey, metaKey }
     expect(messages.length).toBe(0);
     wrapper.trigger("keydown", {
       key: "a",
-      code: "KeyA"
+      code: "KeyA",
     });
     expect(messages.length).toBe(0);
     wrapper.trigger("keydown", {
       key: "s",
-      code: "KeyS"
+      code: "KeyS",
     });
     expect(messages.length).toBe(0);
     wrapper.trigger("keydown", {
       key: "d",
-      code: "KeyD"
+      code: "KeyD",
     });
     expect(messages.length).toBe(0);
     wrapper.trigger("keydown", {
       key: "f",
-      code: "KeyF"
+      code: "KeyF",
     });
     expect(messages.length).toBe(1);
     expect(messages[0]).toBe("trigger: seems you are so boring");
-    wrapper.destroy();
+    wrapper.unmount();
   });
 
   it("will trigger a key shortcut on a certain element", () => {
     const messages: Array<string> = [];
-    const Foo = Vue.extend({
+    const Foo = defineComponent({
       template: `
         <div>
           <input type="text" value="CMD + G" @keydown="bindShortcut($event, 'first')" />
           <input type="text" value="CMD + K" @keydown="bindShortcut($event, 'second')" />
         </div>
       `,
-      mixins: [MixinShortcuts],
-      $shortcuts: {
-        first: [
-          {
-            key: "g",
-            modifiers: { meta: true },
-            handle() {
-              messages.push("trigger: CMD + G");
-            }
-          }
-        ],
-        second: [
-          {
-            key: "k",
-            modifiers: { meta: true },
-            handle() {
-              messages.push("trigger: CMD + K");
-            }
-          }
-        ]
-      }
+      // mixins: [MixinShortcuts],
+      // $shortcuts: {
+      //   first: [
+      //     {
+      //       key: "g",
+      //       modifiers: { meta: true },
+      //       handle() {
+      //         messages.push("trigger: CMD + G");
+      //       }
+      //     }
+      //   ],
+      //   second: [
+      //     {
+      //       key: "k",
+      //       modifiers: { meta: true },
+      //       handle() {
+      //         messages.push("trigger: CMD + K");
+      //       }
+      //     }
+      //   ]
+      // }
     });
-    const wrapper: Wrapper<Vue> = mount(Foo, {
-      attachToDocument: true
+    const wrapper = mount(Foo, {
+      attachToDocument: true,
     });
     // { key, code, ctrlKey, shiftKey, altKey, metaKey }
     expect(messages.length).toBe(0);
     const inputs = wrapper.findAll("input");
-    inputs.at(0).trigger("keydown", { key: "g", code: "KeyG", metaKey: true });
+    inputs[0].trigger("keydown", { key: "g", code: "KeyG", metaKey: true });
     expect(messages.length).toBe(1);
     expect(messages[0]).toBe("trigger: CMD + G");
-    inputs.at(1).trigger("keydown", { key: "k", code: "KeyK", metaKey: true });
+    inputs[1].trigger("keydown", { key: "k", code: "KeyK", metaKey: true });
     expect(messages.length).toBe(2);
     expect(messages[1]).toBe("trigger: CMD + K");
-    wrapper.destroy();
+    wrapper.unmount();
   });
 });
 
-describe("<VueLive> component", () => {
+describe.todo("Live utils", () => {
   it("will generate two zero-size live regions", () => {
-    const Foo = Vue.extend({
-      template: `<VueLive>hello</VueLive>`,
-      components: { VueLive }
+    const Foo = defineComponent({
+      template: `<Live>hello</Live>`,
+      components: { Live },
     });
-    const wrapper: Wrapper<Vue> = mount(Foo);
+    const wrapper = mount(Foo);
     const childNodes = wrapper.element.childNodes;
     expect(childNodes.length).toBe(2);
     expect(childNodes[0].nodeType).toBe(wrapper.element.TEXT_NODE);
@@ -1171,54 +1174,54 @@ describe("<VueLive> component", () => {
       </div>
     `
         .split("\n")
-        .map(line => line.trim())
+        .map((line) => line.trim())
         .join("")
     );
   });
 
-  it("will provide announce method", done => {
+  it("will provide announce method", (done) => {
     let announce: Function = () => {};
-    interface InjectedVue extends Vue {
+    interface InjectedVue extends ComponentPublicInstance {
       announce: Function;
     }
-    const Foo = Vue.extend({
+    const Foo = defineComponent({
       template: `<div>hello</div>`,
       inject: ["announce"],
       created() {
         announce = (...args: []) => {
           (<InjectedVue>this).announce(...args);
         };
-      }
+      },
     });
-    const Bar = Vue.extend({
-      template: `<VueLive><Foo /></VueLive>`,
-      components: { VueLive, Foo }
+    const Bar = defineComponent({
+      template: `<Live><Foo /></Live>`,
+      components: { Live, Foo },
     });
-    const wrapper: Wrapper<Vue> = mount(Bar);
-    const logs: WrapperArray<Vue> = wrapper.findAll('[role="log"]');
-    expect(logs.at(0).text()).toBe("");
-    expect(logs.at(1).text()).toBe("");
-    expect(logs.at(2).text()).toBe("");
-    expect(logs.at(3).text()).toBe("");
+    const wrapper: VueWrapper = mount(Bar);
+    const logs = wrapper.findAll('[role="log"]');
+    expect(logs[0].text()).toBe("");
+    expect(logs[1].text()).toBe("");
+    expect(logs[2].text()).toBe("");
+    expect(logs[3].text()).toBe("");
     announce("A");
-    new Promise(resolve => {
+    new Promise((resolve) => {
       setTimeout(() => {
-        expect(logs.at(0).text()).toBe("");
-        expect(logs.at(1).text()).toBe("");
-        expect(logs.at(2).text()).toBe("A");
-        expect(logs.at(3).text()).toBe("");
+        expect(logs[0].text()).toBe("");
+        expect(logs[1].text()).toBe("");
+        expect(logs[2].text()).toBe("A");
+        expect(logs[3].text()).toBe("");
         announce("B");
         resolve(undefined);
       });
     })
       .then(
         () =>
-          new Promise(resolve => {
+          new Promise((resolve) => {
             setTimeout(() => {
-              expect(logs.at(0).text()).toBe("");
-              expect(logs.at(1).text()).toBe("");
-              expect(logs.at(2).text()).toBe("");
-              expect(logs.at(3).text()).toBe("B");
+              expect(logs[0].text()).toBe("");
+              expect(logs[1].text()).toBe("");
+              expect(logs[2].text()).toBe("");
+              expect(logs[3].text()).toBe("B");
               announce("C", true);
               resolve(undefined);
             });
@@ -1226,12 +1229,12 @@ describe("<VueLive> component", () => {
       )
       .then(
         () =>
-          new Promise(resolve => {
+          new Promise((resolve) => {
             setTimeout(() => {
-              expect(logs.at(0).text()).toBe("C");
-              expect(logs.at(1).text()).toBe("");
-              expect(logs.at(2).text()).toBe("");
-              expect(logs.at(3).text()).toBe("B");
+              expect(logs[0].text()).toBe("C");
+              expect(logs[1].text()).toBe("");
+              expect(logs[2].text()).toBe("");
+              expect(logs[3].text()).toBe("B");
               announce("D", true);
               resolve(undefined);
             });
@@ -1239,12 +1242,12 @@ describe("<VueLive> component", () => {
       )
       .then(
         () =>
-          new Promise(resolve => {
+          new Promise((resolve) => {
             setTimeout(() => {
-              expect(logs.at(0).text()).toBe("");
-              expect(logs.at(1).text()).toBe("D");
-              expect(logs.at(2).text()).toBe("");
-              expect(logs.at(3).text()).toBe("B");
+              expect(logs[0].text()).toBe("");
+              expect(logs[1].text()).toBe("D");
+              expect(logs[2].text()).toBe("");
+              expect(logs[3].text()).toBe("B");
               resolve(undefined);
               // @ts-ignore
               done();
