@@ -562,7 +562,7 @@ describe("Travel utils", () => {
           console.log("focused");
         });
         const bindTravel = useTravel({
-          looped: true,
+          loop: true,
           items,
           index,
           onMove(event, newIndex) {
@@ -655,7 +655,7 @@ describe("Travel utils", () => {
           items.value[0].$el.focus();
         });
         const bindTravel = useTravel({
-          looped: true,
+          loop: true,
           items,
           index,
           onMove(event, newIndex) {

@@ -55,7 +55,7 @@ const value = ref("");
 const travelOption: TravelConfig<HTMLElement> = {
   items,
   index,
-  looped: true,
+  loop: true,
   onMove: (event: KeyboardEvent, newIndex) => {
     event.preventDefault();
     index.value = newIndex;

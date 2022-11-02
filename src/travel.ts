@@ -11,7 +11,7 @@ export type TravelConfig<T> = {
   items: Ref<T[]>;
 
   orientation?: string;
-  looped?: boolean;
+  loop?: boolean;
 
   onAction?: TravelHandler;
   onEnter?: TravelHandler;
@@ -91,7 +91,7 @@ const prev = <T>(event: KeyboardEvent, config: TravelConfig<T>): void => {
       return;
     }
     let newIndex = index === -1 ? length - 1 : index - 1;
-    if (config.looped && index === 0) {
+    if (config.loop && index === 0) {
       newIndex = length - 1;
     }
     config.onMove(event, newIndex, index, items);
@@ -104,7 +104,7 @@ const next = <T>(event: KeyboardEvent, config: TravelConfig<T>): void => {
       return;
     }
     let newIndex = index + 1;
-    if (config.looped && newIndex === length) {
+    if (config.loop && newIndex === length) {
       newIndex = 0;
     }
     config.onMove(event, newIndex, index, items);
