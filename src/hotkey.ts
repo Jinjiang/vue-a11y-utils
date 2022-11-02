@@ -137,8 +137,7 @@ const equalsToKeyDown = (
 const MAX_KEY_SEQ_LENGTH = 32;
 
 const keySeqMap: WeakMap<EventTarget, KeyDown[]> = new WeakMap();
-
-let lastEvent: KeyboardEvent;
+const lastEventMap: WeakMap<EventTarget, KeyboardEvent> = new WeakMap();
 
 const updateKeySeq = (event: KeyboardEvent, target: EventTarget): boolean => {
   const keyDown = parseEvent(event);
@@ -146,10 +145,10 @@ const updateKeySeq = (event: KeyboardEvent, target: EventTarget): boolean => {
     return false;
   }
 
-  if (event === lastEvent) {
-    return true;
-  }
-  lastEvent = event;
+  const lastEvent = lastEventMap.get(target);
+  if (event === lastEvent) return true;
+
+  nextTick(() => lastEventMap.set(target, event));
 
   if (!keySeqMap.has(target)) {
     keySeqMap.set(target, []);
@@ -233,11 +232,14 @@ const matchHotkey = (
   if (!keySeqMap.has(target)) {
     keySeqMap.set(target, []);
   }
+
   const currentKeySeq = keySeqMap.get(target) as KeyDown[];
   const { keySeq } = config;
+
   if (!keySeq.length) {
     return false;
   }
+
   for (let index = 0; index < keySeq.length; index++) {
     if (
       !equalsToKeyDown(
@@ -282,8 +284,10 @@ export const useHotkey = (
     if (!target) {
       return;
     }
+
     // update global unique key seq
     const updated = updateKeySeq(event, target);
+
     // match shortcuts
     if (updated) {
       // check whether end rule matched
@@ -295,7 +299,7 @@ export const useHotkey = (
             // do the job and make sure whether to end the matching process
             const ended = hotkey.handler.call(null, event);
             if (ended) {
-              nextTick(() => endLastKeyDown(target, event));
+              setTimeout(() => endLastKeyDown(target, event));
             }
             return ended;
           }
