@@ -27,7 +27,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, Ref } from "vue";
+import { ref } from "vue";
 import { useTravel, TravelConfig } from "../src/index";
 
 type ExampleOption = {

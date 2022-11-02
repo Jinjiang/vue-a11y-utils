@@ -5,7 +5,6 @@ import {
   nextTick,
   onMounted,
   PropType,
-  Ref,
   ref,
 } from "vue";
 import { mount, VueWrapper } from "@vue/test-utils";
