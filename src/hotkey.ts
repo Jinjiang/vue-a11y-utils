@@ -1,6 +1,6 @@
 // KeyDown events
 
-import { onMounted, onUnmounted } from "vue";
+import { nextTick, onMounted, onUnmounted } from "vue";
 import { capitalizeFirstLetter } from "./util";
 
 // TODO
@@ -138,19 +138,29 @@ const MAX_KEY_SEQ_LENGTH = 32;
 
 const keySeqMap: WeakMap<EventTarget, KeyDown[]> = new WeakMap();
 
+let lastEvent: KeyboardEvent;
+
 const updateKeySeq = (event: KeyboardEvent, target: EventTarget): boolean => {
   const keyDown = parseEvent(event);
   if (!keyDown) {
     return false;
   }
+
+  if (event === lastEvent) {
+    return true;
+  }
+  lastEvent = event;
+
   if (!keySeqMap.has(target)) {
     keySeqMap.set(target, []);
   }
   const keySeq = keySeqMap.get(target) as KeyDown[];
+
   keySeq.push(keyDown);
   if (keySeq.length > MAX_KEY_SEQ_LENGTH) {
     keySeq.shift();
   }
+
   return true;
 };
 
@@ -232,7 +242,7 @@ const matchHotkey = (
     if (
       !equalsToKeyDown(
         currentKeySeq[currentKeySeq.length - 1 - index],
-        keySeq[currentKeySeq.length - 1 - index]
+        keySeq[keySeq.length - 1 - index]
       )
     ) {
       return false;
@@ -285,9 +295,9 @@ export const useHotkey = (
             // do the job and make sure whether to end the matching process
             const ended = hotkey.handler.call(null, event);
             if (ended) {
-              endLastKeyDown(target, event);
+              nextTick(() => endLastKeyDown(target, event));
             }
-            return keyEventIsEnded(target, event);
+            return ended;
           }
           return false;
         });

@@ -39,4 +39,12 @@ useGlobalHotkey({
     alert("You have pressed A-S-D-F. So are you boring now?");
   },
 });
+
+useGlobalHotkey({
+  key: "a",
+  modifiers: { ctrl: true },
+  handler() {
+    alert("CTRL + A");
+  },
+});
 </script>
