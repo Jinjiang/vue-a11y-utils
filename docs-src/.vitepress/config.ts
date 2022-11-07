@@ -7,7 +7,7 @@ export default {
       { text: "Home", link: "/" },
       {
         text: "Examples",
-        link: "https://jinjiang.github.io/vue-a11y-utils/examples/",
+        link: "/examples/",
       },
     ],
 
@@ -22,3 +22,14 @@ export default {
     // editLinkTest: "Help us improve this page!"
   },
 };
+
+// enhanceApp.js
+// export default ({ Vue }) => {
+//   Vue.mixin({
+//     computed: {
+//       $title() {
+//         return this.$page.title;
+//       }
+//     }
+//   });
+// };
