@@ -5,13 +5,13 @@
       <button tabindex="-1">Button can not be accessed throught TAB key</button
       ><br />
       <button tabindex="0">Normal button</button><br />
-      <button tabindex>Normal button</button><br />
+      <!-- <button tabindex>Normal button</button><br /> -->
       <button>Normal button</button><br />
       <span class="button" tabindex="-1"
         >Focusable widget which can not be accessed throught TAB key</span
       ><br />
       <span class="button" tabindex="0">Focusable widget</span><br />
-      <span class="button" tabindex>Normal text</span><br />
+      <!-- <span class="button" tabindex>Normal text</span><br /> -->
       <span>Normal text</span>
     </p>
     <h3>Using <code>ariaToAttrs(aria, role, tabindex)</code></h3>
