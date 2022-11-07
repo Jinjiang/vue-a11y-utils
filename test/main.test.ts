@@ -198,6 +198,7 @@ describe("Aria utils: v-aria directive", () => {
         aria: directiveAria,
       },
     });
+    // TODO: warning about directive on component with non-element root node
     const wrapper = mount(Foo).get("[data-v-app] > *");
     expect(wrapper.element.tagName).toBe("I");
     expect(wrapper.text()).toBe("");
@@ -593,6 +594,7 @@ describe("FocusTrap utils", () => {
 });
 
 describe("Hotkey utils", () => {
+  // TODO: global DOM event listener
   it.todo("will trigger a single-key shortcut", async () => {
     const messages: Array<string> = [];
     const Foo = defineComponent({
