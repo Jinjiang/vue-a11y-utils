@@ -24,6 +24,8 @@ const NothingHappen = defineComponent({
   template: `<slot />`,
 });
 
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 describe("Aria utils", () => {
   it("get tabindex for a role correctly", () => {
     expect(getTabindexByRole(0, "button")).toBe("0");
@@ -209,7 +211,9 @@ describe("Travel utils", () => {
     value: string;
   };
 
-  it.todo("travel through all focusable items", async () => {
+  it("travel through all focusable items", async () => {
+    // a walkaround for HTMLElement#focus() + document.activeElement
+    let currentFocus: HTMLElement | null = null;
     const Foo = defineComponent({
       template: `
         <ul @keydown="bindTravel">
@@ -226,13 +230,8 @@ describe("Travel utils", () => {
       setup() {
         const index = ref(0);
         const items = ref<HTMLElement[]>([]);
-        onMounted(async () => {
-          console.log(items.value);
-          items.value[0].focus();
-          // TODO
-          await nextTick();
-          console.log(items.value[0].ownerDocument.activeElement);
-          console.log("focused");
+        onMounted(() => {
+          currentFocus = items.value[0];
         });
         const bindTravel = useTravel({
           loop: true,
@@ -241,7 +240,7 @@ describe("Travel utils", () => {
           onMove(event, newIndex) {
             event.preventDefault();
             index.value = newIndex;
-            items.value[newIndex].focus();
+            currentFocus = items.value[newIndex];
           },
         });
         return {
@@ -265,9 +264,6 @@ describe("Travel utils", () => {
       },
     });
 
-    // TODO
-    await nextTick();
-
     const document = wrapper.element.ownerDocument;
     const items = wrapper.vm.items;
     expect(document).toBeTruthy();
@@ -275,24 +271,25 @@ describe("Travel utils", () => {
     if (!document || !Array.isArray(items)) {
       return;
     }
-    console.log(document.activeElement);
-    expect(document.activeElement).toBe(items[0]);
+
+    expect(currentFocus).toBe(items[0]);
 
     wrapper.trigger("keydown", { key: "ArrowDown" });
-    expect(document.activeElement).toBe(items[1]);
+    expect(currentFocus).toBe(items[1]);
 
     wrapper.trigger("keydown", { key: "ArrowDown" });
-    expect(document.activeElement).toBe(items[2]);
+    expect(currentFocus).toBe(items[2]);
 
     wrapper.trigger("keydown", { key: "ArrowDown" });
-    expect(document.activeElement).toBe(items[0]);
+    expect(currentFocus).toBe(items[0]);
 
     wrapper.trigger("keydown", { key: "End" });
-    expect(document.activeElement).toBe(items[2]);
+    expect(currentFocus).toBe(items[2]);
   });
 
-  it.todo("fire action when enter key down", () => {
+  it("fire action when enter key down", () => {
     let lastAction: string | undefined = "";
+    let currentFocus: HTMLElement | null = null;
 
     const ListItem = defineComponent({
       template: `<div role="listitem" tabindex="-1">{{ text }}</div>`,
@@ -325,7 +322,7 @@ describe("Travel utils", () => {
         const index = ref(0);
         const items = ref<InstanceType<typeof ListItem>[]>([]);
         onMounted(() => {
-          items.value[0].$el.focus();
+          currentFocus = items.value[0].$el;
         });
         const bindTravel = useTravel({
           loop: true,
@@ -334,7 +331,7 @@ describe("Travel utils", () => {
           onMove(event, newIndex) {
             event.preventDefault();
             index.value = newIndex;
-            items.value[newIndex].$el.focus();
+            currentFocus = items.value[newIndex].$el;
           },
           onAction(_, index, items) {
             const item = items[index] as InstanceType<typeof ListItem>;
@@ -368,31 +365,31 @@ describe("Travel utils", () => {
     if (!document || !Array.isArray(items)) {
       return;
     }
-    expect(document.activeElement).toBe(items[0].$el);
+    expect(currentFocus).toBe(items[0].$el);
     expect(lastAction).toBe("");
 
     wrapper.trigger("keydown", { key: "ArrowDown" });
-    expect(document.activeElement).toBe(items[1].$el);
+    expect(currentFocus).toBe(items[1].$el);
     expect(lastAction).toBe("");
 
     wrapper.trigger("keydown", { key: "Enter" });
-    expect(document.activeElement).toBe(items[1].$el);
+    expect(currentFocus).toBe(items[1].$el);
     expect(lastAction).toBe("bar");
 
     wrapper.trigger("keydown", { key: "ArrowDown" });
-    expect(document.activeElement).toBe(items[2].$el);
+    expect(currentFocus).toBe(items[2].$el);
     expect(lastAction).toBe("bar");
 
     wrapper.trigger("keydown", { key: "Enter" });
-    expect(document.activeElement).toBe(items[2].$el);
+    expect(currentFocus).toBe(items[2].$el);
     expect(lastAction).toBe("baz");
 
     wrapper.trigger("keydown", { key: "ArrowDown" });
-    expect(document.activeElement).toBe(items[0].$el);
+    expect(currentFocus).toBe(items[0].$el);
     expect(lastAction).toBe("baz");
 
     wrapper.trigger("keydown", { key: "End" });
-    expect(document.activeElement).toBe(items[2].$el);
+    expect(currentFocus).toBe(items[2].$el);
     expect(lastAction).toBe("baz");
   });
 });
