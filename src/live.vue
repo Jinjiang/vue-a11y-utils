@@ -31,7 +31,7 @@
 <script lang="ts">
 import { inject, InjectionKey } from "vue";
 
-export type Announce = (message: string, important: boolean) => void;
+export type Announce = (message: string, important?: boolean) => void;
 export type SetBusy = (busy: boolean) => void;
 
 const keyAnnounce: InjectionKey<Announce> = Symbol("announce");

@@ -17,7 +17,9 @@ import {
   genId,
   FocusTrap,
   // useHotkey,
+  Announce,
   Live,
+  useLive,
 } from "../src/index";
 
 const NothingHappen = defineComponent({
@@ -825,45 +827,37 @@ describe.todo("Hotkey mixin", () => {
   });
 });
 
-describe.todo("Live utils", () => {
+describe("Live utils", () => {
   it("will generate two zero-size live regions", () => {
     const Foo = defineComponent({
-      template: `<Live>hello</Live>`,
+      template: `<Live foo>hello</Live>`,
       components: { Live },
     });
     const wrapper = mount(Foo);
-    const childNodes = wrapper.element.childNodes;
-    expect(childNodes.length).toBe(2);
-    expect(childNodes[0].nodeType).toBe(wrapper.element.TEXT_NODE);
-    expect(childNodes[1].nodeName).toBe("DIV");
-    expect(wrapper.element.innerHTML).toBe(
-      `
-      hello
-      <div style="position: absolute; height: 1px; width: 1px; margin: -1px; overflow: hidden;">
-        <div role="log" aria-live="assertive" aria-busy="false"></div> 
-        <div role="log" aria-live="assertive" aria-busy="false"></div> 
-        <div role="log" aria-live="polite" aria-busy="false"></div> 
-        <div role="log" aria-live="polite" aria-busy="false"></div>
-      </div>
-    `
-        .split("\n")
-        .map((line) => line.trim())
-        .join("")
+    const root = wrapper.find("[foo]").element;
+    const children = Array.prototype.filter.call(root.childNodes, (node) => {
+      return node.nodeType === 1 || node.nodeValue.length > 0;
+    });
+    expect(children.length).toBe(2);
+    expect(children[0].nodeType).toBe(3);
+    expect(children[0].nodeValue).toBe("hello");
+    expect(children[1].nodeType).toBe(1);
+    expect(children[1].childNodes.length).toBe(4);
+    expect(children[1].querySelectorAll('[role="log"]').length).toBe(4);
+    expect(children[1].querySelectorAll('[aria-live="assertive"]').length).toBe(
+      2
     );
+    expect(children[1].querySelectorAll('[aria-live="polite"]').length).toBe(2);
   });
 
-  it("will provide announce method", (done) => {
-    let announce: Function = () => {};
-    interface InjectedVue extends ComponentPublicInstance {
-      announce: Function;
-    }
+  it("will provide announce method", async () => {
+    let announce: Announce = () => {};
+
     const Foo = defineComponent({
       template: `<div>hello</div>`,
-      inject: ["announce"],
-      created() {
-        announce = (...args: []) => {
-          (<InjectedVue>this).announce(...args);
-        };
+      setup() {
+        [announce] = useLive();
+        return { announce };
       },
     });
     const Bar = defineComponent({
@@ -876,56 +870,33 @@ describe.todo("Live utils", () => {
     expect(logs[1].text()).toBe("");
     expect(logs[2].text()).toBe("");
     expect(logs[3].text()).toBe("");
+
     announce("A");
-    new Promise((resolve) => {
-      setTimeout(() => {
-        expect(logs[0].text()).toBe("");
-        expect(logs[1].text()).toBe("");
-        expect(logs[2].text()).toBe("A");
-        expect(logs[3].text()).toBe("");
-        announce("B");
-        resolve(undefined);
-      });
-    })
-      .then(
-        () =>
-          new Promise((resolve) => {
-            setTimeout(() => {
-              expect(logs[0].text()).toBe("");
-              expect(logs[1].text()).toBe("");
-              expect(logs[2].text()).toBe("");
-              expect(logs[3].text()).toBe("B");
-              announce("C", true);
-              resolve(undefined);
-            });
-          })
-      )
-      .then(
-        () =>
-          new Promise((resolve) => {
-            setTimeout(() => {
-              expect(logs[0].text()).toBe("C");
-              expect(logs[1].text()).toBe("");
-              expect(logs[2].text()).toBe("");
-              expect(logs[3].text()).toBe("B");
-              announce("D", true);
-              resolve(undefined);
-            });
-          })
-      )
-      .then(
-        () =>
-          new Promise((resolve) => {
-            setTimeout(() => {
-              expect(logs[0].text()).toBe("");
-              expect(logs[1].text()).toBe("D");
-              expect(logs[2].text()).toBe("");
-              expect(logs[3].text()).toBe("B");
-              resolve(undefined);
-              // @ts-ignore
-              done();
-            });
-          })
-      );
+    await sleep(100);
+    expect(logs[0].text()).toBe("");
+    expect(logs[1].text()).toBe("");
+    expect(logs[2].text()).toBe("A");
+    expect(logs[3].text()).toBe("");
+
+    announce("B");
+    await sleep(100);
+    expect(logs[0].text()).toBe("");
+    expect(logs[1].text()).toBe("");
+    expect(logs[2].text()).toBe("");
+    expect(logs[3].text()).toBe("B");
+
+    announce("C", true);
+    await sleep(100);
+    expect(logs[0].text()).toBe("C");
+    expect(logs[1].text()).toBe("");
+    expect(logs[2].text()).toBe("");
+    expect(logs[3].text()).toBe("B");
+
+    announce("D", true);
+    await sleep(100);
+    expect(logs[0].text()).toBe("");
+    expect(logs[1].text()).toBe("D");
+    expect(logs[2].text()).toBe("");
+    expect(logs[3].text()).toBe("B");
   });
 });
