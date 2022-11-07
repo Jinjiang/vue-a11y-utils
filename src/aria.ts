@@ -43,9 +43,11 @@ export const ariaToAttrs = (
   if (role) {
     attrs.role = role;
   }
-  const tabIndexByRole = getTabindexByRole(tabindex, role);
-  if (tabIndexByRole) {
-    attrs.tabindex = tabIndexByRole;
+  if (typeof tabindex !== "undefined") {
+    const tabIndexByRole = getTabindexByRole(tabindex, role);
+    if (tabIndexByRole) {
+      attrs.tabindex = tabIndexByRole;
+    }
   }
   const flatAria = flattenAria(aria);
   travelAria(flatAria, (name, value) => {
