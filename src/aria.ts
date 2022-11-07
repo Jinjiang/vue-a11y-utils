@@ -6,7 +6,9 @@ export type AriaFlat = Record<string, TruthyAriaValue | undefined>;
 export type AriaAttrs = Record<string, string>;
 
 /**
- * <Foo v-aria>
+ * @deprecated
+ * @see ariaToAttrs
+ * <Foo v-aria="{...}">
  */
 export const directiveAria: Directive<any, Aria> = {
   mounted(el: HTMLElement, { value, oldValue }) {
