@@ -174,23 +174,16 @@ describe("Aria utils: v-aria directive", () => {
     });
   });
 
-  it.todo("runs on component", () => {
+  it("only runs on component with element root node", () => {
     const Foo = defineComponent({
       template: `
         <NothingHappen
           v-aria="{
-            label: 'save your changes',
-            pressed: true
+            label: 'Save Your Changes',
+            controls: 'id-of-a-textbox'
           }"
         >
-          <NothingHappen
-            v-aria="{
-              label: 'Save Your Changes',
-              controls: 'id-of-a-textbox'
-            }"
-          >
-            <i class="icon-save" role="button" />
-          </NothingHappen>
+          <i class="icon-save" role="button" />
         </NothingHappen>
       `,
       components: {
@@ -206,197 +199,6 @@ describe("Aria utils: v-aria directive", () => {
     expect(wrapper.attributes()).toEqual({
       class: "icon-save",
       role: "button",
-      "aria-label": "save your changes",
-      "aria-pressed": "true",
-      "aria-controls": "id-of-a-textbox",
-    });
-  });
-
-  // This behavior is unexpected, but it's the current behavior.
-  it.todo("runs on componeant nestedly to update", async () => {
-    const Foo = defineComponent({
-      template: `
-        <NothingHappen v-aria="outer">
-          <NothingHappen v-aria="inner">
-            <i class="icon-save" role="button" />
-          </NothingHappen>
-        </NothingHappen>
-      `,
-      components: {
-        NothingHappen,
-      },
-      directives: {
-        aria: directiveAria,
-      },
-      props: {
-        outer: Object,
-        inner: Object,
-      },
-    });
-
-    const wrapper = mount(Foo, {
-      props: {
-        outer: {
-          label: "save your changes",
-          pressed: true,
-        },
-        inner: {
-          label: "Save Your Changes",
-          controls: "id-of-a-textbox",
-        },
-      },
-    });
-    expect(wrapper.element.tagName).toBe("I");
-    expect(wrapper.text()).toBe("");
-    expect(wrapper.attributes()).toEqual({
-      class: "icon-save",
-      role: "button",
-      "aria-label": "save your changes",
-      "aria-pressed": "true",
-      "aria-controls": "id-of-a-textbox",
-    });
-
-    await wrapper.setProps({
-      outer: {
-        label: "save your changes",
-        pressed: false,
-      },
-      inner: {
-        label: "Save Your Changes",
-        controls: "id-of-a-textbox",
-      },
-    });
-    expect(wrapper.attributes()).toEqual({
-      class: "icon-save",
-      role: "button",
-      "aria-label": "Save Your Changes",
-      "aria-pressed": "false",
-      "aria-controls": "id-of-a-textbox",
-    });
-
-    await wrapper.setProps({
-      outer: {
-        pressed: false,
-      },
-      inner: {
-        label: "Save Your Changes",
-        controls: "id-of-a-textbox",
-      },
-    });
-    expect(wrapper.attributes()).toEqual({
-      class: "icon-save",
-      role: "button",
-      "aria-label": "Save Your Changes",
-      "aria-pressed": "false",
-      "aria-controls": "id-of-a-textbox",
-    });
-
-    await wrapper.setProps({
-      outer: {
-        label: "save your changes",
-        pressed: false,
-      },
-      inner: {
-        controls: "id-of-a-textbox",
-      },
-    });
-    expect(wrapper.attributes()).toEqual({
-      class: "icon-save",
-      role: "button",
-      "aria-pressed": "false",
-      "aria-controls": "id-of-a-textbox",
-    });
-  });
-
-  it.skip("runs after all parent <VueAria> components", () => {
-    const Foo = defineComponent({
-      template: `
-        <VueAria
-          role="menubutton"
-          :aria="{ pressed: true }"
-        >
-          <i
-            class="icon-save"
-            role="button"
-            v-aria="{
-              label: 'save your changes',
-              pressed: false
-            }"
-          />
-        </VueAria>
-      `,
-      components: { VueAria },
-      directives: { aria: directiveAria },
-    });
-    const wrapper = mount(Foo);
-    expect(wrapper.element.tagName).toBe("I");
-    expect(wrapper.text()).toBe("");
-    expect(wrapper.attributes()).toEqual({
-      class: "icon-save",
-      role: "menubutton",
-      "aria-label": "save your changes",
-      "aria-pressed": "false",
-    });
-
-    const Bar = defineComponent({
-      template: `
-        <VueAria
-          role="menubutton"
-          :aria="{ pressed: true }"
-          v-aria="{
-            label: 'save your changes',
-            pressed: false
-          }"
-        >
-          <i
-            class="icon-save"
-            role="button"
-          />
-        </VueAria>
-      `,
-      components: { VueAria },
-      directives: { aria: directiveAria },
-    });
-    const wrapperBar = mount(Bar);
-    expect(wrapperBar.element.tagName).toBe("I");
-    expect(wrapperBar.text()).toBe("");
-    expect(wrapperBar.attributes()).toEqual({
-      class: "icon-save",
-      role: "menubutton",
-      "aria-label": "save your changes",
-      "aria-pressed": "false",
-    });
-
-    const Baz = defineComponent({
-      template: `
-        <NothingHappen
-          v-aria="{
-            label: 'save your changes',
-            pressed: false
-          }"
-        >
-          <VueAria
-            role="menubutton"
-            :aria="{ pressed: true }"
-          >
-            <i
-              class="icon-save"
-              role="button"
-            />
-          </VueAria>
-        </NothingHappen>
-      `,
-      components: { VueAria, NothingHappen },
-      directives: { aria: directiveAria },
-    });
-    const wrapperBaz = mount(Baz);
-    expect(wrapperBaz.element.tagName).toBe("I");
-    expect(wrapperBaz.text()).toBe("");
-    expect(wrapperBaz.attributes()).toEqual({
-      class: "icon-save",
-      role: "menubutton",
-      "aria-label": "save your changes",
-      "aria-pressed": "false",
     });
   });
 });
