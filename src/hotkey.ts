@@ -199,11 +199,11 @@ export type KeyDescriptor = {
 };
 
 export type SingleHotkeyConfig = {
-  handler: Function;
+  handler: (event: KeyboardEvent) => boolean | void;
 } & KeyDescriptor;
 
 export type MultipleHotkeyConfig = {
-  handler: Function;
+  handler: (event: KeyboardEvent) => boolean | void;
   keys: Array<KeyDescriptor | string>;
 };
 

@@ -1,5 +1,5 @@
 <template>
-  <div id="key-shortcuts-example">
+  <div id="key-shortcuts-example" @keydown="wrapper">
     <p>
       Press
       <input type="text" value="CMD + G HERE" @keydown="foo" />
@@ -17,8 +17,10 @@ const foo = useHotkey([
   {
     key: "g",
     modifiers: { meta: true },
-    handler() {
-      alert("trigger: CMD + G");
+    handler(event) {
+      alert("trigger: CMD + G (and avoid wrapper trigger)");
+      event.stopPropagation();
+      return true;
     },
   },
 ]);
@@ -28,7 +30,24 @@ const bar = useHotkey([
     key: "k",
     modifiers: { meta: true },
     handler() {
-      alert("trigger: CMD + K");
+      alert("trigger: CMD + K (and trigger wrapper later)");
+    },
+  },
+]);
+
+const wrapper = useHotkey([
+  {
+    key: "g",
+    modifiers: { meta: true },
+    handler() {
+      alert("wrapper trigger: CMD + G");
+    },
+  },
+  {
+    key: "k",
+    modifiers: { meta: true },
+    handler() {
+      alert("wrapper trigger: CMD + K");
     },
   },
 ]);
