@@ -299,6 +299,7 @@ export const useHotkey = (
             // do the job and make sure whether to end the matching process
             const ended = hotkey.handler.call(null, event);
             if (ended) {
+              event.stopPropagation();
               setTimeout(() => endLastKeyDown(target, event));
             }
             return ended;

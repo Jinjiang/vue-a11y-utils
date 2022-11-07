@@ -19,8 +19,8 @@ const foo = useHotkey([
     modifiers: { meta: true },
     handler(event) {
       alert("trigger: CMD + G (and avoid wrapper trigger)");
+      // or return true;
       event.stopPropagation();
-      return true;
     },
   },
 ]);
