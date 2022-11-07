@@ -1,11 +1,11 @@
 import { describe, it, expect } from "vitest";
 import {
   ComponentPublicInstance,
-  defineComponent,
-  nextTick,
-  onMounted,
   PropType,
+  defineComponent,
+  computed,
   ref,
+  onMounted,
 } from "vue";
 import { mount, VueWrapper } from "@vue/test-utils";
 
@@ -14,7 +14,7 @@ import {
   getTabindexByRole,
   ariaToAttrs,
   useTravel,
-  // genId,
+  genId,
   FocusTrap,
   // useHotkey,
   Live,
@@ -394,12 +394,15 @@ describe("Travel utils", () => {
   });
 });
 
-describe.todo("Id utils", () => {
+describe("Id utils", () => {
   const Foo = defineComponent({
     props: {
       id: String,
     },
-    // mixins: [MixinId],
+    setup(props) {
+      const localId = computed(() => genId(props.id));
+      return { localId };
+    },
     template: `
       <div>
         <label ref="label" :id="\`\${localId}-label\`">Username</label>
@@ -425,8 +428,8 @@ describe.todo("Id utils", () => {
       const inputId = input.getAttribute("id") || "";
       const labelledby = input.getAttribute("aria-labelledby");
       expect(labelledby).toBe(labelId);
-      expect(labelId.substr(0, labelId.length - 5)).toBe(
-        inputId.substr(0, inputId.length - 5)
+      expect(labelId.slice(0, labelId.length - 5)).toBe(
+        inputId.slice(0, inputId.length - 5)
       );
     }
   });
