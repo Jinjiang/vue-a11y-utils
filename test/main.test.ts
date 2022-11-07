@@ -1,10 +1,10 @@
 import { describe, it, expect } from "vitest";
 import {
-  ComponentPublicInstance,
   PropType,
   defineComponent,
   computed,
   ref,
+  watch,
   onMounted,
 } from "vue";
 import { mount, VueWrapper } from "@vue/test-utils";
@@ -477,16 +477,8 @@ describe("Id utils", () => {
   });
 });
 
-describe.todo("FocusTrap utils", () => {
-  interface DialogVm extends ComponentPublicInstance {
-    open(): void;
-    close(autofocus: boolean): void;
-  }
-  interface FooVm extends ComponentPublicInstance {
-    shown: boolean;
-  }
-
-  it("will trap focus to a modal dialog", (done) => {
+describe("FocusTrap utils", () => {
+  it("will trap focus to a modal dialog", async () => {
     const Foo = defineComponent({
       template: `
         <div id="focus-trap-example">
@@ -494,7 +486,7 @@ describe.todo("FocusTrap utils", () => {
             Open a Modal Dialog
           </button>
           <div v-if="shown" class="dialog">
-            <VueFocusTrap
+            <FocusTrap
               ref="dialog"
               @open="open"
               @gofirst="goFirst"
@@ -509,53 +501,58 @@ describe.todo("FocusTrap utils", () => {
                 <input ref="password" type="password" />
               </label>
               <button ref="login" @click="shown = false">Login</button>
-              <button ref="cancel">Cancel</button>
-            </VueFocusTrap>
+              <button ref="cancel" @click="shown = false">Cancel</button>
+            </FocusTrap>
           </div>
         </div>
       `,
       components: {
         FocusTrap,
       },
-      mounted() {
-        (<HTMLElement>this.$refs.trigger).focus();
-      },
-      data() {
-        return {
-          shown: false,
+      setup(_, { expose }) {
+        const trigger = ref<HTMLElement>();
+        const dialog = ref<typeof FocusTrap>();
+        const email = ref<HTMLElement>();
+        const password = ref<HTMLElement>();
+        const login = ref<HTMLElement>();
+        const cancel = ref<HTMLElement>();
+
+        const shown = ref(false);
+
+        const goFirst = () => {
+          email.value?.focus();
         };
-      },
-      watch: {
-        shown(value) {
+        const goLast = () => {
+          cancel.value?.focus();
+        };
+
+        onMounted(() => {
+          trigger.value?.focus();
+        });
+
+        watch(shown, (value) => {
           if (value) {
             setTimeout(() => {
-              const dialog = this.$refs.dialog;
-              (<DialogVm>dialog).open();
+              dialog.value?.open();
             }, 100);
           } else {
-            const dialog = this.$refs.dialog;
-            (<DialogVm>dialog).close(true);
+            dialog.value?.close(true);
           }
-        },
-      },
-      methods: {
-        open() {
-          setTimeout(() => {
-            this.goFirst();
-          });
-        },
-        goFirst() {
-          const item = this.$refs.email;
-          if (item) {
-            (<HTMLElement>item).focus();
-          }
-        },
-        goLast() {
-          const item = this.$refs.cancel;
-          if (item) {
-            (<HTMLElement>item).focus();
-          }
-        },
+        });
+
+        expose({ shown });
+
+        return {
+          shown,
+          trigger,
+          dialog,
+          email,
+          password,
+          login,
+          cancel,
+          goFirst,
+          goLast,
+        };
       },
     });
 
@@ -565,48 +562,33 @@ describe.todo("FocusTrap utils", () => {
 
     // init
     const wrapper = mount(Foo, { attachToDocument: true });
-    const document = <HTMLDocument>wrapper.element.ownerDocument;
+    const document = wrapper.element.ownerDocument;
     expect(document).toBeTruthy();
 
-    const trigger = <HTMLElement>wrapper.element.querySelector(".trigger");
-    expect(trigger).toBeTruthy();
+    const trigger = wrapper.find(".trigger");
+    expect(trigger.exists()).toBeTruthy();
 
     // init state
-    expect((<FooVm>wrapper.vm).shown).toBeFalsy();
-    const dialog = <HTMLElement>wrapper.element.querySelector(".dialog");
-    expect(dialog).toBe(null);
+    expect(wrapper.vm.shown).toBeFalsy();
+    let dialog = wrapper.find(".dialog");
+    expect(dialog.exists()).toBeFalsy();
 
     // click trigger
-    trigger.click();
-    setTimeout(() => {
-      const dialog = <HTMLElement>wrapper.element.querySelector(".dialog");
-      const first = <HTMLElement>(
-        wrapper.element.querySelector('.dialog input[type="email"]')
-      );
-      const password = <HTMLElement>(
-        wrapper.element.querySelector('.dialog input[type="password"]')
-      );
-      const login = <HTMLElement>(
-        wrapper.element.querySelectorAll(".dialog button")[0]
-      );
-      const last = <HTMLElement>(
-        wrapper.element.querySelectorAll(".dialog button")[1]
-      );
-      expect(dialog).toBeTruthy();
-      expect(first).toBeTruthy();
-      expect(last).toBeTruthy();
-      expect((<FooVm>wrapper.vm).shown).toBeTruthy();
-      expect(dialog.style.display).toBe("");
-      expect(document.activeElement).toBe(first);
-      login.click();
-      setTimeout(() => {
-        const dialog = <HTMLElement>wrapper.element.querySelector(".dialog");
-        expect((<FooVm>wrapper.vm).shown).toBeFalsy();
-        expect(dialog).toBe(null);
-        // @ts-ignore
-        done();
-      }, 200);
-    }, 200);
+    await trigger.trigger("click");
+    expect(wrapper.vm.shown).toBeTruthy();
+    dialog = wrapper.find(".dialog");
+    const first = wrapper.find('.dialog input[type="email"]');
+    const [login, cancel] = wrapper.findAll(".dialog button");
+    expect(dialog.exists()).toBeTruthy();
+    expect(first.exists()).toBeTruthy();
+    expect(cancel.exists()).toBeTruthy();
+    expect(dialog.isVisible()).toBeTruthy();
+    // TODO: check focus
+    // expect(document.activeElement).toBe(first.element);
+    await login.trigger("click");
+    dialog = wrapper.find(".dialog");
+    expect(wrapper.vm.shown).toBeFalsy();
+    expect(dialog.exists()).toBeFalsy();
   });
 });
 
