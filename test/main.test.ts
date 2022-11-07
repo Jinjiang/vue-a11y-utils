@@ -16,7 +16,8 @@ import {
   useTravel,
   genId,
   FocusTrap,
-  // useHotkey,
+  useHotkey,
+  useGlobalHotkey,
   Announce,
   Live,
   useLive,
@@ -609,8 +610,8 @@ describe.todo("FocusTrap utils", () => {
   });
 });
 
-describe.todo("Hotkey mixin", () => {
-  it("will trigger a single-key shortcut", () => {
+describe("Hotkey utils", () => {
+  it.todo("will trigger a single-key shortcut", async () => {
     const messages: Array<string> = [];
     const Foo = defineComponent({
       template: `
@@ -620,28 +621,27 @@ describe.todo("Hotkey mixin", () => {
           <kbd>Window</kbd> + <kbd>G</kbd>
         </div>
       `,
-      // mixins: [MixinShortcuts],
-      // $shortcuts: [
-      //   {
-      //     key: "g",
-      //     modifiers: { meta: true },
-      //     handle(event: KeyboardEvent) {
-      //       messages.push("trigger: CMD + G");
-      //     }
-      //   }
-      // ]
+      setup() {
+        useGlobalHotkey({
+          key: "g",
+          modifiers: { meta: true },
+          handler() {
+            messages.push("trigger: CMD + G");
+          },
+        });
+      },
     });
     const wrapper = mount(Foo, {
       attachToDocument: true,
     });
     // { key, code, ctrlKey, shiftKey, altKey, metaKey }
     expect(messages.length).toBe(0);
-    wrapper.trigger("keydown", {
+    await wrapper.trigger("keydown", {
       key: "g",
       code: "KeyG",
     });
     expect(messages.length).toBe(0);
-    wrapper.trigger("keydown", {
+    await wrapper.trigger("keydown", {
       key: "F",
       code: "KeyF",
       metaKey: true,
@@ -650,7 +650,7 @@ describe.todo("Hotkey mixin", () => {
       altKey: false,
     });
     expect(messages.length).toBe(0);
-    wrapper.trigger("keydown", {
+    await wrapper.trigger("keydown", {
       key: "G",
       code: "KeyG",
       metaKey: true,
@@ -659,7 +659,7 @@ describe.todo("Hotkey mixin", () => {
       altKey: false,
     });
     expect(messages.length).toBe(0);
-    wrapper.trigger("keydown", {
+    await wrapper.trigger("keydown", {
       key: "g",
       code: "KeyG",
       metaKey: true,
@@ -669,7 +669,7 @@ describe.todo("Hotkey mixin", () => {
     });
     expect(messages.length).toBe(1);
     expect(messages[0]).toBe("trigger: CMD + G");
-    wrapper.trigger("keydown", {
+    await wrapper.trigger("keydown", {
       key: "G",
       code: "KeyG",
       metaKey: true,
@@ -682,7 +682,7 @@ describe.todo("Hotkey mixin", () => {
     wrapper.unmount();
   });
 
-  it("will trigger a key seq shortcut", () => {
+  it.todo("will trigger a key seq shortcut", async () => {
     const messages: Array<string> = [];
     const Foo = defineComponent({
       template: `
@@ -692,37 +692,36 @@ describe.todo("Hotkey mixin", () => {
           <kbd>Window</kbd> + <kbd>G</kbd>
         </div>
       `,
-      // mixins: [MixinShortcuts],
-      // $shortcuts: [
-      //   {
-      //     keys: [{ key: "a" }, { key: "s" }, { key: "d" }, { key: "f" }],
-      //     handle(event: KeyboardEvent) {
-      //       messages.push("trigger: seems you are so boring");
-      //     }
-      //   }
-      // ]
+      setup() {
+        useGlobalHotkey({
+          keys: [{ key: "a" }, { key: "s" }, { key: "d" }, { key: "f" }],
+          handler(event: KeyboardEvent) {
+            messages.push("trigger: seems you are so boring");
+          },
+        });
+      },
     });
     const wrapper = mount(Foo, {
       attachToDocument: true,
     });
     // { key, code, ctrlKey, shiftKey, altKey, metaKey }
     expect(messages.length).toBe(0);
-    wrapper.trigger("keydown", {
+    await wrapper.trigger("keydown", {
       key: "a",
       code: "KeyA",
     });
     expect(messages.length).toBe(0);
-    wrapper.trigger("keydown", {
+    await wrapper.trigger("keydown", {
       key: "s",
       code: "KeyS",
     });
     expect(messages.length).toBe(0);
-    wrapper.trigger("keydown", {
+    await wrapper.trigger("keydown", {
       key: "d",
       code: "KeyD",
     });
     expect(messages.length).toBe(0);
-    wrapper.trigger("keydown", {
+    await wrapper.trigger("keydown", {
       key: "f",
       code: "KeyF",
     });
@@ -731,85 +730,83 @@ describe.todo("Hotkey mixin", () => {
     wrapper.unmount();
   });
 
-  it("will trigger a key seq shortcut which keys is declared by string array", () => {
-    const messages: Array<string> = [];
-    const Foo = defineComponent({
-      template: `
+  it.todo(
+    "will trigger a key seq shortcut which keys is declared by string array",
+    async () => {
+      const messages: Array<string> = [];
+      const Foo = defineComponent({
+        template: `
         <div>
           Please press:
           <kbd>CMD</kbd> + <kbd>G</kbd> or
           <kbd>Window</kbd> + <kbd>G</kbd>
         </div>
       `,
-      // mixins: [MixinShortcuts],
-      // $shortcuts: [
-      //   {
-      //     keys: ["a", "s", "d", "f"],
-      //     handle(event: KeyboardEvent) {
-      //       messages.push("trigger: seems you are so boring");
-      //     }
-      //   }
-      // ]
-    });
-    const wrapper = mount(Foo, {
-      attachToDocument: true,
-    });
-    // { key, code, ctrlKey, shiftKey, altKey, metaKey }
-    expect(messages.length).toBe(0);
-    wrapper.trigger("keydown", {
-      key: "a",
-      code: "KeyA",
-    });
-    expect(messages.length).toBe(0);
-    wrapper.trigger("keydown", {
-      key: "s",
-      code: "KeyS",
-    });
-    expect(messages.length).toBe(0);
-    wrapper.trigger("keydown", {
-      key: "d",
-      code: "KeyD",
-    });
-    expect(messages.length).toBe(0);
-    wrapper.trigger("keydown", {
-      key: "f",
-      code: "KeyF",
-    });
-    expect(messages.length).toBe(1);
-    expect(messages[0]).toBe("trigger: seems you are so boring");
-    wrapper.unmount();
-  });
+        setup() {
+          useGlobalHotkey({
+            keys: ["a", "s", "d", "f"],
+            handler(event: KeyboardEvent) {
+              messages.push("trigger: seems you are so boring");
+            },
+          });
+        },
+      });
+      const wrapper = mount(Foo, {
+        attachToDocument: true,
+      });
+      // { key, code, ctrlKey, shiftKey, altKey, metaKey }
+      expect(messages.length).toBe(0);
+      await wrapper.trigger("keydown", {
+        key: "a",
+        code: "KeyA",
+      });
+      expect(messages.length).toBe(0);
+      await wrapper.trigger("keydown", {
+        key: "s",
+        code: "KeyS",
+      });
+      expect(messages.length).toBe(0);
+      await wrapper.trigger("keydown", {
+        key: "d",
+        code: "KeyD",
+      });
+      expect(messages.length).toBe(0);
+      await wrapper.trigger("keydown", {
+        key: "f",
+        code: "KeyF",
+      });
+      expect(messages.length).toBe(1);
+      expect(messages[0]).toBe("trigger: seems you are so boring");
+      wrapper.unmount();
+    }
+  );
 
-  it("will trigger a key shortcut on a certain element", () => {
+  it("will trigger a key shortcut on a certain element", async () => {
     const messages: Array<string> = [];
     const Foo = defineComponent({
       template: `
         <div>
-          <input type="text" value="CMD + G" @keydown="bindShortcut($event, 'first')" />
-          <input type="text" value="CMD + K" @keydown="bindShortcut($event, 'second')" />
+          <input type="text" value="CMD + G" @keydown="bindFirst" />
+          <input type="text" value="CMD + K" @keydown="bindSecond" />
         </div>
       `,
-      // mixins: [MixinShortcuts],
-      // $shortcuts: {
-      //   first: [
-      //     {
-      //       key: "g",
-      //       modifiers: { meta: true },
-      //       handle() {
-      //         messages.push("trigger: CMD + G");
-      //       }
-      //     }
-      //   ],
-      //   second: [
-      //     {
-      //       key: "k",
-      //       modifiers: { meta: true },
-      //       handle() {
-      //         messages.push("trigger: CMD + K");
-      //       }
-      //     }
-      //   ]
-      // }
+      setup() {
+        const bindFirst = useHotkey({
+          key: "g",
+          modifiers: { meta: true },
+          handler() {
+            messages.push("trigger: CMD + G");
+          },
+        });
+        const bindSecond = useHotkey({
+          key: "k",
+          modifiers: { meta: true },
+          handler() {
+            messages.push("trigger: CMD + K");
+          },
+        });
+        return { bindFirst, bindSecond };
+      },
     });
     const wrapper = mount(Foo, {
       attachToDocument: true,
@@ -817,10 +814,18 @@ describe.todo("Hotkey mixin", () => {
     // { key, code, ctrlKey, shiftKey, altKey, metaKey }
     expect(messages.length).toBe(0);
     const inputs = wrapper.findAll("input");
-    inputs[0].trigger("keydown", { key: "g", code: "KeyG", metaKey: true });
+    await inputs[0].trigger("keydown", {
+      key: "g",
+      code: "KeyG",
+      metaKey: true,
+    });
     expect(messages.length).toBe(1);
     expect(messages[0]).toBe("trigger: CMD + G");
-    inputs[1].trigger("keydown", { key: "k", code: "KeyK", metaKey: true });
+    await inputs[1].trigger("keydown", {
+      key: "k",
+      code: "KeyK",
+      metaKey: true,
+    });
     expect(messages.length).toBe(2);
     expect(messages[1]).toBe("trigger: CMD + K");
     wrapper.unmount();
