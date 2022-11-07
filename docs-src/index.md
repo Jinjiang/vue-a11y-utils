@@ -121,13 +121,15 @@ yarn add vue-a11y-utils
 ```js
 // choose the utils you need
 import {
-  VueAria,
-  directiveAria,
-  MixinTravel,
-  MixinId,
-  VueFocusTrap,
-  MixinShortcuts,
-  VueLive
+  ariaToAttrs,
+  getTabindexByRole,
+  Live,
+  useLive,
+  FocusTrap,
+  genId,
+  useTravel,
+  useHotkey,
+  useGlobalHotkey,
 } from "vue-a11y-utils";
 ```
 

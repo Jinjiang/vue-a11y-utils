@@ -28,8 +28,8 @@
     "ci": "vitest run",
     "examples:build": "vite build",
     "examples:preview": "vite preview",
-    "docs": "vuepress dev docs-src",
-    "docs:build": "vuepress build docs-src -d docs && vite build"
+    "docs": "vitepress dev docs-src",
+    "docs:build": "vitepress build docs-src -d docs && vite build"
   },
   "repository": {
     "type": "git",
@@ -56,6 +56,7 @@
     "pretty-quick": "^1.11.1",
     "typescript": "^4.8.4",
     "vite": "^3.2.3",
+    "vitepress": "1.0.0-alpha.27",
     "vitest": "^0.24.5",
     "vue": "^3.2.41",
     "vue-tsc": "^1.0.9",
