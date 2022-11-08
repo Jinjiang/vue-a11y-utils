@@ -154,9 +154,11 @@ For user interactions, it also accepts `onEnter()`, `onSpace()`, and `onEsc()`. 
 For example:
 
 ```ts
+import { TravelConfig, useTravel } from "vue-a11y-utils";
+
 const items = ref<HTMLElement[]>([]);
 const index = ref(-1);
-const value = ref("");
+const output = ref("");
 
 const travelOption: TravelConfig<HTMLElement> = {
   items,
@@ -166,7 +168,7 @@ const travelOption: TravelConfig<HTMLElement> = {
     items.value[newIndex].focus();
   },
   onAction: (_: KeyboardEvent, index) => {
-    value.value = options[index].value;
+    output.value = options[index].value;
   },
 };
 
@@ -186,6 +188,7 @@ at the same time, set the template as:
     {{ option.text }}
   </li>
 </ul>
+<p>Output: {{ output }}</p>
 ```
 
 See the full example in file `./examples/travel.vue`.
@@ -248,6 +251,141 @@ const useTravel = <T>(
 </details>
 
 ### Hotkey utils
+
+We provide a composable named `useHotkey(config)` which returns a handler for hotkey bindings.
+
+The `config` accepts a key, a key combination, a sequence of keys to handle, or an array of them above. At the same time, it accepts a `handler`.
+
+The return value of this composable is a event handler that you can bind into a certain element in your Vue template.
+
+For example:
+
+```ts
+import { HotkeyConfig, useHotkey } from "vue-a11y-utils";
+
+const config: HotkeyConfig = {
+  key: "g",
+  modifiers: { meta: true },
+  handler() {
+    alert("trigger: CMD + G");
+  },
+};
+
+const bindHotkey = useHotkey(config);
+```
+
+at the same time, set the template as:
+
+```html
+<input type="text" value="CMD + G HERE" @keydown="bindHotkey" />
+```
+
+See the full example in file `./examples/hotkey.vue`.
+
+We also provide another composable named `useGlobalHotkey(config)`, the only difference from `useHotkey(config)` is it doesn't return any event handler to bind because the event handler will be automatically attached on the document when the component is mounted, and unattached when the component is unmounted.
+
+For example:
+
+```ts
+import { useGlobalHotkey } from "vue-a11y-utils";
+
+useGlobalHotkey({
+  key: "a",
+  modifiers: { ctrl: true },
+  handler() {
+    alert("CTRL + A");
+  },
+});
+```
+
+#### Advanced config
+
+You can set a sequence of keys like:
+
+```ts
+useGlobalHotkey({
+  keys: ["a", "s", "d", "f"],
+  handler() {
+    alert("You have pressed A-S-D-F. So are you boring now?");
+  },
+});
+```
+
+You can set multiple hotkeys in an array like:
+
+```ts
+useGlobalHotkey([
+  {
+    key: "g",
+    modifiers: { meta: true },
+    handler() {
+      alert("wrapper trigger: CMD + G");
+    },
+  },
+  {
+    key: "k",
+    modifiers: { meta: true },
+    handler() {
+      alert("wrapper trigger: CMD + K");
+    },
+  },
+]);
+```
+
+For `key` name, it can be:
+
+- `a-z`
+- `0-9`
+- `up` | `down` | `left` | `right` | `home` | `end` | `pagedown` | `pageup`
+- other `code` in a `KeyboardEvent`
+
+For key `modifiers`, it can be:
+
+- `ctrl`
+- `shift`
+- `alt` | `option`
+- `cmd` | `meta` | `window`
+
+**The full type declaration is below:**
+
+<details>
+
+```ts
+export type KeyModifiers = {
+  ctrl?: boolean;
+  shift?: boolean;
+  alt?: boolean;
+  meta?: boolean;
+  window?: boolean;
+  cmd?: boolean;
+  option?: boolean;
+};
+
+export type KeyDescriptor = {
+  key: string;
+  modifiers?: KeyModifiers;
+};
+
+export type SingleHotkeyConfig = {
+  handler: (event: KeyboardEvent) => boolean | void;
+} & KeyDescriptor;
+
+export type MultipleHotkeyConfig = {
+  handler: (event: KeyboardEvent) => boolean | void;
+  keys: Array<KeyDescriptor | string>;
+};
+
+export type HotkeyConfig =
+  | SingleHotkeyConfig
+  | MultipleHotkeyConfig
+  | Array<SingleHotkeyConfig | MultipleHotkeyConfig>;
+
+const useHotkey = (config: HotkeyConfig): ((event: KeyboardEvent) => void)
+
+const useGlobalHotkey = (config: HotkeyConfig): void
+```
+
+</details>
 
 ### Focus trap utils
 
