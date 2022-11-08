@@ -104,6 +104,8 @@ So that's why **Vue A11y Utils** is trying to supply a group of utilities to hel
 
 ## Getting Started
 
+This guide is for Vue 3.x. If you are using Vue 2.x, please refer to this [doc](./for-vue2.md).
+
 ### Install
 
 ```bash
