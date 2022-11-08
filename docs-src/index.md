@@ -160,14 +160,12 @@ const items = ref<HTMLElement[]>([]);
 const index = ref(-1);
 const output = ref("");
 
-const travelOption: TravelConfig<HTMLElement> = {
-  items,
-  index,
-  onMove: (_: KeyboardEvent, newIndex) => {
-    index.value = newIndex;
-    items.value[newIndex].focus();
-  },
-  onAction: (_: KeyboardEvent, index) => {
+const travelOption: TravelConfig = {
+  itemsex,
+  : (_: KeyboardEvent, newIndex) => {
+    ivalue = newIndex;
+   value[newIndex].focus();
+  }, (_: KeyboardEvent, index) => {
     output.value = options[index].value;
   },
 };
@@ -389,11 +387,176 @@ const useGlobalHotkey = (config: HotkeyConfig): void
 
 ### Focus trap utils
 
+Usually, when you have a modal dialog in your Vue app, you should keep the focus always in it whatever you navigate by touch, mouse or keyboard.
+
+`<FocusTrap>` gives you a easy way to wrap a modal content in a focus trap which supports two events: `gofirst` and `golast`, which is able to reset the focus to the first or the last focusable element in it.
+
+But there must always be at most one focus in the whole Vue app, so by default all the `<FocusTrap>` instances would be disabled by default. To move the focus from one trap to another, you need instance methods:
+
+- `open()`: enable the current focus trap and push the previous focus trap in an "focus stack" internally. At the same time, save the previous focused element, and then emit a `open` event.
+- `replace()`: enable the current focus trap and replace the last focus trap in the "focus stack" with the current one. At the same time, save the previous focused element, and then emit a `open` event.
+- `close(returnFocus)`: disable the current focus trap and enable the last focus trap in the "focus stack". Also you can determine whether auto-focus the previous focused element in that focus trap. And then emit a `open(prevTraget)` event with the previous focused element whatever you determined.
+
+For example:
+
+In this example below, after you open the modal dialog by click the trigger button, the focus will always be in one of the 4 control elements in `<form>`, whatever you press <kbd>tab</kbd>, <kbd>tab</kbd> + <kbd>shift</kbd> or click somewhere out of the dialog:
+
+```vue
+<template>
+  <div>
+    <button ref="trigger" @click="shown = true">Open a Modal Dialog</button>
+    <form class="dialog" v-show="shown">
+      <FocusTrap ref="dialog" @open="open" @gofirst="goFirst" @golast="goLast">
+        <label>Email: <input ref="email" type="email" /></label>
+        <label>Password: <input ref="password" type="password" /></label>
+        <button ref="login" @click="shown = false">Login</button>
+        <button ref="cancel" @click="shown = false">Cancel</button>
+      </FocusTrap>
+    </form>
+  </div>
+</template>
+
+<script setup>
+import { onMounted, ref, watch } from "vue";
+import { FocusTrap } from "vue-a11y-utils";
+
+const trigger = ref();
+const dialog = ref();
+const email = ref();
+const password = ref();
+const login = ref();
+const cancel = ref();
+
+const shown = ref(false);
+
+const goFirst = (): void => {
+  email.value?.focus();
+};
+const goLast = (): void => {
+  cancel.value?.focus();
+};
+
+onMounted(() => {
+  trigger.value?.focus();
+});
+
+watch(shown, (value) => {
+  if (value) {
+    setTimeout(() => {
+      dialog.value?.open();
+    }, 100);
+  } else {
+    dialog.value?.close(true);
+  }
+});
+</script>
+```
+
+::: tip
+Notice that for browser compatibility, please take an about >50ms timeout before focus the modal dialog after its `v-if` or `v-show` directive set truthy.
+:::
+
+#### Methods
+
+- `open()`
+- `replace()`
+- `close(returnFocus: boolean)`
+
+#### Slots
+
+- default slot: the content you would trap focus in.
+
+#### Events
+
+- `open(prevTarget: HTMLElement | null)`: when it is enabled
+- `gofirst()`: when you should manually set focus to the first focusable element
+- `golast()`: when you should manually set focus to the last focusable element
+
 ### Id utils
 
 ### Aria utils
 
 ### Live utils
+
+_inspired from [react-aria-live](https://github.com/AlmeroSteyn/react-aria-live) by AlmeroSteyn_
+
+This component is actually a wrapper which generates a invisible [WAI-ARIA live region](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Live_Regions) and provides a default slot which injects some methods to announce live messages on its descendant components.
+
+For example:
+
+- `App.vue`:
+
+  ```vue
+  <template>
+    <VueLive>
+      <Foo />
+    </VueLive>
+  </template>
+
+  <script setup>
+  import { VueLive } from "vue-a11y-utils";
+  </script>
+  ```
+
+- `Foo.vue`:
+
+  ```vue
+  <template>
+    <div>
+      Message: <input type="text" v-model="message" />
+      <button @click="announce(message)">Announce</button>
+    </div>
+  </template>
+
+  <script setup>
+  import { ref } from "vue";
+  import { useLive } from "vue-a11y-utils";
+  const message = ref("");
+  const [announce] = useLive();
+  </script>
+  ```
+
+Now, if you enable VoiceOver or other a11y screen readers, there will be a live message announced when you input some text in the textbox and press the "announce" button.
+
+The injected method `announce(message)` could announce live message to the screen reader.
+
+But by default the live message will be announced "politely" after other voices spoken. If you want to announce the message immediately, you can pass a second parameter with a truthy value:
+
+```vue
+<template>
+  <div>
+    Message: <input type="text" v-model="message" />
+    <input type="checkbox" v-model="immediately" />: immediately
+    <button @click="announce(message, immediately)">Announce</button>
+  </div>
+</template>
+
+<script setup>
+import { ref } from "vue";
+import { useLive } from "vue-a11y-utils";
+const message = ref("");
+const immediately = ref(false);
+const [announce] = useLive();
+</script>
+```
+
+#### Props
+
+- `role: string`: `"log"` by default, you can also choose other [live region roles](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Live_Regions#Preferring_Specialized_Live_Region_Roles)
+- `label: string`: the label of the live region
+
+#### Slots
+
+- default slot: the content you would wrap.
+
+#### `useLive()`
+
+It returns 2 methods in sequence:
+
+- `announce(message: string, immediately: boolean)`: announce message to screen reader
+  - `message`: the message text would be announced
+  - `immediately`: whether announce immediately or "politely"
+- `isBusy(busy: boolean)` if you set it `true`, only the last message you send during that time would be announced after you set it `false` later. _(experimental, not sure screen readers support that well)_
 
 ## Further resources
 
