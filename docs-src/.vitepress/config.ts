@@ -1,5 +1,6 @@
 export default {
   base: "/vue-a11y-utils/",
+  outDir: "../docs",
   title: "Vue A11y Utils",
   titleTemplate: false,
   description: "Utilities for accessibility (a11y) in Vue.js",
@@ -9,7 +10,7 @@ export default {
       { text: "For Vue 2", link: "/for-vue2" },
       {
         text: "Examples",
-        link: "/examples/",
+        link: "https://jinjiang.dev/vue-a11y-utils/examples/",
       },
     ],
     socialLinks: [

@@ -29,7 +29,8 @@
     "examples:build": "vite build",
     "examples:preview": "vite preview",
     "docs": "vitepress dev docs-src",
-    "docs:build": "vitepress build docs-src -d docs && vite build"
+    "docs:build": "vitepress build docs-src -d docs && vite build",
+    "docs:preview": "vitepress serve docs-src"
   },
   "repository": {
     "type": "git",
