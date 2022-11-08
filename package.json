@@ -1,6 +1,6 @@
 {
   "name": "vue-a11y-utils",
-  "version": "0.9.0-beta3",
+  "version": "0.9.0",
   "description": "Utilities for accessibility (a11y) in Vue.js",
   "type": "module",
   "main": "./dist/vue-a11y-utils.umd.cjs",
