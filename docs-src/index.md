@@ -147,9 +147,7 @@ See the docs below or preview some [examples](https://github.com/Jinjiang/vue-a1
 
 For more complicated examples, there is another repo in [`Jinjiang/vue-a11y-examples`](https://github.com/Jinjiang/vue-a11y-examples/) you can [preview online](https://jinjiang.github.io/vue-a11y-examples/). (currently based on v0.8.x and below)
 
-## APIs
-
-### Keyboard travel utils
+## Keyboard travel utils
 
 We provide a composable named `useTravel(config)` to help you use <kbd>Arrow</kbd> keys to travel through a group of focusable items or descendants. At the same time we support you fire some common actions by pressing <kbd>ENTER</kbd>, <kbd>SPACE</kbd> or <kbd>ESC</kbd> key.
 
@@ -199,7 +197,7 @@ at the same time, set the template as:
 
 See the full example in file `./examples/travel.vue`.
 
-#### Advanced config
+### Advanced config
 
 - `orientation: "horizontal" | "vertical"`: which pair of <kbd>Arrow</kbd> keys would be listened. The default value is `"vertical"` as <kbd>ArrowUp and ArrowDown</kbd>.
 - `loop: Boolean`: whether the travel is in loop mode.
@@ -256,7 +254,7 @@ const useTravel = <T>(
 
 </details>
 
-### Hotkey utils
+## Hotkey utils
 
 We provide a composable named `useHotkey(config)` which returns a handler for hotkey bindings.
 
@@ -302,7 +300,7 @@ useGlobalHotkey({
 });
 ```
 
-#### Advanced config
+### Advanced config
 
 You can set a sequence of keys like:
 
@@ -393,7 +391,7 @@ const useGlobalHotkey = (config: HotkeyConfig): void
 
 See the full example in file `./examples/hotkey.vue`.
 
-### Focus trap utils
+## Focus trap utils
 
 Usually, when you have a modal dialog in your Vue app, you should keep the focus always in it whatever you navigate by touch, mouse or keyboard.
 
@@ -464,17 +462,17 @@ watch(shown, (value) => {
 Notice that for browser compatibility, please take an about >50ms timeout before focus the modal dialog after its `v-if` or `v-show` directive set truthy.
 :::
 
-#### Methods
+### Methods
 
 - `open()`
 - `replace()`
 - `close(returnFocus: boolean)`
 
-#### Slots
+### Slots
 
 - default slot: the content you would trap focus in.
 
-#### Events
+### Events
 
 - `open(prevTarget: HTMLElement | null)`: when it is enabled
 - `gofirst()`: when you should manually set focus to the first focusable element
@@ -482,7 +480,7 @@ Notice that for browser compatibility, please take an about >50ms timeout before
 
 See the full example in file `./examples/focus-trap.vue`.
 
-### Id utils
+## Id utils
 
 - `useId(content?: string)`: returns a local ID for template.
 
@@ -548,7 +546,7 @@ Then the final generated DOM tree will be:
 
 See the full example in file `./examples/id.vue` and `./examples/id-input.vue`.
 
-### Aria utils
+## Aria utils
 
 We provide some composables to help you write, `tabindex`, `role` and `aria-*` attributes likely in a better way.
 
@@ -584,7 +582,7 @@ We also provide another simple composable named `getTabindexByRole(tabindex: num
 
 See the full example in file `./examples/aria.vue`.
 
-### Live utils
+## Live utils
 
 _inspired from [react-aria-live](https://github.com/AlmeroSteyn/react-aria-live) by AlmeroSteyn_
 
@@ -648,16 +646,16 @@ const [announce] = useLive();
 </script>
 ```
 
-#### Props
+### Props
 
 - `role: string`: `"log"` by default, you can also choose other [live region roles](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Live_Regions#Preferring_Specialized_Live_Region_Roles)
 - `label: string`: the label of the live region
 
-#### Slots
+### Slots
 
 - default slot: the content you would wrap.
 
-#### `useLive()`
+### `useLive()`
 
 It returns 2 methods in sequence:
 

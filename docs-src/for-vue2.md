@@ -1,5 +1,7 @@
 # Vue A11y Utils for Vue 2.x
 
+This guide is for Vue 2.x. If you are using Vue 3.x, please refer to this [doc](./index.md).
+
 ## Install
 
 ```bash
