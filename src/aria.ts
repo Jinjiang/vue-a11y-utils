@@ -1,92 +1,70 @@
-import Vue, { CreateElement, VNode, VNodeData, DirectiveOptions } from "vue";
+import { Directive } from "vue";
 
-export interface VueAriaProps {
-  role: string;
-  aria: Record<string, string> | string[];
-  tabindex: number;
-}
-
-export const VueAria = Vue.extend({
-  props: {
-    role: String,
-    aria: [Object, Array],
-    tabindex: Number
-  },
-  render(h: CreateElement): VNode | undefined {
-    const { role, aria, tabindex } = this;
-    const rootVNode = this.$slots.default && this.$slots.default[0];
-    if (rootVNode) {
-      if (!rootVNode.data) {
-        rootVNode.data = {};
-      }
-      if (!rootVNode.data.attrs) {
-        rootVNode.data.attrs = {};
-      }
-      const attrs = rootVNode.data.attrs;
-
-      // set `role`
-      if (role) {
-        attrs.role = role;
-      }
-
-      // set `tabindex`
-      mergeTabindexToVNode(attrs, tabindex);
-
-      // set `aria-*`
-      mergeAriaAttrsToVNode(attrs, aria);
-    }
-    return rootVNode;
-  }
-});
+export type TruthyAriaValue = string | number | boolean | string[];
+export type Aria = AriaFlat | AriaFlat[];
+export type AriaFlat = Record<string, TruthyAriaValue | undefined>;
+export type AriaAttrs = Record<string, string>;
 
 /**
- * <Foo v-aria>
+ * @deprecated
+ * @see ariaToAttrs
+ * <Foo v-aria="{...}">
  */
-export const directiveAria: DirectiveOptions = {
-  inserted(el: HTMLElement, { value, oldValue }) {
-    mergeAriaAttrsToElement(el, value, oldValue);
+export const directiveAria: Directive<any, Aria> = {
+  mounted(el: HTMLElement, { value, oldValue }) {
+    mergeAriaAttrsToElement(el, value, oldValue || {});
   },
-  update(el: HTMLElement, { value, oldValue }) {
-    mergeAriaAttrsToElement(el, value, oldValue);
+  updated(el: HTMLElement, { value, oldValue }) {
+    mergeAriaAttrsToElement(el, value, oldValue || {});
+  },
+};
+
+/**
+ * Ignore tabindex for non-functional roles.
+ */
+export const getTabindexByRole = (
+  tabindex: number | undefined,
+  role?: string
+): string => {
+  const isAppearance: boolean = role === "none" || role === "appearance";
+  if (isAppearance || typeof tabindex === "undefined" || isNaN(tabindex)) {
+    return "-1";
   }
+  return tabindex.toString();
+};
+
+/**
+ * Convert aria, tabindex, and role into final attributes.
+ */
+export const ariaToAttrs = (
+  aria: Aria,
+  role?: string,
+  tabindex?: number
+): AriaAttrs => {
+  const attrs: AriaAttrs = {};
+  if (role) {
+    attrs.role = role;
+  }
+  if (typeof tabindex !== "undefined") {
+    const tabIndexByRole = getTabindexByRole(tabindex, role);
+    if (tabIndexByRole) {
+      attrs.tabindex = tabIndexByRole;
+    }
+  }
+  const flatAria = flattenAria(aria);
+  travelAria(flatAria, (name, value) => {
+    attrs[name] = value;
+  });
+  return attrs;
 };
 
 // merging functions
 
-function mergeTabindexToVNode(
-  attrs: VNodeData["attrs"],
-  tabindex: number
-): void {
-  if (attrs) {
-    const isAppearance: boolean =
-      attrs.role === "none" || attrs.role === "appearance";
-    if (typeof tabindex !== "number" || isNaN(tabindex)) {
-      // no value passed in
-      if (isAppearance) {
-        attrs.tabindex = "";
-      }
-    } else {
-      // a number passed in
-      attrs.tabindex = tabindex.toString();
-    }
-  }
-}
-
-function mergeAriaAttrsToVNode(attrs: VNodeData["attrs"], aria: any): void {
-  if (attrs) {
-    const flatAria = flattenAria(aria);
-    for (const name in flatAria) {
-      const value = flatAria[name];
-      if (isValidAttributeValue(value)) {
-        attrs[`aria-${name}`] = value.toString();
-      } else {
-        delete attrs[`aria-${name}`];
-      }
-    }
-  }
-}
-
-function mergeAriaAttrsToElement(el: HTMLElement, aria: any, oldAria: any) {
+const mergeAriaAttrsToElement = (
+  el: HTMLElement,
+  aria: Aria,
+  oldAria: Aria
+) => {
   const flatAria = flattenAria(aria);
   const flatOldAria = flattenAria(oldAria);
 
@@ -101,21 +79,34 @@ function mergeAriaAttrsToElement(el: HTMLElement, aria: any, oldAria: any) {
   }
 
   // 2. set all attributes in value
-  for (const name in flatAria) {
-    const value = flatAria[name];
-    if (isValidAttributeValue(value)) {
-      el.setAttribute(`aria-${name}`, value.toString());
-    }
-  }
-}
+  travelAria(flatAria, (name, value) => {
+    el.setAttribute(name, value);
+  });
+};
 
 // util functions
 
-function flattenAria(aria: any): { [key: string]: any } {
+const travelAria = (
+  aria: AriaFlat,
+  handler: (name: string, value: string) => void
+): void => {
+  for (const name in aria) {
+    const value = aria[name];
+    if (isValidAttributeValue(value)) {
+      if (Array.isArray(value)) {
+        handler(`aria-${name}`, value.join(" "));
+      } else {
+        handler(`aria-${name}`, value.toString());
+      }
+    }
+  }
+};
+
+const flattenAria = (aria: Aria): AriaFlat => {
   const result = {};
   if (aria) {
     if (Array.isArray(aria)) {
-      aria.forEach(ariaItem => {
+      aria.forEach((ariaItem) => {
         Object.assign(result, ariaItem);
       });
     } else {
@@ -123,9 +114,9 @@ function flattenAria(aria: any): { [key: string]: any } {
     }
   }
   return result;
-}
+};
 
-function isValidAttributeValue(value: any): boolean {
+const isValidAttributeValue = (value: any): value is TruthyAriaValue => {
   if (typeof value === "undefined") {
     return false;
   }
@@ -133,4 +124,4 @@ function isValidAttributeValue(value: any): boolean {
     return false;
   }
   return true;
-}
+};

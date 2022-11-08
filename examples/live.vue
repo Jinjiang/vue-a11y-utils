@@ -1,46 +1,26 @@
 <template>
   <div id="live-example">
     <p>
-      <label>Message: <input type="text" v-model="value"/></label>
+      <label>Message: <input type="text" v-model="value" /></label>
     </p>
     <!-- <p>
       <label><input type="checkbox" v-model="busy" /> Busy</label>
     </p> -->
     <p>
-      <button @click="announce(value, true)">
-        Announce Immediately
-      </button>
-      <button @click="announce(value, false)">
-        Announce Politely
-      </button>
+      <button @click="announce(value, true)">Announce Immediately</button>
+      <button @click="announce(value, false)">Announce Politely</button>
     </p>
   </div>
 </template>
 
-<script lang="ts">
-import Vue from "vue";
+<script setup lang="ts">
+import { ref, watch } from "vue";
+import { useLive } from "../src";
 
-const LiveInjected = Vue.extend<
-  {},
-  {
-    announce: (message: string, important: boolean) => void;
-    setBusy: (busy: boolean) => void;
-  },
-  {}
->({});
+const value = ref("");
+const busy = ref(false);
 
-export default LiveInjected.extend({
-  data() {
-    return {
-      value: "",
-      busy: false
-    };
-  },
-  inject: ["announce", "setBusy"],
-  watch: {
-    busy(value) {
-      this.setBusy(value);
-    }
-  }
-});
+const [announce, setBusy] = useLive();
+
+watch(busy, setBusy);
 </script>

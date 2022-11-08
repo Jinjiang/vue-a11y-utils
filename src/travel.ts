@@ -1,251 +1,191 @@
-import Vue from "vue";
+import { Ref } from "vue";
 
-type NameMap = Record<string, string>;
+export type TravelHandler = <T>(
+  event: KeyboardEvent,
+  rawIndex: number,
+  rawItems: T[]
+) => boolean | void;
 
-declare module "vue/types/options" {
-  interface ComponentOptions<V extends Vue> {
-    $travel?: TravelOption;
-  }
-}
+export type TravelConfig<T> = {
+  index: Ref<number>;
+  items: Ref<T[]>;
 
-declare global {
-  interface KeyboardEvent {
-    ended: boolean;
-  }
-}
-
-export type TravelOption = TravelConfig | Record<string, TravelConfig>;
-
-export interface TravelConfig {
   orientation?: string;
-  looped?: boolean;
-  hasPagination?: boolean;
-  hasSearch?: boolean;
-  getIndex(vm: Vue): number;
-  setIndex(vm: Vue, index: number): void;
-  getItems(vm: Vue): Array<any>;
+  loop?: boolean;
 
-  move?(
-    vm: Vue,
+  onAction?: TravelHandler;
+  onEnter?: TravelHandler;
+  onSpace?: TravelHandler;
+  onEsc?: TravelHandler;
+
+  onMove?(
     event: KeyboardEvent,
-    newIndex: number,
-    oldIndex: number,
-    items: Array<any>
-  ): any;
-  search?(
-    vm: Vue,
+    rawIndex: number,
+    oldRawIndex: number,
+    rawItems: T[]
+  ): boolean | void;
+
+  supportTyping?: boolean;
+  onType?(
     event: KeyboardEvent,
     keyword: string,
-    index: number,
-    items: Array<any>
-  ): any;
-  nextPage?(
-    vm: Vue,
-    event: KeyboardEvent,
-    index: number,
-    items: Array<any>
-  ): any;
-  prevPage?(
-    vm: Vue,
-    event: KeyboardEvent,
-    index: number,
-    items: Array<any>
-  ): any;
+    rawIndex: number,
+    rawItems: T[]
+  ): boolean | void;
 
-  action?(vm: Vue, event: KeyboardEvent, index: number, items: Array<any>): any;
-  enter?(vm: Vue, event: KeyboardEvent, index: number, items: Array<any>): any;
-  space?(vm: Vue, event: KeyboardEvent, index: number, items: Array<any>): any;
-  esc?(vm: Vue, event: KeyboardEvent, index: number, items: Array<any>): any;
-}
+  supportPagination?: boolean;
+  onNextPage?: TravelHandler;
+  onPrevPage?: TravelHandler;
+};
 
-function getTravelConfig(
-  travelOption?: TravelOption,
-  name: string = "default"
-): TravelConfig | void {
-  if (travelOption && typeof travelOption.getItems !== "function") {
-    return (<Record<string, TravelConfig>>travelOption)[name];
+type Method = <T>(event: KeyboardEvent, config: TravelConfig<T>) => void;
+
+const getData = <T>(
+  config: TravelConfig<T>
+): {
+  index: number;
+  items: T[];
+  length: number;
+} => {
+  const index = config.index.value;
+  const items = config.items.value;
+  return {
+    items,
+    index,
+    length: items.length,
+  };
+};
+
+const callOnNonEmptyItems = <T>(
+  method: TravelHandler | undefined,
+  event: KeyboardEvent,
+  rawIndex: number,
+  rawItems: T[]
+): boolean | void => {
+  if (method && rawItems.length) {
+    return method(event, rawIndex, rawItems);
   }
-  if (name === "default") {
-    return <TravelConfig>travelOption;
-  }
-}
-
-const defaultKeyToMethod: NameMap = {
-  Home: "first",
-  End: "last",
-  Enter: "enter",
-  " ": "space",
-  Escape: "esc"
+  return;
 };
 
-const verticalKeyToMethod: NameMap = {
-  ArrowUp: "prev",
-  ArrowDown: "next"
-};
-
-const horizontalKeyToMethod: NameMap = {
-  ArrowLeft: "prev",
-  ArrowRight: "next"
-};
-
-const paginationKeyToMethod: NameMap = {
-  PageUp: "prevPage",
-  PageDown: "nextPage"
-};
-
-const methodMap: Record<string, Function> = {
-  prev(vm: Vue, event: KeyboardEvent, config: TravelConfig): void {
-    const index = config.getIndex(vm);
-    const items = config.getItems(vm);
-    const length = items.length;
-    if (typeof config.move === "function" && length > 0) {
-      if (length === 1 && index === 0) {
-        return;
-      }
-      let newIndex = index === -1 ? length - 1 : index - 1;
-      if (config.looped && index === 0) {
-        newIndex = length - 1;
-      }
-      config.move(vm, event, newIndex, index, items) && (event.ended = true);
-    }
-  },
-  next(vm: Vue, event: KeyboardEvent, config: TravelConfig): void {
-    const index = config.getIndex(vm);
-    const items = config.getItems(vm);
-    const length = items.length;
-    if (typeof config.move === "function" && length > 0) {
-      if (length === 1 && index === 0) {
-        return;
-      }
-      let newIndex = index + 1;
-      if (config.looped && newIndex === length) {
-        newIndex = 0;
-      }
-      config.move(vm, event, newIndex, index, items) && (event.ended = true);
-    }
-  },
-  first(vm: Vue, event: KeyboardEvent, config: TravelConfig): void {
-    const index = config.getIndex(vm);
-    const items = config.getItems(vm);
-    const length = items.length;
-    if (typeof config.move === "function" && length > 0 && index !== 0) {
-      config.move(vm, event, 0, index, items) && (event.ended = true);
-    }
-  },
-  last(vm: Vue, event: KeyboardEvent, config: TravelConfig): void {
-    const index = config.getIndex(vm);
-    const items = config.getItems(vm);
-    const length = items.length;
-    if (
-      typeof config.move === "function" &&
-      length > 0 &&
-      index !== length - 1
-    ) {
-      config.move(vm, event, length - 1, index, items) && (event.ended = true);
-    }
-  },
-  prevPage(vm: Vue, event: KeyboardEvent, config: TravelConfig): void {
-    const index = config.getIndex(vm);
-    const items = config.getItems(vm);
-    const length = items.length;
-    if (typeof config.prevPage === "function" && length > 0) {
-      config.prevPage(vm, event, index, items) && (event.ended = true);
-    }
-  },
-  nextPage(vm: Vue, event: KeyboardEvent, config: TravelConfig): void {
-    const index = config.getIndex(vm);
-    const items = config.getItems(vm);
-    const length = items.length;
-    if (typeof config.nextPage === "function" && length > 0) {
-      config.nextPage(vm, event, index, items) && (event.ended = true);
-    }
-  },
-  enter(vm: Vue, event: KeyboardEvent, config: TravelConfig): void {
-    const index = config.getIndex(vm);
-    const items = config.getItems(vm);
-    const length = items.length;
-    if (typeof config.action === "function" && length > 0) {
-      config.action(vm, event, index, items) && (event.ended = true);
-    }
-    if (!event.ended && typeof config.enter === "function" && length > 0) {
-      config.enter(vm, event, index, items) && (event.ended = true);
-    }
-  },
-  space(vm: Vue, event: KeyboardEvent, config: TravelConfig): void {
-    const index = config.getIndex(vm);
-    const items = config.getItems(vm);
-    const length = items.length;
-    if (typeof config.action === "function" && length > 0) {
-      config.action(vm, event, index, items) && (event.ended = true);
-    }
-    if (!event.ended && typeof config.space === "function" && length > 0) {
-      config.space(vm, event, index, items) && (event.ended = true);
-    }
-  },
-  esc(vm: Vue, event: KeyboardEvent, config: TravelConfig): void {
-    const index = config.getIndex(vm);
-    const items = config.getItems(vm);
-    const length = items.length;
-    if (typeof config.esc === "function" && length > 0) {
-      config.esc(vm, event, index, items) && (event.ended = true);
-    }
-  }
-};
-
-const MixinTravel = Vue.extend({
-  methods: {
-    bindTravel(event: KeyboardEvent, name: string = "default"): void {
-      const option = this.$options.$travel;
-      const config = getTravelConfig(option, name);
-      if (
-        !config ||
-        typeof config.getIndex !== "function" ||
-        typeof config.setIndex !== "function" ||
-        typeof config.getItems !== "function"
-      ) {
-        return;
-      }
-      if (event.ended) {
-        return;
-      }
-
-      // get the current key and corresponding method
-      const keyToMethod: NameMap = Object.assign(
-        {},
-        defaultKeyToMethod,
-        config.orientation === "horizontal"
-          ? horizontalKeyToMethod
-          : verticalKeyToMethod,
-        config.hasPagination ? paginationKeyToMethod : {}
+const genMethodForSimpleCalls = (
+  names: Array<keyof TravelConfig<null>>
+): Method => {
+  return <T>(event: KeyboardEvent, config: TravelConfig<T>): void => {
+    const { index, items } = getData(config);
+    names.some((key) => {
+      return callOnNonEmptyItems(
+        config[key as keyof TravelConfig<T>] as TravelHandler | undefined,
+        event,
+        index,
+        items
       );
-      const methodName: string = keyToMethod[event.key];
+    });
+  };
+};
 
-      // make sure what to do next
-      const method = methodMap[methodName];
-      if (typeof method === "function") {
-        method(this, event, config);
-      }
-
-      // make sure whether to search
-      if (config.hasSearch && typeof config.search === "function") {
-        let keyword = "";
-        if (event.key.match(/^Digit\d$/)) {
-          keyword = event.key.substr(5);
-        } else if (event.code.match(/^Key\w$/)) {
-          keyword = event.code.substr(3).toLowerCase();
-        }
-        if (keyword) {
-          config.search(
-            this,
-            event,
-            keyword,
-            config.getIndex(this),
-            config.getItems(this)
-          ) && (event.ended = true);
-        }
-      }
+const prev = <T>(event: KeyboardEvent, config: TravelConfig<T>): void => {
+  const { index, items, length } = getData(config);
+  if (config.onMove && length > 0) {
+    if (length === 1 && index === 0) {
+      return;
     }
+    let newIndex = index === -1 ? length - 1 : index - 1;
+    if (config.loop && index === 0) {
+      newIndex = length - 1;
+    }
+    config.onMove(event, newIndex, index, items);
   }
-});
+};
+const next = <T>(event: KeyboardEvent, config: TravelConfig<T>): void => {
+  const { index, items, length } = getData(config);
+  if (config.onMove && length > 0) {
+    if (length === 1 && index === 0) {
+      return;
+    }
+    let newIndex = index + 1;
+    if (config.loop && newIndex === length) {
+      newIndex = 0;
+    }
+    config.onMove(event, newIndex, index, items);
+  }
+};
+const first = <T>(event: KeyboardEvent, config: TravelConfig<T>): void => {
+  const { index, items, length } = getData(config);
+  if (config.onMove && length > 0 && index !== 0) {
+    config.onMove(event, 0, index, items);
+  }
+};
+const last = <T>(event: KeyboardEvent, config: TravelConfig<T>): void => {
+  const { index, items, length } = getData(config);
+  if (config.onMove && length > 0 && index !== length - 1) {
+    config.onMove(event, length - 1, index, items);
+  }
+};
+const prevPage = genMethodForSimpleCalls(["onPrevPage"]);
+const nextPage = genMethodForSimpleCalls(["onNextPage"]);
+const enter = genMethodForSimpleCalls(["onEnter", "onAction"]);
+const space = genMethodForSimpleCalls(["onSpace", "onAction"]);
+const esc = genMethodForSimpleCalls(["onEsc"]);
 
-export default MixinTravel;
+const search = <T>(event: KeyboardEvent, config: TravelConfig<T>): void => {
+  const { index, items } = getData(config);
+  let keyword = "";
+  if (event.key.match(/^Digit\d$/)) {
+    keyword = event.key.slice(5);
+  } else if (event.code.match(/^Key\w$/)) {
+    keyword = event.code.slice(3).toLowerCase();
+  }
+  if (config.onType && keyword) {
+    config.onType(event, keyword, index, items);
+  }
+};
+
+type MethodMap = Record<string, Method>;
+
+const generalKeyToMethod: MethodMap = {
+  Home: first,
+  End: last,
+  Enter: enter,
+  " ": space,
+  Escape: esc,
+};
+
+const verticalKeyToMethod: MethodMap = {
+  ArrowUp: prev,
+  ArrowDown: next,
+};
+
+const horizontalKeyToMethod: MethodMap = {
+  ArrowLeft: prev,
+  ArrowRight: next,
+};
+
+const paginationKeyToMethod: MethodMap = {
+  PageUp: prevPage,
+  PageDown: nextPage,
+};
+
+export const useTravel = <T>(
+  config: TravelConfig<T>
+): ((event: KeyboardEvent) => void) => {
+  const keyToMethod: MethodMap = Object.assign(
+    {},
+    generalKeyToMethod,
+    config.orientation === "horizontal"
+      ? horizontalKeyToMethod
+      : verticalKeyToMethod,
+    config.supportPagination ? paginationKeyToMethod : {}
+  );
+
+  const handler = (event: KeyboardEvent): void => {
+    const method = keyToMethod[event.key];
+    if (method) {
+      method(event, config);
+    } else if (config.supportTyping) {
+      search(event, config);
+    }
+  };
+
+  return handler;
+};

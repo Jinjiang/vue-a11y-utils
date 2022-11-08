@@ -26,76 +26,55 @@
   </div>
 </template>
 
-<script lang="ts">
-import Vue from "vue";
-import { MixinTravel } from "../src/index";
-import { TravelConfig } from "../src/travel";
+<script setup lang="ts">
+import { ref } from "vue";
+import { useTravel, TravelConfig } from "../src/index";
 
-interface ExampleOption {
+type ExampleOption = {
   text: string;
   value: string;
-}
+};
 
-interface ExampleData {
-  activeIndex: number;
-  options: Array<ExampleOption>;
-  value: string;
-}
+const options: Array<ExampleOption> = [
+  { text: "Option 1", value: "1" },
+  { text: "Option 2", value: "2" },
+  { text: "Option 3", value: "3" },
+  { text: "Option 4", value: "4" },
+  { text: "Option 5", value: "5" },
+  { text: "Option 6", value: "6" },
+  { text: "Option 7", value: "7" },
+  { text: "Option 8", value: "8" },
+  { text: "Option 9", value: "9" },
+  { text: "Option 10", value: "10" },
+];
 
-interface ExampleVue extends Vue {
-  activeIndex: number;
-  options: Array<ExampleOption>;
-  value: string;
-}
+const items = ref<HTMLElement[]>([]);
+const index = ref(-1);
+const value = ref("");
 
-const travelOption: TravelConfig = {
-  looped: true,
-  getItems(vm: Vue) {
-    return <HTMLElement[]>vm.$refs.items;
-  },
-  getIndex(vm: ExampleVue) {
-    return vm.activeIndex;
-  },
-  setIndex(vm: ExampleVue, index: number) {
-    this.getItems(vm)[index].focus();
-    vm.activeIndex = index;
-  },
-  move(vm: ExampleVue, event: KeyboardEvent, newIndex) {
+const travelOption: TravelConfig<HTMLElement> = {
+  items,
+  index,
+  loop: true,
+  onMove: (event: KeyboardEvent, newIndex) => {
     event.preventDefault();
-    this.setIndex(vm, newIndex);
+    index.value = newIndex;
+    items.value[newIndex].focus();
   },
-  action(vm: ExampleVue, _: KeyboardEvent, index: number) {
-    vm.value = vm.options[index].value;
+  onAction: (_: KeyboardEvent, index: number) => {
+    value.value = options[index].value;
+  },
+};
+
+const goCurrentItem = () => {
+  const index = options.map((option) => option.value).indexOf(value.value);
+  const currentItem = items.value[index];
+  if (currentItem) {
+    currentItem.focus();
   }
 };
 
-export default Vue.extend({
-  data(): ExampleData {
-    return {
-      activeIndex: -1,
-      options: [
-        { text: "Foo", value: "x" },
-        { text: "Bar", value: "y" },
-        { text: "Baz", value: "z" }
-      ],
-      value: "y"
-    };
-  },
-  methods: {
-    goCurrentItem() {
-      const items = travelOption.getItems(this);
-      const index = this.options
-        .map(option => option.value)
-        .indexOf(this.value);
-      const currentItem = items[index];
-      if (currentItem) {
-        currentItem.focus();
-      }
-    }
-  },
-  mixins: [MixinTravel],
-  $travel: travelOption
-});
+const bindTravel = useTravel(travelOption);
 </script>
 
 <style scoped>
