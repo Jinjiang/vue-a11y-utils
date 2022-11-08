@@ -143,6 +143,110 @@ For more complicated examples, there is another repo in [`Jinjiang/vue-a11y-exam
 
 ### Keyboard travel utils
 
+We provide a composable named `useTravel(config)` to help you use <kbd>Arrow</kbd> keys to travel through a group of focusable items or descendants. At the same time we support you fire some common actions by pressing <kbd>ENTER</kbd>, <kbd>SPACE</kbd> or <kbd>ESC</kbd> key.
+
+About the `config`, it accepts a `Ref` of current `index` and a `Ref` of the `items` to track them.
+
+For traveling, it accepts a `onMove()` function which would be fired when the index changes by <kbd>Arrow</kbd> keys.
+
+For user interactions, it also accepts `onEnter()`, `onSpace()`, and `onEsc()`. They would be fired when users press the corresponding keys down. As a shortcut, `onAction()` is also accepted for both <kbd>ENTER</kbd> and <kbd>SPACE</kbd> keys.
+
+For example:
+
+```ts
+const items = ref<HTMLElement[]>([]);
+const index = ref(-1);
+const value = ref("");
+
+const travelOption: TravelConfig<HTMLElement> = {
+  items,
+  index,
+  onMove: (_: KeyboardEvent, newIndex) => {
+    index.value = newIndex;
+    items.value[newIndex].focus();
+  },
+  onAction: (_: KeyboardEvent, index) => {
+    value.value = options[index].value;
+  },
+};
+
+const bindTravel = useTravel(travelOption);
+```
+
+at the same time, set the template as:
+
+```html
+<ul @keydown="bindTravel">
+  <li
+    v-for="option in options"
+    :key="option.value"
+    ref="items"
+    :class="{ current: option.value === value }"
+  >
+    {{ option.text }}
+  </li>
+</ul>
+```
+
+See the full example in file `./examples/travel.vue`.
+
+#### Advanced config
+
+- `orientation: "horizontal" | "vertical"`: which pair of <kbd>Arrow</kbd> keys would be listened. The default value is `"vertical"` as <kbd>ArrowUp and ArrowDown</kbd>.
+- `loop: Boolean`: whether the travel is in loop mode.
+- `supportTyping: Boolean` and `onType()`: customize the support of quick positioning to a certain item by typing its letters.
+- `supportPagination: Boolean` and `onNextPage()` / `onPrevPage()`: customize the support of <kbd>PageUp</kbd> and <kbd>PageDown</kbd>.
+
+**The full type declaration is below:**
+
+<details>
+
+```ts
+type TravelHandler = <T>(
+  event: KeyboardEvent,
+  rawIndex: number,
+  rawItems: T[]
+) => boolean | void;
+
+type TravelConfig<T> = {
+  index: Ref<number>;
+  items: Ref<T[]>;
+
+  orientation?: string;
+  loop?: boolean;
+
+  onAction?: TravelHandler;
+  onEnter?: TravelHandler;
+  onSpace?: TravelHandler;
+  onEsc?: TravelHandler;
+
+  onMove?(
+    event: KeyboardEvent,
+    rawIndex: number,
+    oldRawIndex: number,
+    rawItems: T[]
+  ): boolean | void;
+
+  supportTyping?: boolean;
+  onType?(
+    event: KeyboardEvent,
+    keyword: string,
+    rawIndex: number,
+    rawItems: T[]
+  ): boolean | void;
+
+  supportPagination?: boolean;
+  onNextPage?: TravelHandler;
+  onPrevPage?: TravelHandler;
+};
+
+const useTravel = <T>(
+  config: TravelConfig<T>
+): ((event: KeyboardEvent) => void)
+```
+
+</details>
+
 ### Hotkey utils
 
 ### Focus trap utils
