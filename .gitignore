@@ -73,6 +73,6 @@ tmp
 # docs
 
 # Examples build files
-.vuepress/public/examples
+docs-src/.vitepress/cache
 
 todo
